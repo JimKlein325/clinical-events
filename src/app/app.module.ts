@@ -5,11 +5,13 @@ import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
 import { ClinicalEventsComponent } from './clinical-events/clinical-events.component';
+import { SimpleBarchartComponent } from './simple-barchart/simple-barchart.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ClinicalEventsComponent
+    ClinicalEventsComponent,
+    SimpleBarchartComponent
   ],
   imports: [
     BrowserModule,
