@@ -11,7 +11,7 @@ export class SimpleBarchartComponent implements OnInit {
   // w: number = 300;
   // h: number = 300;
   scalePadding: number = 15;
-  dataset = [0, 5, 15, 10, 8, 16, 25, 0, 0, -15, -10];
+  dataset = [0, 5, 15, 10, 8, 16, 25, 0, -10, -15];
 
   private margin: any = { top: 20, bottom: 20, left: 20, right: 20 };
   private chart: any;
@@ -54,46 +54,37 @@ export class SimpleBarchartComponent implements OnInit {
       .range([0, this.height]);
 
 
-    console.log(element.offsetHeight);
-    console.log(this.height);
-    console.log(this.width);
-
-    // console.log(d3.extent(this.dataset));
-    console.log(this.yScale(-15));
-    console.log(this.yScale(0));
-    console.log(this.yScale(15));
+    // console.log(element.offsetHeight);
+    // console.log(this.height);
+    // console.log(this.width);
 
     // x & y axis
     this.xAxis = svg.append('g')
-    .attr('class', 'axis axis-x')
-    .attr('transform', `translate(0, ${this.yScale(0)})`)
-    .call(d3.axisBottom(this.xScale).tickFormat((d)=>"").tickSize(0))
+    .attr('class', 'axis axis-yZero')
+    .attr('transform', `translate(0, ${this.yScale(0)})`)//place an axis at y=0
+    .call(d3.axisBottom(this.xScale).tickFormat((d)=>"").tickSize(0))//style the axis
     ;
 
-
-    // let g = svg.select('g');
-    // g.select('.x.axis.zero')
-    // .attr("tranform", `"translate(0, ${this.yScale(0)})"`)
-    // .call(this.xAxis.tic)
+    // bar yValues
 
     //add bars
-    // let bars = svg.selectAll("rect")
-    //   .data(this.dataset)
-    //   .enter()
-    //   .append("rect")
-    //   .attr("x", (d, i) => i * 30 + 2)
-    //   .attr("y", (d) => this.yScale(d))
-    //   .attr("width", 2)
-    //   .attr("height", (d, i) => ((this.dataset.length - i) * 20))
-    //   .attr("fill", "green");
+    let bars = svg.selectAll("rect")
+      .data(this.dataset)
+      .enter()
+      .append("rect")
+      .attr("x", (d, i) => this.xScale(i*3))
+      .attr("y", (d, i) =>  this.height - this.yScale(this.barHeight(i, this.dataset.length, 5)))//this.yScale(0))//this.height - this.yScale(this.barHeight(i, this.dataset.length, 10))) // this.yScale(0))
+      .attr("width", 2)
+      .attr("height", (d, i) => this.yScale(this.barHeight(i, this.dataset.length, 5)) - this.yScale(0))
+      .attr("fill", "green");
 
     //add circles
     let dots = svg.selectAll("circle")
       .data(this.dataset)
       .enter()
       .append("circle")
-      .attr("cx", (d, i) => this.xScale(i*9))
-      .attr("cy", (d) => this.height - this.yScale(d))
+      .attr("cx", (d, i) => this.xScale(i*3))
+      .attr("cy", (d, i) => this.height - this.yScale(this.barHeight(i, this.dataset.length, 5)))
       .attr("r", 4)
       .attr("fill", "#666665");
 
@@ -105,7 +96,12 @@ export class SimpleBarchartComponent implements OnInit {
     // .attr("transform", "translate(0,"+ (h-scalePadding-25) + ")");
 
   }
-
+  barHeight( i : number, dataPoints: number, pointVeritalOffset ): number{
+    return (dataPoints - i) * pointVeritalOffset;
+  }
+    // barYValue = function (d, i) {
+    //     return  this.height - this.yScale(this.barHeight(i, 10, 5))
+    // }
 
   ngOnInit() {
     this.createChart();
