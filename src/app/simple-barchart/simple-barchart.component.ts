@@ -11,7 +11,7 @@ export class SimpleBarchartComponent implements OnInit {
   // w: number = 300;
   // h: number = 300;
   scalePadding: number = 15;
-  dataset = [0, 5, 15, 10, 8, 16, 25, 0, -10, -15];
+  //dataset = [0, 5, 15, 10, 8, 16, 25, 0, -10, -15];
 
   private margin: any = { top: 20, bottom: 20, left: 20, right: 20 };
   private chart: any;
@@ -22,13 +22,125 @@ export class SimpleBarchartComponent implements OnInit {
   private colors: any;
   private xAxis: any ;
   private yAxis: any;
+  private readonly verticalTextOffset: number = 5;
+
+  private dataset = [
+  {
+    "patientid": 1,
+    "sourceid": 1000000000,
+    "semantictype": "DiagnosticProcedure",
+    "clinicalevent": "Diagnosis",
+    "eventtime": "2010-02-01",
+    "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+    "eventtype": 1
+  },
+  {
+    "patientid": 1,
+    "sourceid": 1000000001,
+    "semantictype": "DiagnosticProcedure",
+    "clinicalevent": "Staging",
+    "eventtime": "2010-02-01",
+    "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+    "eventtype": 1
+  },
+  {
+    "patientid": 1,
+    "sourceid": 1000000003,
+    "semantictype": "Medication",
+    "clinicalevent": "Aloxi",
+    "eventtime": "2010-03-18",
+    "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+    "eventtype": 1
+  },
+  {
+    "patientid": 1,
+    "sourceid": 1000000002,
+    "semantictype": "Medication",
+    "clinicalevent": "Taxotere",
+    "eventtime": "2010-03-18",
+    "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+    "eventtype": 1
+  },
+  {
+    "patientid": 1,
+    "sourceid": 1000000006,
+    "semantictype": "Medication",
+    "clinicalevent": "Tarceva",
+    "eventtime": "2010-05-20",
+    "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+    "eventtype": 1
+  },
+  {
+    "patientid": 1,
+    "sourceid": 1000000007,
+    "semantictype": "Medication",
+    "clinicalevent": "Tarceva",
+    "eventtime": "2010-06-16",
+    "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+    "eventtype": 1
+  },
+  {
+    "patientid": 1,
+    "sourceid": 1000000008,
+    "semantictype": "Medication",
+    "clinicalevent": "Gemzar",
+    "eventtime": "2010-06-17",
+    "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+    "eventtype": 1
+  },
+  {
+    "patientid": 1,
+    "sourceid": 1000000009,
+    "semantictype": "Medication",
+    "clinicalevent": "Navelbine",
+    "eventtime": "2010-06-17",
+    "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+    "eventtype": 1
+  },
+  {
+    "patientid": 1,
+    "sourceid": 1000000010,
+    "semantictype": "Medication",
+    "clinicalevent": "Aloxi",
+    "eventtime": "2010-06-27",
+    "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+    "eventtype": 0
+  },
+  {
+    "patientid": 1,
+    "sourceid": 1000000011,
+    "semantictype": "Medication",
+    "clinicalevent": "Gemzar",
+    "eventtime": "2010-06-27",
+    "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+    "eventtype": 1
+  },
+  {
+    "patientid": 1,
+    "sourceid": 1000000012,
+    "semantictype": "Medication",
+    "clinicalevent": "Navelbine",
+    "eventtime": "2010-06-27",
+    "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+    "eventtype": 0
+  },
+  {
+    "patientid": 1,
+    "sourceid": 1000000015,
+    "semantictype": "Medication",
+    "clinicalevent": "Emend",
+    "eventtime": "2010-07-11",
+    "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+    "eventtype": 1
+  }
+  ];
 
   constructor() { }
 
   createChart() {
     let element = this.chartContainer.nativeElement;
     this.width = element.offsetWidth - this.margin.left - this.margin.right;
-    this.height = 360;//element.offsetHeight - this.margin.top - this.margin.bottom;
+    this.height = element.offsetHeight - this.margin.top - this.margin.bottom;
 
 
     let svg = d3.select(element).append("svg")
@@ -73,9 +185,10 @@ export class SimpleBarchartComponent implements OnInit {
       .enter()
       .append("rect")
       .attr("x", (d, i) => this.xScale(i*3))
-      .attr("y",  (d, i) =>  this.height - this.yScale(this.barHeight(i, this.dataset.length, 5)))//this.yScale(0))//this.height - this.yScale(this.barHeight(i, this.dataset.length, 10))) // this.yScale(0))
+      .attr("y",  (d, i) => d.eventtype==1 ? this.height - this.yScale((this.barHeight(i, this.dataset.length))) : this.yScale(0) )
+      // .attr("y",  (d, i) =>  this.height - this.yScale(d.eventtype!=1 ? -1*(this.barHeight(i, this.dataset.length)) + 29: (this.barHeight(i, this.dataset.length))))
       .attr("width", 2)
-      .attr("height", (d, i) => this.yScale(this.barHeight(i, this.dataset.length, 5)) - this.yScale(0))
+      .attr("height", (d, i) => this.yScale(this.barHeight(i, this.dataset.length)) - this.yScale(0))
       .attr("fill", "green");
 
       let test = true;
@@ -85,7 +198,7 @@ export class SimpleBarchartComponent implements OnInit {
       .enter()
       .append("circle")
       .attr("cx", (d, i) => this.xScale(i*3))
-      .attr("cy", (d, i) => this.height - this.yScale(test ? -1*(this.barHeight(i, this.dataset.length, 5)): (this.barHeight(i, this.dataset.length, 5))) )
+      .attr("cy", (d, i) => this.height - this.yScale(d.eventtype!=1 ? -1*(this.barHeight(i, this.dataset.length)): (this.barHeight(i, this.dataset.length))) )
       .attr("r", 4)
       .attr("fill", "#666665");
 
@@ -99,8 +212,8 @@ export class SimpleBarchartComponent implements OnInit {
     // .attr("transform", "translate(0,"+ (h-scalePadding-25) + ")");
 
   }
-  barHeight( i : number, dataPoints: number, pointVeritalOffset ): number{
-    return (dataPoints - i) * pointVeritalOffset;
+  barHeight( i : number, dataPoints: number ): number{
+    return (dataPoints - i) * this.verticalTextOffset;
   }
   // barYValue = function (d, i, g) {
   //       return   this.height - this.yScale(this.b);
