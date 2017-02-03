@@ -6,12 +6,14 @@ import { HttpModule } from '@angular/http';
 import { AppComponent } from './app.component';
 import { ClinicalEventsComponent } from './clinical-events/clinical-events.component';
 import { SimpleBarchartComponent } from './simple-barchart/simple-barchart.component';
+import { TextTestComponent } from './text-test/text-test.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ClinicalEventsComponent,
-    SimpleBarchartComponent
+    SimpleBarchartComponent,
+    TextTestComponent
   ],
   imports: [
     BrowserModule,
