@@ -22,7 +22,9 @@ export class SimpleBarchartComponent implements OnInit {
   private colors: any;
   private xAxis: any;
   private yAxis: any;
-  private readonly verticalTextOffset: number = 5;
+  private readonly verticalTextOffset: number = 4;
+  private barColor: string = "lightgray";
+  private dotColor: string = "green";
 
   private dataset = [
     {
@@ -68,7 +70,7 @@ export class SimpleBarchartComponent implements OnInit {
       "clinicalevent": "Tarceva",
       "eventtime": "2010-05-20",
       "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
-      "eventtype": 1
+      "eventtype": 0
     },
     {
       "patientid": 1,
@@ -77,7 +79,7 @@ export class SimpleBarchartComponent implements OnInit {
       "clinicalevent": "Tarceva",
       "eventtime": "2010-06-16",
       "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
-      "eventtype": 1
+      "eventtype": 0
     },
     {
       "patientid": 1,
@@ -104,7 +106,7 @@ export class SimpleBarchartComponent implements OnInit {
       "clinicalevent": "Aloxi",
       "eventtime": "2010-06-27",
       "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
-      "eventtype": 0
+      "eventtype": 1
     },
     {
       "patientid": 1,
@@ -132,7 +134,80 @@ export class SimpleBarchartComponent implements OnInit {
       "clinicalevent": "Emend",
       "eventtime": "2010-07-11",
       "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "eventtype": 0
+    },
+    {
+      "patientid": 1,
+      "sourceid": 1000000006,
+      "semantictype": "Medication",
+      "clinicalevent": "Tarceva",
+      "eventtime": "2010-05-20",
+      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "eventtype": 0
+    },
+    {
+      "patientid": 1,
+      "sourceid": 1000000007,
+      "semantictype": "Medication",
+      "clinicalevent": "Tarceva",
+      "eventtime": "2010-06-16",
+      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "eventtype": 0
+    },
+    {
+      "patientid": 1,
+      "sourceid": 1000000008,
+      "semantictype": "Medication",
+      "clinicalevent": "Gemzar",
+      "eventtime": "2010-06-17",
+      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
       "eventtype": 1
+    },
+    {
+      "patientid": 1,
+      "sourceid": 1000000009,
+      "semantictype": "Medication",
+      "clinicalevent": "Navelbine",
+      "eventtime": "2010-06-17",
+      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "eventtype": 1
+    },
+    {
+      "patientid": 1,
+      "sourceid": 1000000010,
+      "semantictype": "Medication",
+      "clinicalevent": "Aloxi",
+      "eventtime": "2010-06-27",
+      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "eventtype": 1
+    },
+    {
+      "patientid": 1,
+      "sourceid": 1000000011,
+      "semantictype": "Medication",
+      "clinicalevent": "Gemzar",
+      "eventtime": "2010-06-27",
+      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "eventtype": 1
+    },
+    {
+      "patientid": 1,
+      "sourceid": 1000000012,
+      "semantictype": "Medication",
+      "clinicalevent": "Navelbine",
+      "eventtime": "2010-06-27",
+      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "eventtype": 1
+    }
+    ,
+    {
+      "patientid": 1,
+      "sourceid": 1000000015,
+      "semantictype": "Medication",
+      "clinicalevent": "Emend",
+      "eventtime": "2010-07-11",
+      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "eventtype": 0
     }
   ];
 
@@ -171,17 +246,32 @@ export class SimpleBarchartComponent implements OnInit {
     // console.log(this.height);
     // console.log(this.width);
 
-    // x & y axis
-    this.xAxis = svg.append('g')
-      .attr('class', 'axis axis-yZero')
-      .attr('transform', `translate(0, ${this.yScale(0)})`)//place an axis at y=0
-      .call(d3.axisBottom(this.xScale).tickFormat((d) => "").tickSize(0))//style the axis
+
+
+    let labels = svg.selectAll("text")
+      .data(this.dataset)
+      .enter()
+      .append("text")
+      .text((d) => d.clinicalevent)
+      .attr("x", (d, i) => this.xScale(i * 5) + 6)
+      .attr("y", (d, i) => this.height + 4 - this.yScale(d.eventtype != 1 ? -1 * (this.barHeight(i)) : (this.barHeight(i))))//(d, i) => d.eventtype == 1 ? this.height - this.yScale((this.barHeight(i))) : this.yScale(0))
+      .attr("font-size", "12px")
+      .attr("font-family", "sans-serif")
+      .attr("fill", "blue")
+      .attr("text-anchor", "right")
       ;
 
-    // bar yValues
-    let posY = function (d: any, i: number) {
-      return this.height;
-    }
+    //add bars
+    let bars = svg.selectAll("rect")
+      .data(this.dataset)
+      .enter()
+      .append("rect")
+      .attr("x", (d, i) => this.xScale(i * 5))
+      .attr("y", (d, i) => d.eventtype == 1 ? this.height - this.yScale((this.barHeight(i))) : this.yScale(0))
+      // .attr("y",  (d, i) =>  this.height - this.yScale(d.eventtype!=1 ? -1*(this.barHeight(i)) + 29: (this.barHeight(i))))
+      .attr("width", 2)
+      .attr("height", (d, i) => this.yScale(this.barHeight(i)) - this.yScale(0))
+      .attr("fill", this.barColor);
 
     //add circles
     let dots = svg.selectAll("circle")
@@ -191,40 +281,30 @@ export class SimpleBarchartComponent implements OnInit {
       .attr("cx", (d, i) => this.xScale(i * 5) + 1)
       .attr("cy", (d, i) => this.height - this.yScale(d.eventtype != 1 ? -1 * (this.barHeight(i)) : (this.barHeight(i))))
       .attr("r", 4)
-      .attr("fill", "#666665");
+      .attr("fill", this.dotColor);
+
 
     //add text
-    svg.selectAll("text")
-    .data(this.dataset2)
-    .enter()
-    .append("text")
-    .text((d,i) => "hello " + String(i) )
-      // .attr("x", (d, i) => this.xScale(59 + i *2) + 6)
-      // .attr("y",100 )//(d, i) => d.eventtype == 1 ? this.height - this.yScale((this.barHeight(i))) : this.yScale(0))
-      // .data(this.dataset)
-      // .enter()
-      // .append("text")
-      // .text((d) => d.clinicalevent)
-      .attr("class", "event")
-      .attr("x", (d, i) => this.xScale(i * 5) + 6)
-      .attr("y", (d, i) => true ? this.height - this.yScale((this.barHeight(i))) : this.yScale(0))
-       .attr('text-anchor', 'right')
-      .attr("fill", "blue")
-      .attr('font-size', '12px')
-      .attr('font-family', 'sans-serif')
-      ;
+    // svg.selectAll("text")
+    // .data(this.dataset2)
+    // .enter()
+    // .append("text")
+    // .text((d,i) => "hello " + String(i) )
+    // .attr("x", (d, i) => this.xScale(59 + i *2) + 6)
+    // .attr("y",100 )//(d, i) => d.eventtype == 1 ? this.height - this.yScale((this.barHeight(i))) : this.yScale(0))
+    // .data(this.dataset)
+    // .enter()
+    // .append("text")
+    // .text((d) => d.clinicalevent)
+    // .attr("class", "event")
+    // .attr("x", (d, i) => this.xScale(i * 5) + 6)
+    // .attr("y", (d, i) => true ? this.height - this.yScale((this.barHeight(i))) : this.yScale(0))
+    //  .attr('text-anchor', 'right')
+    // .attr("fill", "blue")
+    // .attr('font-size', '12px')
+    // .attr('font-family', 'sans-serif')
+    // ;
 
-          //add bars
-    // let bars = svg.selectAll("rect")
-    //   .data(this.dataset)
-    //   .enter()
-    //   .append("rect")
-    //   .attr("x", (d, i) => this.xScale(i * 5))
-    //   .attr("y", (d, i) => d.eventtype == 1 ? this.height - this.yScale((this.barHeight(i))) : this.yScale(0))
-    //   // .attr("y",  (d, i) =>  this.height - this.yScale(d.eventtype!=1 ? -1*(this.barHeight(i)) + 29: (this.barHeight(i))))
-    //   .attr("width", 2)
-    //   .attr("height", (d, i) => this.yScale(this.barHeight(i)) - this.yScale(0))
-    //   .attr("fill", "green");
 
     // .attr({
     //   "text-anchor": "middle",
@@ -233,13 +313,22 @@ export class SimpleBarchartComponent implements OnInit {
     //   "font-family" : "sans-serif"
     // });
 
+    // x & y axis
+    this.xAxis = svg.append('g')
+      .attr('class', 'axis axis-yZero')
+      .attr('transform', `translate(0, ${this.yScale(0)})`)//place an axis at y=0
+      .call(d3.axisBottom(this.xScale).tickFormat((d) => "").tickSize(0))//style the axis
+      ;
+
 
   }
   // barHeight( i : number, dataPoints: number ): number{
   //   return (dataPoints - i) * this.verticalTextOffset;
   // }
   barHeight(i: number): number {
-    return (this.dataset.length - i) * this.verticalTextOffset;
+    let barHeight = (this.dataset.length - i)%10;
+    barHeight = (barHeight > 0)? barHeight : 10;
+    return barHeight * this.verticalTextOffset;
     // return ((this.dataset.length - i)%10) * this.verticalTextOffset;
   }
   // barYValue = function (d, i, g) {

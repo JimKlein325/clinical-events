@@ -129,6 +129,8 @@ export class TextTestComponent implements OnInit {
       .attr('width', element.offsetWidth)
       .attr('height', element.offsetHeight);
 
+      
+
     //add circles
     let dots = svg.selectAll("circle")
       .data(this.events)
@@ -163,13 +165,6 @@ export class TextTestComponent implements OnInit {
       .attr("width", 2)
       .attr("height", (d, i) => ((this.events.length - i) * 20))
       .attr("fill", "green");
-    // .attr({
-    //   x: (d, i) => i*30+ 2,
-    //   y:    (d, i) => this.h - ((this.events.length-i)*20), 
-    //   width: 2,
-    //   height: (d,i) => ((this.events.length-i)*20),
-    //   "fill": "green"
-    // });
   }
   constructor() { }
 
