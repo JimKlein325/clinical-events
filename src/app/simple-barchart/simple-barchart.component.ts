@@ -224,12 +224,12 @@ export class SimpleBarchartComponent implements OnInit {
       .attr('height', this.height);
 
     //chart plot area
-    this.chart = svg.append('g')
-      .attr('class', 'bars')
-      .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`)
+    // this.chart = svg.append('g')
+    //   .attr('class', 'bars')
+    //   .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`)
 
     // define domains
-    let xDomain = [-2, 100];
+    let xDomain = [0, 100];
     let yDomain = [-50, 50];
 
     let minDate = this.getDate(this.dataset[0].eventtime);
@@ -240,11 +240,11 @@ console.log(maxDate);
 
     let xBottomScale = d3.scaleTime()
       .domain([minDate, maxDate])
-      .range([0, this.width - this.margin['right']]);
+      .range([this.margin.left, this.width - this.margin['right']]);
 
     this.xScale = d3.scaleLinear()
       .domain(xDomain)
-      .range([0, this.width])
+      .range([this.margin.left, this.width - this.margin.right]);
 
     this.yScale = d3.scaleLinear()
       .domain(yDomain)
@@ -255,7 +255,7 @@ console.log(maxDate);
     // console.log(this.height);
     // console.log(this.width);
 
-    let xDateAxisGen = d3.axisTop(xBottomScale).ticks(6);
+    let xDateAxisGen = d3.axisTop(xBottomScale).ticks(5);
 
     let labels = svg.selectAll("text")
       .data(this.dataset)
