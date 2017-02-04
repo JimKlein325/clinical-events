@@ -5,6 +5,10 @@
             "name": "Launch Chrome against localhost",
             "type": "chrome",
             "request": "launch",
+            "sourceMaps": true,
+            "sourceMapPathOverrides": {
+                "webpack:///*": "/*"
+            },
             "url": "http://localhost:4200/",
             "webRoot": "${workspaceRoot}",
             "userDataDir": "${workspaceRoot}/out/chrome"

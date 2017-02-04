@@ -224,15 +224,24 @@ export class SimpleBarchartComponent implements OnInit {
       .attr('height', this.height);
 
     //chart plot area
-    // this.chart = svg.append('g')
-    //   .attr('class', 'bars')
-    //   .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`)
+    this.chart = svg.append('g')
+      .attr('class', 'bars')
+      .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`)
 
     // define domains
-    let xDomain = [0, 100];
+    let xDomain = [-2, 100];
     let yDomain = [-50, 50];
 
-    // define scales
+    let minDate = this.getDate(this.dataset[0].eventtime);
+    let maxDate = this.getDate(this.dataset[this.dataset.length - 1].eventtime);
+
+console.log(minDate);
+console.log(maxDate);
+
+    let xBottomScale = d3.scaleTime()
+      .domain([minDate, maxDate])
+      .range([0, this.width - this.margin['right']]);
+
     this.xScale = d3.scaleLinear()
       .domain(xDomain)
       .range([0, this.width])
@@ -246,7 +255,7 @@ export class SimpleBarchartComponent implements OnInit {
     // console.log(this.height);
     // console.log(this.width);
 
-
+    let xDateAxisGen = d3.axisTop(xBottomScale).ticks(6);
 
     let labels = svg.selectAll("text")
       .data(this.dataset)
@@ -284,40 +293,19 @@ export class SimpleBarchartComponent implements OnInit {
       .attr("fill", this.dotColor);
 
 
-    //add text
-    // svg.selectAll("text")
-    // .data(this.dataset2)
-    // .enter()
-    // .append("text")
-    // .text((d,i) => "hello " + String(i) )
-    // .attr("x", (d, i) => this.xScale(59 + i *2) + 6)
-    // .attr("y",100 )//(d, i) => d.eventtype == 1 ? this.height - this.yScale((this.barHeight(i))) : this.yScale(0))
-    // .data(this.dataset)
-    // .enter()
-    // .append("text")
-    // .text((d) => d.clinicalevent)
-    // .attr("class", "event")
-    // .attr("x", (d, i) => this.xScale(i * 5) + 6)
-    // .attr("y", (d, i) => true ? this.height - this.yScale((this.barHeight(i))) : this.yScale(0))
-    //  .attr('text-anchor', 'right')
-    // .attr("fill", "blue")
-    // .attr('font-size', '12px')
-    // .attr('font-family', 'sans-serif')
-    // ;
-
-
-    // .attr({
-    //   "text-anchor": "middle",
-    //   x: function(d,i) {return i * (w/this.dataset.length) + (w/this.dataset.length - padding)/2 ;},
-    //   y: function(d) { return h - (d*4) + 15;},
-    //   "font-family" : "sans-serif"
-    // });
 
     // x & y axis
     this.xAxis = svg.append('g')
       .attr('class', 'axis axis-yZero')
       .attr('transform', `translate(0, ${this.yScale(0)})`)//place an axis at y=0
       .call(d3.axisBottom(this.xScale).tickFormat((d) => "").tickSize(0))//style the axis
+      ;
+    let xBottomAxis = svg.append('g')
+      .call(xDateAxisGen)
+      .attr('class', 'axis bottomAxis')
+      .attr('transform', `translate(0, ${this.height-this.margin['bottom']})`)//place
+      
+      //style the axis
       ;
 
 
@@ -326,15 +314,21 @@ export class SimpleBarchartComponent implements OnInit {
   //   return (dataPoints - i) * this.verticalTextOffset;
   // }
   barHeight(i: number): number {
-    let barHeight = (this.dataset.length - i)%10;
-    barHeight = (barHeight > 0)? barHeight : 10;
+    let barHeight = (this.dataset.length - i) % 10;
+    barHeight = (barHeight > 0) ? barHeight : 10;
     return barHeight * this.verticalTextOffset;
-    // return ((this.dataset.length - i)%10) * this.verticalTextOffset;
   }
-  // barYValue = function (d, i, g) {
-  //       return   this.height - this.yScale(this.b);
-  //   }
 
+  getDate(d): Date {
+    //  "eventtime": "2010-02-01",
+    let strDate = new String(d);
+    let year = +strDate.substr(0, 4);// unary operator converts string to number
+    let month = +strDate.substr(5, 2) - 1;
+    let day = +strDate.substr(8, 2);
+
+    return new Date(year, month, day);
+
+  }
   ngOnInit() {
     this.createChart();
   }
