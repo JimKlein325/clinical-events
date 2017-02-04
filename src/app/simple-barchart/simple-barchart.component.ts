@@ -1,5 +1,7 @@
 import { Component, OnInit, OnChanges, ViewChild, ElementRef, Input, ViewEncapsulation } from '@angular/core';
 import * as d3 from 'd3';
+import * as d3TimeFormat from 'd3-time-format';
+
 
 @Component({
   selector: 'simple-barchart',
@@ -52,7 +54,7 @@ export class SimpleBarchartComponent implements OnInit {
       "clinicalevent": "Aloxi",
       "eventtime": "2010-03-18",
       "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
-      "eventtype": 1
+      "eventtype": 0
     },
     {
       "patientid": 1,
@@ -70,7 +72,7 @@ export class SimpleBarchartComponent implements OnInit {
       "clinicalevent": "Tarceva",
       "eventtime": "2010-05-20",
       "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
-      "eventtype": 0
+      "eventtype": 1
     },
     {
       "patientid": 1,
@@ -79,7 +81,7 @@ export class SimpleBarchartComponent implements OnInit {
       "clinicalevent": "Tarceva",
       "eventtime": "2010-06-16",
       "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
-      "eventtype": 0
+      "eventtype": 1
     },
     {
       "patientid": 1,
@@ -106,7 +108,7 @@ export class SimpleBarchartComponent implements OnInit {
       "clinicalevent": "Aloxi",
       "eventtime": "2010-06-27",
       "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
-      "eventtype": 1
+      "eventtype": 0
     },
     {
       "patientid": 1,
@@ -141,25 +143,25 @@ export class SimpleBarchartComponent implements OnInit {
       "sourceid": 1000000006,
       "semantictype": "Medication",
       "clinicalevent": "Tarceva",
-      "eventtime": "2010-05-20",
+      "eventtime": "2010-07-20",
       "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
-      "eventtype": 0
+      "eventtype": 1
     },
     {
       "patientid": 1,
       "sourceid": 1000000007,
       "semantictype": "Medication",
       "clinicalevent": "Tarceva",
-      "eventtime": "2010-06-16",
+      "eventtime": "2010-08-16",
       "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
-      "eventtype": 0
+      "eventtype": 1
     },
     {
       "patientid": 1,
       "sourceid": 1000000008,
       "semantictype": "Medication",
       "clinicalevent": "Gemzar",
-      "eventtime": "2010-06-17",
+      "eventtime": "2010-08-17",
       "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
@@ -168,7 +170,7 @@ export class SimpleBarchartComponent implements OnInit {
       "sourceid": 1000000009,
       "semantictype": "Medication",
       "clinicalevent": "Navelbine",
-      "eventtime": "2010-06-17",
+      "eventtime": "2010-08-17",
       "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
@@ -177,16 +179,16 @@ export class SimpleBarchartComponent implements OnInit {
       "sourceid": 1000000010,
       "semantictype": "Medication",
       "clinicalevent": "Aloxi",
-      "eventtime": "2010-06-27",
+      "eventtime": "2010-08-27",
       "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
-      "eventtype": 1
+      "eventtype": 0
     },
     {
       "patientid": 1,
       "sourceid": 1000000011,
       "semantictype": "Medication",
       "clinicalevent": "Gemzar",
-      "eventtime": "2010-06-27",
+      "eventtime": "2010-08-27",
       "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
@@ -195,7 +197,7 @@ export class SimpleBarchartComponent implements OnInit {
       "sourceid": 1000000012,
       "semantictype": "Medication",
       "clinicalevent": "Navelbine",
-      "eventtime": "2010-06-27",
+      "eventtime": "2010-08-27",
       "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
       "eventtype": 1
     }
@@ -205,7 +207,7 @@ export class SimpleBarchartComponent implements OnInit {
       "sourceid": 1000000015,
       "semantictype": "Medication",
       "clinicalevent": "Emend",
-      "eventtime": "2010-07-11",
+      "eventtime": "2010-09-11",
       "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
       "eventtype": 0
     }
@@ -242,9 +244,12 @@ console.log(maxDate);
       .domain([minDate, maxDate])
       .range([this.margin.left, this.width - this.margin['right']]);
 
-    this.xScale = d3.scaleLinear()
-      .domain(xDomain)
+    this.xScale = d3.scaleTime()
+      .domain([minDate, maxDate])
       .range([this.margin.left, this.width - this.margin.right]);
+    // this.xScale = d3.scaleLinear()
+    //   .domain(xDomain)
+    //   .range([this.margin.left, this.width - this.margin.right]);
 
     this.yScale = d3.scaleLinear()
       .domain(yDomain)
@@ -255,15 +260,15 @@ console.log(maxDate);
     // console.log(this.height);
     // console.log(this.width);
 
-    let xDateAxisGen = d3.axisTop(xBottomScale).ticks(5);
+    let xDateAxisGen = d3.axisTop(xBottomScale).ticks(5).tickFormat(d3.timeFormat("%b"));
 
     let labels = svg.selectAll("text")
       .data(this.dataset)
       .enter()
       .append("text")
       .text((d) => d.clinicalevent)
-      .attr("x", (d, i) => this.xScale(i * 5) + 6)
-      .attr("y", (d, i) => this.height + 4 - this.yScale(d.eventtype != 1 ? -1 * (this.barHeight(i)) : (this.barHeight(i))))//(d, i) => d.eventtype == 1 ? this.height - this.yScale((this.barHeight(i))) : this.yScale(0))
+      .attr("x", (d, i) => this.xScale(this.getDate(d.eventtime))+4)
+      .attr("y", (d, i) => this.height + 4 - this.yScale(d.eventtype != 1 ? -1 * (this.barHeight(i)) : (this.barHeight(i) ) ) )//(d, i) => d.eventtype == 1 ? this.height - this.yScale((this.barHeight(i))) : this.yScale(0))
       .attr("font-size", "12px")
       .attr("font-family", "sans-serif")
       .attr("fill", "blue")
@@ -275,7 +280,7 @@ console.log(maxDate);
       .data(this.dataset)
       .enter()
       .append("rect")
-      .attr("x", (d, i) => this.xScale(i * 5))
+      .attr("x", (d, i) => this.xScale(this.getDate(d.eventtime)))
       .attr("y", (d, i) => d.eventtype == 1 ? this.height - this.yScale((this.barHeight(i))) : this.yScale(0))
       // .attr("y",  (d, i) =>  this.height - this.yScale(d.eventtype!=1 ? -1*(this.barHeight(i)) + 29: (this.barHeight(i))))
       .attr("width", 2)
@@ -287,7 +292,7 @@ console.log(maxDate);
       .data(this.dataset)
       .enter()
       .append("circle")
-      .attr("cx", (d, i) => this.xScale(i * 5) + 1)
+      .attr("cx", (d, i) => this.xScale(this.getDate(d.eventtime)))
       .attr("cy", (d, i) => this.height - this.yScale(d.eventtype != 1 ? -1 * (this.barHeight(i)) : (this.barHeight(i))))
       .attr("r", 4)
       .attr("fill", this.dotColor);
