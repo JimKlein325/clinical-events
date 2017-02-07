@@ -6,12 +6,17 @@
             "type": "chrome",
             "request": "launch",
             "sourceMaps": true,
-            "sourceMapPathOverrides": {
-                "webpack:///*": "/*"
-            },
-            "url": "http://localhost:4200/",
+            "runtimeArgs": [
+                "--disable-session-crashed-bubble",
+                "--disable-infobars"
+            ], //disables the Chrome didn't shut down properly message
+            "userDataDir": "${workspaceRoot}/out/chrome", //enables multiple chrome instances
             "webRoot": "${workspaceRoot}",
-            "userDataDir": "${workspaceRoot}/out/chrome"
+            "url": "http://localhost:4200/",
+            "sourceMapPathOverrides": {
+                "webpack:///./*": "${webRoot}/*", // Example: "webpack:///./src/app.js" -> "/users/me/project/src/app.js"
+                "webpack:///*": "*" // Example: "webpack:///C:/project/app.ts" -> "C:/project/app.ts"
+            }
         },
         {
             "name": "Attach to Chrome",

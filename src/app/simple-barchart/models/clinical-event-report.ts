@@ -10,7 +10,7 @@ export class ClinicalEventReport {
     public palliativeEntrySlots: number;
 
 
-    constructor(eventItems: [ClinicalEventItem],
+    constructor(public eventItems: ClinicalEventItem[],
         public totalVerticalEntrySlots: number,
         public verticalOffset: number) {
         this.problemName = eventItems[0].problem;
@@ -73,10 +73,10 @@ export class ClinicalEventReport {
 
     yValue(item: ClinicalEventItem, numberOfSlots: number, itemCount: number, indexValue: number): number {
         let value = ((itemCount - indexValue) % numberOfSlots);
-        console.log(value);
+        //console.log(value);
         value = value > 0 ? value * this.verticalOffset: numberOfSlots* this.verticalOffset;;
         let yVal = item.eventtype === 1 ? value : (-1) * value;
-        console.log(yVal);
+        //console.log(yVal);
         return yVal;
     }
 
