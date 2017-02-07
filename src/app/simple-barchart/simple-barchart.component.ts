@@ -443,16 +443,16 @@ export class SimpleBarchartComponent implements OnInit {
     let xBottomAxis = svg.append('g')
       .call(xDateAxisGen)
       .attr('class', 'axis bottomAxis')
-      .attr('transform', `translate(0, ${this.height - this.margin['bottom']})`)//place
-
-      //style the axis
+      .attr('transform', `translate(0, ${this.height - this.margin['bottom']})`)
       ;
 
 
   }
 
 
-
+ ngOnChanges(){
+       this.createChart();
+ }
 
   ngOnInit() {
     //data service works.  Uncomment to use.
