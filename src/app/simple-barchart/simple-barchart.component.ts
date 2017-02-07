@@ -451,7 +451,7 @@ export class SimpleBarchartComponent implements OnInit {
 
 
  ngOnChanges(){
-       this.createChart();
+       //this.createChart();
  }
 
   ngOnInit() {
