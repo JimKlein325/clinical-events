@@ -29,7 +29,7 @@ export class ClinicalEventReport {
             }
                 , 0);
 
-        this.problemTreatmentEntrySlots = 10;//this.getNumberOfVeriticalEntrySlots(this.problemTreatmentItemCount);
+        this.problemTreatmentEntrySlots = this.getNumberOfVeriticalEntrySlots(this.problemTreatmentItemCount);
         this.palliativeEntrySlots = this.getNumberOfVeriticalEntrySlots(this.palliativeItemCount);
 
         let treatmentCounter = 0;
@@ -55,14 +55,14 @@ export class ClinicalEventReport {
     getNumberOfVeriticalEntrySlots(itemCount: number): number {
         // return 20;
         if (itemCount <= this.totalVerticalEntrySlots / 2) {
-            return itemCount
+            return itemCount;
         }
         else {
             if (itemCount < this.totalVerticalEntrySlots) {
                 return itemCount / 2;
             }
             else {
-                return itemCount % this.totalVerticalEntrySlots / 2;
+                return this.totalVerticalEntrySlots / 2;
             }
         }
 
