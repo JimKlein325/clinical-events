@@ -1,6 +1,8 @@
 import { Component, OnInit, OnChanges, ViewChild, ElementRef, Input, ViewEncapsulation } from '@angular/core';
 import * as d3 from 'd3';
 import * as d3TimeFormat from 'd3-time-format';
+import {ClinicalEventReport} from './models/clinical-event-report'
+import {ClinicalEventItem} from './models/clinical-event-item'
 
 
 @Component({
@@ -15,6 +17,7 @@ export class SimpleBarchartComponent implements OnInit {
   scalePadding: number = 15;
   dataset2 = [0, 5, 15, 10, 8, 16, 25, 0, -10, -15];
 
+  private clinicalEventReport: ClinicalEventReport;
   private margin: any = { top: 20, bottom: 20, left: 20, right: 80 };
   private chart: any;
   private width: number;
@@ -26,9 +29,12 @@ export class SimpleBarchartComponent implements OnInit {
   private yAxis: any;
   private readonly verticalTextOffset: number = 4;
   private barColor: string = "lightgray";
-  private dotColor: string = "green";
+  private dotColor: string = "black";
+  private labelColor: string = "darkblue";
+  private numberOfVerticalEntrySlots: number = 10;
+  private dateTicks: number = 5;
 
-private dataset = [
+private dataset: [ClinicalEventItem] = [
   {
     "patientid": 1,
     "sourceid": 1000000000,
@@ -316,7 +322,8 @@ private dataset = [
     "eventtime": "2010-07-21",
     "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
     "eventtype": 0
-  },
+  }
+  ,
   {
     "patientid": 1,
     "sourceid": 1000000026,
@@ -358,76 +365,60 @@ private dataset = [
       .attr('width', this.width)
       .attr('height', this.height);
 
-    //chart plot area
-    // this.chart = svg.append('g')
-    //   .attr('class', 'bars')
-    //   .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`)
-
     // define domains
-    let xDomain = [0, 100];
+    let minDate = this.clinicalEventReport.wrappedItems[0].itemDate;
+    let maxDate = this.clinicalEventReport.wrappedItems[this.clinicalEventReport.wrappedItems.length - 1].itemDate;
+
+    let xDomain = [minDate, maxDate];
     let yDomain = [-50, 50];
-
-    let minDate = this.getDate(this.dataset[0].eventtime);
-    let maxDate = this.getDate(this.dataset[this.dataset.length - 1].eventtime);
-
-console.log(minDate);
-console.log(maxDate);
 
     let xBottomScale = d3.scaleTime()
       .domain([minDate, maxDate])
-      .range([this.margin.left, this.width - this.margin['right']]);
+      .range([this.margin.left, this.width - this.margin.right]);
 
     this.xScale = d3.scaleTime()
       .domain([minDate, maxDate])
       .range([this.margin.left, this.width - this.margin.right]);
-    // this.xScale = d3.scaleLinear()
-    //   .domain(xDomain)
-    //   .range([this.margin.left, this.width - this.margin.right]);
 
     this.yScale = d3.scaleLinear()
       .domain(yDomain)
       .range([0, this.height]);
 
 
-    // console.log(element.offsetHeight);
-    // console.log(this.height);
-    // console.log(this.width);
-
-    let xDateAxisGen = d3.axisTop(xBottomScale).ticks(5).tickFormat(d3.timeFormat("%b"));
+    let xDateAxisGen = d3.axisTop(xBottomScale).ticks(this.dateTicks).tickFormat(d3.timeFormat("%b"));
 
     let labels = svg.selectAll("text")
-      .data(this.dataset)
+      .data(this.clinicalEventReport.wrappedItems)
       .enter()
       .append("text")
-      .text((d) => d.clinicalevent)
-      .attr("x", (d, i) => this.xScale(this.getDate(d.eventtime))+4)
-      .attr("y", (d, i) => this.height + 4 - this.yScale(d.eventtype != 1 ? -1 * (this.barHeight(i)) : (this.barHeight(i) ) ) )//(d, i) => d.eventtype == 1 ? this.height - this.yScale((this.barHeight(i))) : this.yScale(0))
-      .attr("font-size", "12px")
+      .text((d) => d.item.clinicalevent)
+      .attr("x", (d, i) => this.xScale(d.itemDate)+4)
+      .attr("y", (d, i) => this.height + 4 - this.yScale(d.yValue) )
+      .attr("font-size", "14px")
       .attr("font-family", "sans-serif")
-      .attr("fill", "blue")
+      .attr("fill", this.labelColor)
       .attr("text-anchor", "right")
       ;
 
     //add bars
     let bars = svg.selectAll("rect")
-      .data(this.dataset)
+      .data(this.clinicalEventReport.wrappedItems)
       .enter()
       .append("rect")
-      .attr("x", (d, i) => this.xScale(this.getDate(d.eventtime)))
-      .attr("y", (d, i) => d.eventtype == 1 ? this.height - this.yScale((this.barHeight(i))) : this.yScale(0))
-      // .attr("y",  (d, i) =>  this.height - this.yScale(d.eventtype!=1 ? -1*(this.barHeight(i)) + 29: (this.barHeight(i))))
+      .attr("x", (d, i) => this.xScale(d.itemDate))
+      .attr("y", (d, i) => d.item.eventtype == 1 ? this.height - this.yScale((d.yValue)) : this.yScale(0))
       .attr("width", 2)
-      .attr("height", (d, i) => this.yScale(this.barHeight(i)) - this.yScale(0))
+      .attr("height", (d, i) => Math.abs(this.yScale(d.yValue) - this.yScale(0)))
       .attr("fill", this.barColor);
 
     //add circles
     let dots = svg.selectAll("circle")
-      .data(this.dataset)
+      .data(this.clinicalEventReport.wrappedItems)
       .enter()
       .append("circle")
-      .attr("cx", (d, i) => this.xScale(this.getDate(d.eventtime)))
-      .attr("cy", (d, i) => this.height - this.yScale(d.eventtype != 1 ? -1 * (this.barHeight(i)) : (this.barHeight(i))))
-      .attr("r", 4)
+      .attr("cx", (d, i) => this.xScale(d.itemDate))
+      .attr("cy", (d, i) => this.height - this.yScale(d.yValue))
+      .attr("r", 3)
       .attr("fill", this.dotColor);
 
 
@@ -448,26 +439,12 @@ console.log(maxDate);
 
 
   }
-  // barHeight( i : number, dataPoints: number ): number{
-  //   return (dataPoints - i) * this.verticalTextOffset;
-  // }
-  barHeight(i: number): number {
-    let barHeight = (this.dataset.length - i) % 10;
-    barHeight = (barHeight > 0) ? barHeight : 10;
-    return barHeight * this.verticalTextOffset;
-  }
 
-  getDate(d): Date {
-    //  "eventtime": "2010-02-01",
-    let strDate = new String(d);
-    let year = +strDate.substr(0, 4);// unary operator converts string to number
-    let month = +strDate.substr(5, 2) - 1;
-    let day = +strDate.substr(8, 2);
 
-    return new Date(year, month, day);
 
-  }
+
   ngOnInit() {
+    this.clinicalEventReport = new ClinicalEventReport(this.dataset, 20, this.verticalTextOffset);
     this.createChart();
   }
 
