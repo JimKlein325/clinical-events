@@ -2,6 +2,8 @@ import { Component, Injectable, OnInit, OnChanges, ViewChild, ElementRef, Input,
 import * as d3 from 'd3';
 import * as d3TimeFormat from 'd3-time-format';
 
+import { Observable } from 'rxjs/Observable';
+
 import { ClinicalEventReport } from './models/clinical-event-report'
 import { ClinicalEventItem } from './models/clinical-event-item'
 import {ClinicalEventDataService} from './models/clinical-event-data-service'
@@ -37,6 +39,8 @@ export class ClinicaleventChartComponent implements OnInit {
   private labelColor: string = "darkblue";
   private numberOfVerticalEntrySlots: number = 10;
   private dateTicks: number = 5;
+  public testDataset: Observable<ClinicalEventItem[]>;
+  public problemName: string;
 
   
   public dataset: ClinicalEventItem[] = [
@@ -371,6 +375,8 @@ export class ClinicaleventChartComponent implements OnInit {
     this.width = element.offsetWidth - this.margin.left - this.margin.right;
     this.height = element.offsetHeight - this.margin.top - this.margin.bottom;
 
+    this.problemName = this.dataset[0].problem;
+
 
     let svg = d3.select(element).append("svg")
       .attr('width', this.width)
@@ -455,7 +461,7 @@ export class ClinicaleventChartComponent implements OnInit {
  }
 
   ngOnInit() {
-    //data service works.  Uncomment to use.
+    // data service works.  Uncomment to use.
   //   this.dataService.getClinicalEventData()
   //   .subscribe(
   //     data => this.dataset,
@@ -463,6 +469,8 @@ export class ClinicaleventChartComponent implements OnInit {
   //     () => this.createChart()
   //  );
 
+   //this.testDataset = this.dataService.getClinicalEventData();
+  //  console.log(this.dataset[0].sourceid + 1);
     this.createChart();
   }
 

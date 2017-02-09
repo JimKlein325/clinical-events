@@ -67,15 +67,12 @@ export class ClinicalEventReport {
         }
 
     }
-    // getSlot(): number{
-    //     let slot = index%this.totalVerticalEntrySlots  * this.verticalOffset
-    // }
 
     yValue(item: ClinicalEventItem, numberOfSlots: number, itemCount: number, indexValue: number): number {
         let value = ((itemCount - indexValue) % numberOfSlots);
         //console.log(value);
-        value = value > 0 ? value * this.verticalOffset: numberOfSlots* this.verticalOffset;;
-        let yVal = item.eventtype === 1 ? value : (-1) * value;
+        let yAbsoluteValue = value > 0 ? value * this.verticalOffset : numberOfSlots* this.verticalOffset;;
+        let yVal = item.eventtype === 1 ? yAbsoluteValue : (-1) * yAbsoluteValue;
         //console.log(yVal);
         return yVal;
     }

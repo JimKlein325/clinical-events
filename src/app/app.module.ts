@@ -3,6 +3,10 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
+
+import { Observable } from 'rxjs/Observable';
+
+
 import { AppComponent } from './app.component';
 import { ClinicalEventsComponent } from './clinical-events/clinical-events.component';
 import { SimpleBarchartComponent } from './simple-barchart/simple-barchart.component';

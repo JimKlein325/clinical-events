@@ -14,12 +14,12 @@ export class ClinicalEventDataService {
     getClinicalEventData():  Observable<ClinicalEventItem[]> {
         return  this.http.get('http://192.168.2.207/RecentiaHealth/Patient/getClinicalItem.php?ClinicalItem=ClinicalEventTimeline&PatientID=1')//('./app/simple-barchart/models/clinical-event.json')
             .map((response: Response) => { console.log(response); <ClinicalEventItem[]>response.json()})
-            .do(data => console.log(data))
+            .do(data => console.log("data:  " + data))
             .catch(this.handleError);
     }
 
     private handleError(error: Response) {
-        console.error(error);
+        console.error("handle error:"  + error);
         let msg = `Error status code ${error.status} at ${error.url}`;
         return Observable.throw(msg);
     }
