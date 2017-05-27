@@ -8,5 +8,4 @@ export class ClinicalEventItem {
         public problem: string,
         public eventtype: number) {
     }
-
 }

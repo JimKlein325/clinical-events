@@ -13,7 +13,7 @@ export class ClinicalEventReport {
     constructor(public eventItems: ClinicalEventItem[],
         public totalVerticalEntrySlots: number,
         public verticalOffset: number) {
-        this.problemName = eventItems[0].problem;
+        this.problemName = eventItems[0].problem != null ? eventItems[0].problem : "";
 
         this.problemTreatmentItemCount = //30;
             eventItems.reduce((count, item) => {
@@ -32,6 +32,7 @@ export class ClinicalEventReport {
         this.problemTreatmentEntrySlots = this.getNumberOfVeriticalEntrySlots(this.problemTreatmentItemCount);
         this.palliativeEntrySlots = this.getNumberOfVeriticalEntrySlots(this.palliativeItemCount);
 
+        // assemble wrappedItems collection
         let treatmentCounter = 0;
         let palliativeCounter = 0;
         for (let item of eventItems) {

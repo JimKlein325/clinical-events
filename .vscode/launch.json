@@ -2,28 +2,65 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Chrome against localhost",
-            "type": "chrome",
-            "request": "launch",
-            "sourceMaps": true,
-            "runtimeArgs": [
-                "--disable-session-crashed-bubble",
-                "--disable-infobars"
-            ], //disables the Chrome didn't shut down properly message
-            "userDataDir": "${workspaceRoot}/out/chrome", //enables multiple chrome instances
-            "webRoot": "${workspaceRoot}",
-            "url": "http://localhost:4200/",
-            "sourceMapPathOverrides": {
-                "webpack:///./*": "${webRoot}/*", // Example: "webpack:///./src/app.js" -> "/users/me/project/src/app.js"
-                "webpack:///*": "*" // Example: "webpack:///C:/project/app.ts" -> "C:/project/app.ts"
-            }
-        },
-        {
-            "name": "Attach to Chrome",
-            "type": "chrome",
-            "request": "attach",
-            "port": 4200,
-            "webRoot": "${workspaceRoot}"
-        }
+
+			"name": "Launch localhost with sourcemaps",
+			"type": "chrome",
+			"request": "launch",
+			"url": "http://localhost:4200",
+			"sourceMaps": true,
+			"webRoot": "${workspaceRoot}",
+
+			// Uncomment this to run easily alongside another running instance of Chrome
+
+			"userDataDir": "${workspaceRoot}/.vscode/chrome"
+
+
+
+			// Uncomment this to get diagnostic logs in the console
+
+			// "diagnosticLogging": true
+
+		},
+
+		{
+
+			"name": "Attach with sourcemaps",
+
+			"type": "chrome",
+
+			"request": "attach",
+
+			"port": 9222,
+
+			"sourceMaps": true,
+
+			"webRoot": "${workspaceRoot}"
+
+		}
+
+        // {
+        //     "name": "Launch Chrome against localhost",
+        //     "type": "chrome",
+        //     "request": "launch",
+        //     "sourceMaps": true,
+        //     "runtimeArgs": [
+        //         "--disable-session-crashed-bubble",
+        //         "--disable-infobars"
+        //     ], //disables the Chrome didn't shut down properly message
+        //     "userDataDir": "${workspaceRoot}/out/chrome", //enables multiple chrome instances
+        //     "webRoot": "${workspaceRoot}",
+        //     "url": "http://localhost:4200/",
+        //     "sourceMapPathOverrides": {
+        //         "webpack:///./*": "${webRoot}/*", // Example: "webpack:///./src/app.js" -> "/users/me/project/src/app.js"
+        //         "webpack:///*": "*" // Example: "webpack:///C:/project/app.ts" -> "C:/project/app.ts"
+        //     }
+        // },
+        // {
+        //     "name": "Attach to Chrome",
+        //     "type": "chrome",
+        //     "request": "attach",
+        //     "port": 4200,
+        //     "webRoot": "${workspaceRoot}"
+        // }
     ]
 }
