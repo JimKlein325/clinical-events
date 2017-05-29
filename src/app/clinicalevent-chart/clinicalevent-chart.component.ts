@@ -2,11 +2,21 @@ import { Component, Injectable, OnInit, OnChanges, ViewChild, ElementRef, Input,
 import * as d3 from 'd3';
 import * as d3TimeFormat from 'd3-time-format';
 
-import { Observable } from 'rxjs/Observable';
+//import { Observable } from 'rxjs/Observable';
+import { Observable } from "rxjs/Rx";
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/operator/reduce';
+import 'rxjs/add/operator/scan';
+
+
 
 import { ClinicalEventReport } from './models/clinical-event-report'
 import { ClinicalEventItem } from './models/clinical-event-item'
-import {ClinicalEventDataService} from './models/clinical-event-data-service'
+import { ClinicalEventDataService } from './models/clinical-event-data-service'
+import { ClinicalEventItemWrapper } from './models/clinical-event-item-wrapper'
 
 @Component({
   selector: 'clinicalevent-chart',
@@ -22,7 +32,7 @@ export class ClinicaleventChartComponent implements OnInit {
   // h: number = 300;
   scalePadding: number = 15;
   dataset2 = [0, 5, 15, 10, 8, 16, 25, 0, -10, -15];
- // private dataSerice: ClinicalEventDataService;
+  // private dataSerice: ClinicalEventDataService;
   public clinicalEventReport: ClinicalEventReport;
   private margin: any = { top: 20, bottom: 20, left: 20, right: 80 };
   private chart: any;
@@ -42,7 +52,7 @@ export class ClinicaleventChartComponent implements OnInit {
   public testDataset: Observable<ClinicalEventItem[]>;
   public problemName: string;
 
-  
+
   public dataset: ClinicalEventItem[] = [
     {
       "patientid": 1,
@@ -362,12 +372,8 @@ export class ClinicaleventChartComponent implements OnInit {
     }
   ]
   ;
-  
-  constructor(public dataService: ClinicalEventDataService) {
-    
-    
-  }
 
+  constructor(public dataService: ClinicalEventDataService) { }
   createChart() {
     this.clinicalEventReport = new ClinicalEventReport(this.dataset, 20, this.verticalTextOffset);
 
@@ -455,23 +461,158 @@ export class ClinicaleventChartComponent implements OnInit {
 
   }
 
-
- ngOnChanges(){
-       //this.createChart();
- }
+  ngOnChanges() {
+    //this.createChart();
+  }
 
   ngOnInit() {
     // data service works.  Uncomment to use.
-  //   this.dataService.getClinicalEventData()
-  //   .subscribe(
-  //     data => this.dataset,
-  //     error => console.log("data access error"),
-  //     () => this.createChart()
-  //  );
-
-   //this.testDataset = this.dataService.getClinicalEventData();
-  //  console.log(this.dataset[0].sourceid + 1);
+    //   this.dataService.getClinicalEventData()
+    //   .subscribe(
+    //     data => this.dataset,
+    //     error => console.log("data access error"),
+    //     () => this.createChart()
+    //  );
     this.createChart();
+    this.testFn();
   }
+  // generate the height above or below the unmarked axis based on item's index position
+  genYValue(isTreatment: boolean,
+    slots: number,
+    offset: number,
+    index: number
+  ): number {
+    let multiplier: number;
+    let slotsAboveOrBelowAxis = slots / 2;
+
+    if (isTreatment) {
+      multiplier = 1;
+    } else {
+      multiplier = -1;
+    }
+    return multiplier * (slotsAboveOrBelowAxis - (index % (slots / 2))) * offset
+  };
+  getDate(s): Date {
+    //  "eventtime": "2010-02-01",
+    let strDate = new String(s);
+    let year = +strDate.substr(0, 4);// unary operator converts string to number
+    let month = +strDate.substr(5, 2) - 1;
+    let day = +strDate.substr(8, 2);
+
+    return new Date(year, month, day);
+  }
+
+  testFn() {
+    let slots: number = 20;
+    let offset: number = 5;
+
+    let items: ClinicalEventItemWrapper[];
+
+
+    const data$ = Observable.from(this.dataset);
+
+    const treatment$ = data$.filter(item => item.eventtype == 1);
+    // .subscribe(console.log);
+
+    const palative$ = data$.filter(item => item.eventtype == 0);
+    // .subscribe(console.log);
+
+    let treetmentArray: ClinicalEventItemWrapper[];
+    let palArray: ClinicalEventItemWrapper[];
+    let mergeArray: ClinicalEventItemWrapper[];
+
+    // transform event item array to wrapper array with yValue calculated
+    let treatmentTransform$ = treatment$.reduce((acc, item, index) => {
+      let yVal = this.genYValue(true, slots, offset, index);
+      // array.push returns a number, so use concat here
+      let ce = [new ClinicalEventItemWrapper(item, yVal, this.getDate(item.eventtime))];
+      return acc.concat(ce);
+    },
+      new Array<ClinicalEventItemWrapper>()
+    );
+
+
+    // .map(ceiArray => treetmentArray = ceiArray);
+    // .subscribe(console.log);
+
+    let palativeTransform$ = palative$
+      .reduce((acc, item, index) => {
+        let yVal = this.genYValue(false, slots, offset, index);
+        // array.push returns a number, so use concat here
+        let ce = [new ClinicalEventItemWrapper(item, yVal, this.getDate(item.eventtime))];
+        return acc.concat(ce);
+      },
+      new Array<ClinicalEventItemWrapper>()
+      );
+    // .map( val => palArray = val);
+    // .subscribe(console.log);
+    // console.log(palativeTransform$);
+    // const fullListEvents$ = treatmentTransform$.concat(palativeTransform$)
+    //   // .map(data => this.dataset);
+    // //.flatMap(list =>Observable.combineLatest(list))
+    // .reduce((acc, item, index) => {
+    //   return item.map(ce => acc.concat(ce));
+
+    // },
+    //   new Array<ClinicalEventItemWrapper>()
+    // )
+
+    // .count()
+    // .do(val => console.log(`Concats two arrays into one containing two: ${val}`))
+    // .subscribe()
+    // ;
+    // const fList$ = Observable.merge( )
+
+
+    // merge creates array of arrays, concatMap iterates over 
+    // the arrays and concats array items to new array
+    const mergeList$ = Observable.merge(treatmentTransform$, palativeTransform$)
+      .concatMap(x => x)
+      //.do(console.log) // prints out each item in new array
+      .reduce((acc, item) =>
+        acc.itemDate > item.itemDate ? acc : item
+      );
+
+    mergeList$.subscribe(console.log);//val => console.log("values",val));
+
+
+    //  Calculating the latest date in a sequence of events
+    let maxDay: Date;
+
+    let lastItem = treatmentTransform$
+      .map((vals: ClinicalEventItemWrapper[]) => vals
+        .reduce((acc, item) =>
+          acc.itemDate < item.itemDate ? acc : item
+        )
+      ).map(item => maxDay = item.itemDate);
+    lastItem.subscribe();
+
+    console.log(maxDay);
+
+    // .map((vals: ClinicalEventItemWrapper[]) => vals.map(item => item.item.eventtime))
+    // .scan((acc, item, i) => 
+    //   acc.itemDate < item.itemDate ? acc: item
+    //  )
+    // .map( items => arr = items)
+    // .do(console.log)
+    // .map( items => items.reduce( (acc, item) => 
+    //    acc.itemDate < item.itemDate ? acc: item
+    //    ) )
+    // .subscribe(console.log);
+
+    //Math.max(items// items[items.length - 1].itemDate;
+
+    //  let val = arr.scan((acc, item) => 
+    //    item.itemDate > acc.itemDate ? item: acc
+    //    ) ;
+
+    //  console.log(val.item.eventtime);
+
+    let vals = [1, 2, 3];
+    let min = vals.reduce((acc, item) =>
+      acc > item ? item : acc);
+    console.log(min);
+  }
+
 
 }

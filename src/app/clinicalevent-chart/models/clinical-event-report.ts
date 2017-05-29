@@ -1,6 +1,8 @@
 import { ClinicalEventItem } from './clinical-event-item';
 import { ClinicalEventItemWrapper } from './clinical-event-item-wrapper';
-
+export class ClinicalEventReport_New {
+    
+}
 export class ClinicalEventReport {
     public problemName: string;
     public wrappedItems: ClinicalEventItemWrapper[] = new Array();
