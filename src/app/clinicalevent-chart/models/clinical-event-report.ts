@@ -1,21 +1,31 @@
 import { ClinicalEventItem } from './clinical-event-item';
 import { ClinicalEventItemWrapper } from './clinical-event-item-wrapper';
 export class ClinicalEventReport_New {
-    
+
 }
 export class ClinicalEventReport {
     public problemName: string;
-    public wrappedItems: ClinicalEventItemWrapper[] = new Array();
+    public wrappedItems: ClinicalEventItemWrapper[];// = new Array();
+
+    public minDate: Date;
+    public maxDate: Date;
+
     public problemTreatmentItemCount: number;
     public palliativeItemCount: number;
     public problemTreatmentEntrySlots: number;
     public palliativeEntrySlots: number;
 
 
-    constructor(public eventItems: ClinicalEventItem[],
+    constructor(
         public totalVerticalEntrySlots: number,
-        public verticalOffset: number) {
-        this.problemName = eventItems[0].problem != null ? eventItems[0].problem : "";
+        public verticalOffset: number,
+        public eventItems?: ClinicalEventItem[]) {
+        if (eventItems) {
+
+            this.problemName = eventItems[0].problem != null ? eventItems[0].problem : "";
+        } else  {
+            return;
+        }
 
         this.problemTreatmentItemCount = //30;
             eventItems.reduce((count, item) => {
@@ -41,7 +51,7 @@ export class ClinicalEventReport {
             let itemDate = this.getDate(item.eventtime);
 
             if (item.eventtype === 1) {
-                let wrappedItem = new ClinicalEventItemWrapper(item, this.yValue(item, this.problemTreatmentEntrySlots, this.problemTreatmentItemCount, 
+                let wrappedItem = new ClinicalEventItemWrapper(item, this.yValue(item, this.problemTreatmentEntrySlots, this.problemTreatmentItemCount,
                     treatmentCounter), itemDate);
                 this.wrappedItems.push(wrappedItem);
                 ++treatmentCounter;
@@ -74,7 +84,7 @@ export class ClinicalEventReport {
     yValue(item: ClinicalEventItem, numberOfSlots: number, itemCount: number, indexValue: number): number {
         let value = ((itemCount - indexValue) % numberOfSlots);
         //console.log(value);
-        let yAbsoluteValue = value > 0 ? value * this.verticalOffset : numberOfSlots* this.verticalOffset;;
+        let yAbsoluteValue = value > 0 ? value * this.verticalOffset : numberOfSlots * this.verticalOffset;;
         let yVal = item.eventtype === 1 ? yAbsoluteValue : (-1) * yAbsoluteValue;
         //console.log(yVal);
         return yVal;

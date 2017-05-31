@@ -375,7 +375,7 @@ export class ClinicaleventChartComponent implements OnInit {
 
   constructor(public dataService: ClinicalEventDataService) { }
   createChart() {
-    this.clinicalEventReport = new ClinicalEventReport(this.dataset, 20, this.verticalTextOffset);
+    //this.clinicalEventReport = new ClinicalEventReport(this.dataset, 20, this.verticalTextOffset);
 
     let element = this.chartContainer.nativeElement;
     this.width = element.offsetWidth - this.margin.left - this.margin.right;
@@ -389,8 +389,8 @@ export class ClinicaleventChartComponent implements OnInit {
       .attr('height', this.height);
 
     // define domains
-    let minDate = this.clinicalEventReport.wrappedItems[0].itemDate;
-    let maxDate = this.clinicalEventReport.wrappedItems[this.clinicalEventReport.wrappedItems.length - 1].itemDate;
+    let minDate = this.clinicalEventReport.minDate;// this.clinicalEventReport.wrappedItems[0].itemDate;
+    let maxDate = this.clinicalEventReport.maxDate;//.wrappedItems[this.clinicalEventReport.wrappedItems.length - 1].itemDate;
 
     let xDomain = [minDate, maxDate];
     let yDomain = [-50, 50];
@@ -473,19 +473,20 @@ export class ClinicaleventChartComponent implements OnInit {
     //     error => console.log("data access error"),
     //     () => this.createChart()
     //  );
-    this.createChart();
+    //this.createChart();
     this.testFn();
+    this.createChart();
   }
   // generate the height above or below the unmarked axis based on item's index position
-  genYValue(isTreatment: boolean,
+  genYValue(eventType: number,
     slots: number,
     offset: number,
     index: number
   ): number {
     let multiplier: number;
     let slotsAboveOrBelowAxis = slots / 2;
-
-    if (isTreatment) {
+    // multiplier used to position item above or below axis
+    if (eventType == 1) {
       multiplier = 1;
     } else {
       multiplier = -1;
@@ -493,7 +494,7 @@ export class ClinicaleventChartComponent implements OnInit {
     return multiplier * (slotsAboveOrBelowAxis - (index % (slots / 2))) * offset
   };
   getDate(s): Date {
-    //  "eventtime": "2010-02-01",
+    // input format: "eventtime": "2010-02-01",
     let strDate = new String(s);
     let year = +strDate.substr(0, 4);// unary operator converts string to number
     let month = +strDate.substr(5, 2) - 1;
@@ -504,114 +505,160 @@ export class ClinicaleventChartComponent implements OnInit {
 
   testFn() {
     let slots: number = 20;
-    let offset: number = 5;
+    let offset: number = 3;
+    this.clinicalEventReport = new ClinicalEventReport(slots, offset, null);
 
     let items: ClinicalEventItemWrapper[];
-
-
     const data$ = Observable.from(this.dataset);
-
+   // data$.subscibe(items=> report.wrappedItems = items);
     const treatment$ = data$.filter(item => item.eventtype == 1);
-    // .subscribe(console.log);
+    // .subscribe(console.log);()
+    //items = treatment$
 
-    const palative$ = data$.filter(item => item.eventtype == 0);
-    // .subscribe(console.log);
-
-    let treetmentArray: ClinicalEventItemWrapper[];
-    let palArray: ClinicalEventItemWrapper[];
-    let mergeArray: ClinicalEventItemWrapper[];
-
-    // transform event item array to wrapper array with yValue calculated
-    let treatmentTransform$ = treatment$.reduce((acc, item, index) => {
-      let yVal = this.genYValue(true, slots, offset, index);
+    let treatmentItems = this.dataset
+      .filter(item => item.eventtype ==1)
+      .reduce((acc, item, index) => {
+      let yVal = this.genYValue(item.eventtype, slots, offset, index);
       // array.push returns a number, so use concat here
       let ce = [new ClinicalEventItemWrapper(item, yVal, this.getDate(item.eventtime))];
       return acc.concat(ce);
     },
       new Array<ClinicalEventItemWrapper>()
-    );
-
-
-    // .map(ceiArray => treetmentArray = ceiArray);
-    // .subscribe(console.log);
-
-    let palativeTransform$ = palative$
-      .reduce((acc, item, index) => {
-        let yVal = this.genYValue(false, slots, offset, index);
-        // array.push returns a number, so use concat here
-        let ce = [new ClinicalEventItemWrapper(item, yVal, this.getDate(item.eventtime))];
-        return acc.concat(ce);
-      },
+    )
+      ;
+      
+    console.log(treatmentItems.length);
+    
+    let palativeItems = this.dataset.filter(item => item.eventtype ==0)
+    .reduce((acc, item, index) => {
+      let yVal = this.genYValue(item.eventtype, slots, offset, index);
+      // array.push returns a number, so use concat here
+      let ce = [new ClinicalEventItemWrapper(item, yVal, this.getDate(item.eventtime))];
+      return acc.concat(ce);
+    },
       new Array<ClinicalEventItemWrapper>()
+    )
+    ;
+
+    let fullList = treatmentItems.concat(palativeItems);
+
+    this.clinicalEventReport.wrappedItems = fullList;
+    
+    // set properties for timeline start and finish
+    let FirstItem = fullList
+      .reduce((acc, item) =>
+        acc.itemDate < item.itemDate ? acc : item
       );
-    // .map( val => palArray = val);
-    // .subscribe(console.log);
-    // console.log(palativeTransform$);
-    // const fullListEvents$ = treatmentTransform$.concat(palativeTransform$)
-    //   // .map(data => this.dataset);
-    // //.flatMap(list =>Observable.combineLatest(list))
-    // .reduce((acc, item, index) => {
-    //   return item.map(ce => acc.concat(ce));
-
-    // },
-    //   new Array<ClinicalEventItemWrapper>()
-    // )
-
-    // .count()
-    // .do(val => console.log(`Concats two arrays into one containing two: ${val}`))
-    // .subscribe()
-    // ;
-    // const fList$ = Observable.merge( )
-
-
-    // merge creates array of arrays, concatMap iterates over 
-    // the arrays and concats array items to new array
-    const mergeList$ = Observable.merge(treatmentTransform$, palativeTransform$)
-      .concatMap(x => x)
-      //.do(console.log) // prints out each item in new array
+    this.clinicalEventReport.minDate = this.getDate(FirstItem.item.eventtime);
+    
+    let lastItem = fullList
       .reduce((acc, item) =>
         acc.itemDate > item.itemDate ? acc : item
       );
+    this.clinicalEventReport.maxDate = this.getDate(lastItem.item.eventtime);
+      
+    // const palative$ = data$.filter(item => item.eventtype == 0);
 
-    mergeList$.subscribe(console.log);//val => console.log("values",val));
+
+    // // transform event item array to wrapper array with yValue calculated: Treatment events, eventType = 1
+    // let treatmentTransform$ = treatment$.reduce((acc, item, index) => {
+    //   let yVal = this.genYValue(item.eventtype, slots, offset, index);
+    //   // array.push returns a number, so use concat here
+    //   let ce = [new ClinicalEventItemWrapper(item, yVal, this.getDate(item.eventtime))];
+    //   return acc.concat(ce);
+    // },
+    //   new Array<ClinicalEventItemWrapper>()
+    // );
+
+    // // transform event item array to wrapper array with yValue calculated: Palative events, , eventType = 0
+    // let palativeTransform$ = palative$
+    //   .reduce((acc, item, index) => {
+    //     let yVal = this.genYValue(item.eventtype, slots, offset, index);
+    //     // array.push returns a number, so use concat here
+    //     let ce = [new ClinicalEventItemWrapper(item, yVal, this.getDate(item.eventtime))];
+    //     return acc.concat(ce);
+    //   },
+    //   new Array<ClinicalEventItemWrapper>()
+    //   );
 
 
-    //  Calculating the latest date in a sequence of events
-    let maxDay: Date;
+    // let maxDay: Date;
+    // let minDay: Date;
+    // // merge creates array of arrays, concatMap iterates over 
+    // // the arrays and concats array items to new array
+    // const mergeList$ = Observable.merge(treatmentTransform$, palativeTransform$)
+    //   .concatMap(x => x);
 
-    let lastItem = treatmentTransform$
-      .map((vals: ClinicalEventItemWrapper[]) => vals
-        .reduce((acc, item) =>
-          acc.itemDate < item.itemDate ? acc : item
-        )
-      ).map(item => maxDay = item.itemDate);
-    lastItem.subscribe();
+    // // const mergeList2$ = Observable.merge(treatmentTransform$, palativeTransform$)
+    // //   //.concatMap(x => x)
+    // //   .flatMap(x => x )
+    // //   .map(x => )
+    // //   .subscribe(console.log)
+    // //   ; // prints out each item in new array
+    // const setMaxDate$ = mergeList$
+    //   .reduce((acc, item) =>
+    //     acc.itemDate > item.itemDate ? acc : item
+    //   )
+    //   .map(item => clinicalEventReport.maxDate=this.getDate(item.item.eventtime))// this.getDate(item.item.eventtime))
+    //   .subscribe((val) => console.log("max date", val))
+    //   ;
 
-    console.log(maxDay);
+    // const setMinDate$ = mergeList$
+    //   .reduce((acc, item) =>
+    //     acc.itemDate < item.itemDate ? acc : item
+    //   )
+    //   .map(item => minDay=this.getDate(item.item.eventtime))
+    //   .subscribe((val) => console.log("min date", val))
+    //   ;
+    
+    // //let treatmentArray: ClinicalEventItemWrapper[] = treatment$;
 
-    // .map((vals: ClinicalEventItemWrapper[]) => vals.map(item => item.item.eventtime))
-    // .scan((acc, item, i) => 
-    //   acc.itemDate < item.itemDate ? acc: item
-    //  )
-    // .map( items => arr = items)
-    // .do(console.log)
-    // .map( items => items.reduce( (acc, item) => 
-    //    acc.itemDate < item.itemDate ? acc: item
-    //    ) )
-    // .subscribe(console.log);
+    // let palArray: ClinicalEventItemWrapper[];
+    // let mergeArray: ClinicalEventItemWrapper[];
 
-    //Math.max(items// items[items.length - 1].itemDate;
+    // // const mergeList3$ =  Observable.merge(treatmentTransform$, palativeTransform$)
+    // // .subscribe(console.log);
+    // // const m4$ = treatmentTransform$.concat(palativeTransform$)
+    // //   .flatMap(x => x)
+    // //   //   .concatMap(x => x.reduce((acc, item, index) => {
+    // //   //  // let yVal = this.genYValue(item.eventtype, slots, offset, index);
+    // //   //   // array.push returns a number, so use concat here
+    // //   //   //let ce = [new ClinicalEventItemWrapper(item, yVal, this.getDate(item.eventtime))];
+    // //   //   return acc.concat(item);
+    // //   // },
+    // //   // new Array<ClinicalEventItemWrapper>()
+    // //   //   ));
+    // // m4$.subscribe(console.log);
 
-    //  let val = arr.scan((acc, item) => 
-    //    item.itemDate > acc.itemDate ? item: acc
-    //    ) ;
+    // // m4$.count().subscribe(val => console.log( "what", val));
+    // // const mergeList2$ =  Observable.merge(treatmentTransform$, palativeTransform$)
+    // // .subscribe(val=> report.wrappedItems = val);
+    // // console.log(report.wrappedItems);
+    // // .mergeMap(()
+    // // .map(wrapperItems => report.wrappedItems = wrapperItems)
+    // // .subscribe(console.log);//val => console.log("values",val));
 
-    //  console.log(val.item.eventtime);
+    // const mergeListMaxDate$ = Observable.merge(treatmentTransform$, palativeTransform$)
+    //   .concatMap(x => x)
+    //   //.do(console.log) // prints out each item in new array
+    //   .reduce((acc, item) =>
+    //     acc.itemDate > item.itemDate ? acc : item
+    //   );
 
-    let vals = [1, 2, 3];
-    let min = vals.reduce((acc, item) =>
-      acc > item ? item : acc);
-    console.log(min);
+    // //  Calculating the latest date in a sequence of events
+
+    // let lastItem$ = treatmentTransform$
+    //   .map((vals: ClinicalEventItemWrapper[]) => vals
+    //     .reduce((acc, item) =>
+    //       acc.itemDate > item.itemDate ? acc : item
+    //     )
+    //   ).map(item => maxDay = item.itemDate);
+    // // lastItem$.subscribe((val) => console.log("max date", val));
+
+    // // let vals = [1, 2, 3];
+    // // let min = vals.reduce((acc, item) =>
+    // //   acc > item ? item : acc);
+    // // console.log(min);
   }
 
 

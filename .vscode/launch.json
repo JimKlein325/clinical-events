@@ -1,42 +1,66 @@
 {
     "version": "0.2.0",
-    "configurations": [
-        {
-
+	"configurations": [
+		{
 			"name": "Launch localhost with sourcemaps",
 			"type": "chrome",
 			"request": "launch",
 			"url": "http://localhost:4200",
 			"sourceMaps": true,
-			"webRoot": "${workspaceRoot}",
-
+			"webRoot": "${workspaceRoot}"
 			// Uncomment this to run easily alongside another running instance of Chrome
-
-			"userDataDir": "${workspaceRoot}/.vscode/chrome"
-
-
+			// "userDataDir": "${workspaceRoot}/.vscode/chrome",
 
 			// Uncomment this to get diagnostic logs in the console
-
 			// "diagnosticLogging": true
-
 		},
-
 		{
-
 			"name": "Attach with sourcemaps",
-
 			"type": "chrome",
-
 			"request": "attach",
-
 			"port": 9222,
-
 			"sourceMaps": true,
-
 			"webRoot": "${workspaceRoot}"
-
 		}
+	]
+    // "version": "0.2.0",
+    // "configurations": [
+    //     {
+
+	// 		"name": "Launch localhost with sourcemaps",
+	// 		"type": "chrome",
+	// 		"request": "launch",
+	// 		"url": "http://localhost:4200",
+	// 		"sourceMaps": true,
+	// 		"webRoot": "${workspaceRoot}",
+
+	// 		// Uncomment this to run easily alongside another running instance of Chrome
+
+	// 		"userDataDir": "${workspaceRoot}/.vscode/chrome"
+
+
+
+	// 		// Uncomment this to get diagnostic logs in the console
+
+	// 		// "diagnosticLogging": true
+
+	// 	},
+
+	// 	{
+
+	// 		"name": "Attach with sourcemaps",
+
+	// 		"type": "chrome",
+
+	// 		"request": "attach",
+
+	// 		"port": 9222,
+
+	// 		"sourceMaps": true,
+
+	// 		"webRoot": "${workspaceRoot}"
+
+	// 	}
 
         // {
         //     "name": "Launch Chrome against localhost",
@@ -62,5 +86,5 @@
         //     "port": 4200,
         //     "webRoot": "${workspaceRoot}"
         // }
-    ]
+    // ]
 }
