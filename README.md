@@ -14,7 +14,7 @@ Install Material 2
 npm install --save @angular/material
 npm install --save @angular/animations
 
-
+(see notes for additional updates to styles.css)
 
 Install flex layout
 
