@@ -2,8 +2,28 @@
 
 This project was generated with [angular-cli](https://github.com/angular/angular-cli) version 1.0.0-beta.19-3.
 
+## Install Notes
+Install Lodash and Moment
+npm i --save lodash
+npm install moment
+
+Install Rxjs
+npm install @reactivex/rxjs
+
+Install Material 2
+npm install --save @angular/material
+npm install --save @angular/animations
+
+
+
+Install flex layout
+
+Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source ## Development server
+files.
+
 ## Development server
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source ## Development server
+files.
 
 ## Code scaffolding
 
