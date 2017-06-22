@@ -19,6 +19,7 @@ import { ClinicalEventDataService } from './models/clinical-event-data-service'
 import { ClinicalEventItemWrapper } from './models/clinical-event-item-wrapper'
 import { TimelineService } from "../timeline.service";
 
+
 @Component({
   selector: 'clinicalevent-chart',
   templateUrl: './clinicalevent-chart.component.html',
@@ -45,22 +46,27 @@ export class ClinicaleventChartComponent implements OnInit {
   private colors: any;
   private xAxis: any;
   private yAxis: any;
-  private readonly verticalTextOffset: number = 4;
+  // private readonly verticalTextOffset: number = 4;
   private barColor: string = "lightgray";
   private dotColor: string = "black";
   private labelColor: string = "darkblue";
-  private numberOfVerticalEntrySlots: number = 10;
+  // private numberOfVerticalEntrySlots: number = 10;
   private dateTicks: number = 5;
-  public testDataset: Observable<ClinicalEventItem[]>;
+  // public testDataset: Observable<ClinicalEventItem[]>;
   public problemName: string;
 
 
   constructor(private tlService: TimelineService, public dataService: ClinicalEventDataService) { }
   createChart() {
-
     let element = this.chartContainer.nativeElement;
-    this.width = element.offsetWidth - this.margin.left - this.margin.right;
-    this.height = element.offsetHeight - this.margin.top - this.margin.bottom;
+    console.log( element.width);
+    console.log("height");
+    console.log( element.offsetHeight);
+    console.log("width");
+    console.log(element.offsetWidth);
+    this.width = 800;//element.offsetWidth - this.margin.left - this.margin.right;
+    console.log("width: " + this.width);
+    this.height = element.offsetHeight;// - this.margin.top - this.margin.bottom;
 
     this.problemName = this.clinicalEventReport.problemName;
 
@@ -151,7 +157,6 @@ export class ClinicaleventChartComponent implements OnInit {
     //  );
     
     this.clinicalEventReport = this.tlService.clinicalEventReport;
-
     this.createChart();
   }
 

@@ -329,7 +329,9 @@ export class TimelineService {
     }
   ];
 
-  constructor() { }
+  constructor() {
+    this.prepareData();
+   }
 
   // generate the height above or below the unmarked axis based on item's index position
   genYValue(eventType: number,

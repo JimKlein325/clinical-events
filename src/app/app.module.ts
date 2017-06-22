@@ -13,6 +13,7 @@ import { TextTestComponent } from './text-test/text-test.component';
 import { ClinicaleventChartComponent } from './clinicalevent-chart/clinicalevent-chart.component';
 import {TimelineService  } from "./timeline.service";
 import { MaterialModule } from "./material/material.module";
+import { FlexLayoutModule } from '@angular/flex-layout';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { MaterialModule } from "./material/material.module";
     BrowserModule,
     ReactiveFormsModule,
     HttpModule,
-    MaterialModule
+    MaterialModule,
+    FlexLayoutModule
   ],
   providers: [TimelineService],
   bootstrap: [AppComponent]

@@ -4,6 +4,18 @@
 body {
     /*padding: 2em 23em;*/
     font-family: Roboto, sans-serif;
-    background:lightgray;
+    /*background:lightgray;*/
+    
+}
+.container {
+  display: flex; /* or inline-flex */
+}
+.chart {
+        background:lightgray;
+
+}
+.control {
+        background:lightblue;
+
 }
 
