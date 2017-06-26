@@ -2,15 +2,21 @@ import { Injectable } from '@angular/core';
 import { ClinicalEventItem } from "./clinicalevent-chart/models/clinical-event-item";
 import { ClinicalEventReport } from "./clinicalevent-chart/models/clinical-event-report";
 import { ClinicalEventItemWrapper } from "./clinicalevent-chart/models/clinical-event-item-wrapper";
+import { Observable, Subject, BehaviorSubject } from "rxjs/Rx";
+import * as _ from "lodash";
+import * as moment from 'moment';
+
 
 @Injectable()
 export class TimelineService {
 
+
+
   public clinicalEventReport: ClinicalEventReport;
-  
 
 
-  public dataset: ClinicalEventItem[] = [
+
+  private dataset: ClinicalEventItem[] = [
     {
       "patientid": 1,
       "sourceid": 1000000000,
@@ -329,9 +335,47 @@ export class TimelineService {
     }
   ];
 
+  private subject = new BehaviorSubject<ClinicalEventItem[]>(this.dataset);
+  private wrappedSubject = new BehaviorSubject<ClinicalEventItemWrapper[]>(this.prepareData(this.dataset));
+
+  private filterList: string[] = [];
+  private clinicalEvents: string[];
+
+  clinicalEventItems$: Observable<ClinicalEventItem[]> = this.subject.asObservable();
+
+  // wrappedEvents$ = this.clinicalEventItems$
+  //   .map(items => this.prepareData(items));
+  wrappedEvents$ = this.wrappedSubject.asObservable();
+
+  // timelineEvents$ = this.clinicalEventItems$
+  //   .map();
+
+  clinicalEvents$: Observable<string[]> = this.clinicalEventItems$
+    .switchMap(items => {
+      const noDupes = _.uniqBy(items, 'clinicalevent');
+      this.clinicalEvents = noDupes.map(ce => ce.clinicalevent);
+      return Observable.of(this.clinicalEvents);
+    })
+  ;
+
+  dataDateRange$ = this.clinicalEventItems$
+    .map(event => event.map(item => new Date(item.eventtime)));
+
+  maxMinDates$ = this.clinicalEventItems$
+    .map(event => event.map(item => new Date(item.eventtime)))
+    .switchMap(dates => {
+      let minD = _.min(dates.map(date => date.getTime()));
+      let maxD = _.max(dates.map(date => date.getTime()));
+      let min = moment(minD).format('YYYY-MM-DD');
+      let max = moment(maxD).format('YYYY-MM-DD');
+      //console.log(moment(maxD).format('YYYY-MM-DD'))
+      return [{ minDate: min, maxDate: max }];
+    });
+
+
   constructor() {
-    this.prepareData();
-   }
+    //this.prepareData();
+  }
 
   // generate the height above or below the unmarked axis based on item's index position
   genYValue(eventType: number,
@@ -360,7 +404,7 @@ export class TimelineService {
     return new Date(year, month, day);
   }
 
- prepareData() {
+  prepareData(dataset: ClinicalEventItem[]): ClinicalEventItemWrapper[] {
     let slots: number = 20;
     let offset: number = 3;
     this.clinicalEventReport = new ClinicalEventReport(slots, offset, null);
@@ -368,7 +412,7 @@ export class TimelineService {
     let items: ClinicalEventItemWrapper[];
 
     // use reduce(fold) to build new list of wrapper items containing the yValue for chart elements
-    let treatmentItems = this.dataset
+    let treatmentItems = dataset
       .filter(item => item.eventtype == 1)
       .reduce((acc, item, index) => {
         let yVal = this.genYValue(item.eventtype, slots, offset, index);
@@ -379,7 +423,7 @@ export class TimelineService {
       new Array<ClinicalEventItemWrapper>()
       );
 
-    let palativeItems = this.dataset.filter(item => item.eventtype == 0)
+    let palativeItems = dataset.filter(item => item.eventtype == 0)
       .reduce((acc, item, index) => {
         let yVal = this.genYValue(item.eventtype, slots, offset, index);
         let ce = [new ClinicalEventItemWrapper(item, yVal, this.getDate(item.eventtime))];
@@ -406,5 +450,39 @@ export class TimelineService {
       );
     this.clinicalEventReport.maxDate = this.getDate(lastItem.item.eventtime);
 
+    return fullList;
   }
+
+
+  //Strings used to display/hide items in timeline
+  initializeClinicalEvents() {
+    const noDupes = _.uniqBy(this.dataset, 'clinicalevent');
+    this.clinicalEvents = noDupes.map(ce => ce.clinicalevent);
+    this.clinicalEvents$ = Observable.of(this.clinicalEvents);
+  }
+
+
+  // always filter and emit clone of dataset
+  // filter operation performed on raw event items
+  // prepareData then builds out the list with the correct offset.
+  filterBySelectedItems() {
+    const newArray = this.dataset.map(a => Object.assign({}, a));
+    const filteredList = newArray.filter(x => !_.includes(this.filterList, x.clinicalevent));
+    // console.log(filteredList);
+    const newSet = this.prepareData(filteredList);
+    console.log("set filtered:  " + newSet.length);
+    this.wrappedSubject.next(newSet);
+    // console.log("wrappedSubject emit");
+  }
+
+  filterFromForm(item: string, checked: boolean) {
+    if (checked) {
+      this.filterList = this.filterList.filter(element => element !== item);
+    }
+    else {
+      this.filterList.push(item);
+    }
+    this.filterBySelectedItems();
+  }
+
 }

@@ -1,0 +1,16 @@
+<p>
+  item-select works!
+</p>
+<form [formGroup]="userForm" (ngSubmit)="onFormSubmit()">
+  <md-list dense>
+      <h3 md-subheader>Treatment</h3>
+
+    <div formArrayName="users">
+      <md-list-item *ngFor="let user of users.controls; index as idx">
+        <h3 md-line> {{labels[idx]}} </h3>
+        <md-checkbox [formControlName]="idx" (change)="onCheckChange($event)" id="{{idx}}" value="{{labels[idx]}}"></md-checkbox>
+      </md-list-item>
+    </div>
+  </md-list>
+</form>
+

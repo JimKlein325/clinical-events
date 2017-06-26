@@ -14,6 +14,8 @@ import { ClinicaleventChartComponent } from './clinicalevent-chart/clinicalevent
 import {TimelineService  } from "./timeline.service";
 import { MaterialModule } from "./material/material.module";
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { EventsInputComponent } from './events-input/events-input.component';
+import { ItemSelectComponent } from './item-select/item-select.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +23,9 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     ClinicalEventsComponent,
     SimpleBarchartComponent,
     TextTestComponent,
-    ClinicaleventChartComponent
+    ClinicaleventChartComponent,
+    EventsInputComponent,
+    ItemSelectComponent
   ],
   imports: [
     BrowserModule,

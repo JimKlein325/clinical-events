@@ -36,6 +36,7 @@ export class ClinicaleventChartComponent implements OnInit {
 
   public clinicalEventReport: ClinicalEventReport;
 
+  private wrappedItems: ClinicalEventItemWrapper[];
 
   private margin: any = { top: 20, bottom: 20, left: 20, right: 80 };
   private chart: any;
@@ -47,7 +48,7 @@ export class ClinicaleventChartComponent implements OnInit {
   private xAxis: any;
   private yAxis: any;
   // private readonly verticalTextOffset: number = 4;
-  private barColor: string = "lightgray";
+  private barColor: string = "gray";
   private dotColor: string = "black";
   private labelColor: string = "darkblue";
   // private numberOfVerticalEntrySlots: number = 10;
@@ -57,22 +58,24 @@ export class ClinicaleventChartComponent implements OnInit {
 
 
   constructor(private tlService: TimelineService, public dataService: ClinicalEventDataService) { }
-  createChart() {
-    let element = this.chartContainer.nativeElement;
-    console.log( element.width);
-    console.log("height");
-    console.log( element.offsetHeight);
-    console.log("width");
-    console.log(element.offsetWidth);
-    this.width = 800;//element.offsetWidth - this.margin.left - this.margin.right;
-    console.log("width: " + this.width);
-    this.height = element.offsetHeight;// - this.margin.top - this.margin.bottom;
 
+
+  createChart() {
+    // this.chart = true;
+    let element = this.chartContainer.nativeElement;
+    this.width = 800;//element.offsetWidth - this.margin.left - this.margin.right;
+    // console.log("width: " + this.width);
+    this.height = 450;//element.offsetHeight - this.margin.top - this.margin.bottom;
     this.problemName = this.clinicalEventReport.problemName;
 
     let svg = d3.select(element).append("svg")
       .attr('width', this.width)
       .attr('height', this.height);
+
+    // chart plot area
+    // this.chart = svg.append('g')
+    //   .attr('class', 'bars')
+    //   .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
 
     // define domains
     let minDate = this.clinicalEventReport.minDate;
@@ -98,7 +101,7 @@ export class ClinicaleventChartComponent implements OnInit {
 
     //add bars
     let bars = svg.selectAll("rect")
-      .data(this.clinicalEventReport.wrappedItems)
+      .data(this.wrappedItems)
       .enter()
       .append("rect")
       .attr("x", (d, i) => this.xScale(d.itemDate))
@@ -108,7 +111,7 @@ export class ClinicaleventChartComponent implements OnInit {
       .attr("fill", this.barColor);
     //labels
     let labels = svg.selectAll("text")
-      .data(this.clinicalEventReport.wrappedItems)
+      .data(this.wrappedItems)
       .enter()
       .append("text")
       .text((d) => d.item.clinicalevent)
@@ -122,7 +125,7 @@ export class ClinicaleventChartComponent implements OnInit {
 
     //add circles
     let dots = svg.selectAll("circle")
-      .data(this.clinicalEventReport.wrappedItems)
+      .data(this.wrappedItems)
       .enter()
       .append("circle")
       .attr("cx", (d, i) => this.xScale(d.itemDate))
@@ -155,9 +158,41 @@ export class ClinicaleventChartComponent implements OnInit {
     //     error => console.log("data access error"),
     //     () => this.createChart()
     //  );
-    
-    this.clinicalEventReport = this.tlService.clinicalEventReport;
-    this.createChart();
+    // console.log("onInit chart component");
+
+    this.tlService.wrappedEvents$
+      // .do(val => console.log(val))
+      .do(val => {
+        this.wrappedItems = val;
+        this.clinicalEventReport = this.tlService.clinicalEventReport;
+        console.log("wrapped items");
+        if (!this.chart) {
+          this.createChart();
+        }
+        else {
+          this.updateChart();
+        }
+      })
+      .subscribe()
+      ;
+  }
+
+  updateChart() {
+    console.log("update");
+    // this.chartContainer.nativeElement = null;
+// JOIN new data with old elements.
+    let update = this.chart.select("svg").selectAll("text");
+    // let update = this.chart.select("svg")
+    //   .data(this.wrappedItems);
+
+      // EXIT old elements not present in new data.
+      update.exit().remove();
+
+
+       // UPDATE old elements present in new data.
+
+       // ENTER new elements present in new data.
+
   }
 
 
