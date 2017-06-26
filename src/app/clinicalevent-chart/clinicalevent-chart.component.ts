@@ -73,9 +73,9 @@ export class ClinicaleventChartComponent implements OnInit {
       .attr('height', this.height);
 
     // chart plot area
-    // this.chart = svg.append('g')
-    //   .attr('class', 'bars')
-    //   .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
+    this.chart = svg.append('g')
+      .attr('class', 'labels')
+      .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
 
     // define domains
     let minDate = this.clinicalEventReport.minDate;
@@ -84,6 +84,7 @@ export class ClinicaleventChartComponent implements OnInit {
     let xDomain = [minDate, maxDate];
     let yDomain = [-50, 50];
 
+    // create scales
     let xBottomScale = d3.scaleTime()
       .domain([minDate, maxDate])
       .range([this.margin.left, this.width - this.margin.right]);
@@ -96,42 +97,9 @@ export class ClinicaleventChartComponent implements OnInit {
       .domain(yDomain)
       .range([0, this.height]);
 
-
+    // Date axix
     let xDateAxisGen = d3.axisTop(xBottomScale).ticks(this.dateTicks).tickFormat(d3.timeFormat("%b"));
 
-    //add bars
-    let bars = svg.selectAll("rect")
-      .data(this.wrappedItems)
-      .enter()
-      .append("rect")
-      .attr("x", (d, i) => this.xScale(d.itemDate))
-      .attr("y", (d, i) => d.item.eventtype == 1 ? this.height - this.yScale((d.yValue)) : this.yScale(0))
-      .attr("width", 2)
-      .attr("height", (d, i) => Math.abs(this.yScale(d.yValue) - this.yScale(0)))
-      .attr("fill", this.barColor);
-    //labels
-    let labels = svg.selectAll("text")
-      .data(this.wrappedItems)
-      .enter()
-      .append("text")
-      .text((d) => d.item.clinicalevent)
-      .attr("x", (d, i) => this.xScale(d.itemDate) + 4)
-      .attr("y", (d, i) => this.height + 4 - this.yScale(d.yValue))
-      .attr("font-size", "14px")
-      .attr("font-family", "sans-serif")
-      .attr("fill", this.labelColor)
-      .attr("text-anchor", "right")
-      ;
-
-    //add circles
-    let dots = svg.selectAll("circle")
-      .data(this.wrappedItems)
-      .enter()
-      .append("circle")
-      .attr("cx", (d, i) => this.xScale(d.itemDate))
-      .attr("cy", (d, i) => this.height - this.yScale(d.yValue))
-      .attr("r", 3)
-      .attr("fill", this.dotColor);
 
     // x & y axis
     this.xAxis = svg.append('g')
@@ -144,6 +112,169 @@ export class ClinicaleventChartComponent implements OnInit {
       .attr('class', 'axis bottomAxis')
       .attr('transform', `translate(0, ${this.height - this.margin['bottom']})`)
       ;
+  }
+
+  updateChart() {
+    console.log("update");
+    // update scales and axes
+    // define domains
+    let minDate = this.clinicalEventReport.minDate;
+    let maxDate = this.clinicalEventReport.maxDate;
+
+    let xDomain = [minDate, maxDate];
+    let yDomain = [-50, 50];
+
+    // create scales
+    let xBottomScale = d3.scaleTime()
+      .domain([minDate, maxDate])
+      .range([this.margin.left, this.width - this.margin.right]);
+
+    this.xScale = d3.scaleTime()
+      .domain([minDate, maxDate])
+      .range([this.margin.left, this.width - this.margin.right]);
+
+    this.yScale = d3.scaleLinear()
+      .domain(yDomain)
+      .range([0, this.height]);
+
+    // Date axix
+    let xDateAxisGen = d3.axisTop(xBottomScale).ticks(this.dateTicks).tickFormat(d3.timeFormat("%b"));
+
+
+    // x & y axis
+    // this.xAxis = svg.append('g')
+    //   .attr('class', 'axis axis-yZero')
+    //   .attr('transform', `translate(0, ${this.yScale(0)})`)//place an axis at y=0
+    //   .call(d3.axisBottom(this.xScale).tickFormat((d) => "").tickSize(0))//style the axis
+    //   ;
+    // let xBottomAxis = svg.append('g')
+    //   .call(xDateAxisGen)
+    //   .attr('class', 'axis bottomAxis')
+    //   .attr('transform', `translate(0, ${this.height - this.margin['bottom']})`)
+    //   ;
+
+    // let updateRect = this.chart.selectAll("rect")
+    //   .data(this.wrappedItems);
+    let updateText = this.chart.selectAll("label")
+      .data(this.wrappedItems, (d) => <ClinicalEventItemWrapper>d.item.clinicalevent + d.item.eventtime);
+    // let updateCircles = this.chart.selectAll("circle")
+    //   .data(this.wrappedItems);
+
+    // remove existing bars
+    //  updateRect.exit().remove();
+    updateText.exit().remove();
+    //  updateCircles.exit().remove();
+
+    // update existing
+    //add bars
+    // let bars = this.chart.selectAll("rect")
+    //   .data(this.wrappedItems)
+    //   .enter()
+    //   .append("rect")
+    //   .attr("x", (d, i) => this.xScale(d.itemDate))
+    //   .attr("y", (d, i) => d.item.eventtype == 1 ? this.height - this.yScale((d.yValue)) : this.yScale(0))
+    //   .attr("width", 2)
+    //   .attr("height", (d, i) => Math.abs(this.yScale(d.yValue) - this.yScale(0)))
+    //   .attr("fill", this.barColor);
+    //labels
+    //this.chart.selectAll("label")//.transition()
+    // .do(console.log(this.chart.selectAll("label")))
+    this.chart.selectAll('label').transition()
+      .attr("x", (d, i) => this.xScale(d.itemDate) + 4)
+      .attr("y", (d, i) => this.height + 4 - this.yScale(d.yValue))
+
+
+    let enter = updateText
+      // .data(this.wrappedItems, (d) => <ClinicalEventItemWrapper>d.item.clinicalevent+d.item.eventtime)
+      .enter()
+      .append("text")
+      .text((d) => d.item.clinicalevent)
+      .attr("x", (d, i) => this.xScale(d.itemDate) + 4)
+      .attr("y", (d, i) => this.height + 4 - this.yScale(d.yValue))
+      .attr("font-size", "14px")
+      .attr("font-family", "sans-serif")
+      .attr("fill", this.labelColor)
+      .attr("text-anchor", "right")
+      ;
+    // updateText
+    // .enter();
+    //add circles
+    // let dots = this.chart.selectAll("circle")
+    //   .data(this.wrappedItems)
+    //   .enter()
+    //   .append("circle")
+    //   .attr("cx", (d, i) => this.xScale(d.itemDate))
+    //   .attr("cy", (d, i) => this.height - this.yScale(d.yValue))
+    //   .attr("r", 3)
+    //   .attr("fill", this.dotColor);
+    //add new items
+
+    // this.chartContainer.nativeElement = null;
+    // JOIN new data with old elements.
+    // let update = this.chart.select("this.chart").selectAll("text");
+
+    // EXIT old elements not present in new data.
+    // update.exit().remove();
+
+
+    // UPDATE old elements present in new data.
+
+    // ENTER new elements present in new data.
+
+  }
+  updateChart2() {
+    console.log("update");
+    // update scales and axes
+    // define domains
+    let minDate = this.clinicalEventReport.minDate;
+    let maxDate = this.clinicalEventReport.maxDate;
+
+    let xDomain = [minDate, maxDate];
+    let yDomain = [-50, 50];
+
+    // create scales
+    let xBottomScale = d3.scaleTime()
+      .domain([minDate, maxDate])
+      .range([this.margin.left, this.width - this.margin.right]);
+
+    this.xScale = d3.scaleTime()
+      .domain([minDate, maxDate])
+      .range([this.margin.left, this.width - this.margin.right]);
+
+    this.yScale = d3.scaleLinear()
+      .domain(yDomain)
+      .range([0, this.height]);
+
+    // Date axix
+    let xDateAxisGen = d3.axisTop(xBottomScale).ticks(this.dateTicks).tickFormat(d3.timeFormat("%b"));
+
+
+    
+    let updateText = this.chart.selectAll("label")
+      .data(this.wrappedItems, (d) => <ClinicalEventItemWrapper>d.item.clinicalevent + d.item.eventtime);
+    
+    updateText.exit().remove();
+    
+    // this.chart.selectAll('label').transition()
+    //   .attr("x", (d, i) => this.xScale(d.itemDate) + 4)
+    //   .attr("y", (d, i) => this.height + 4 - this.yScale(d.yValue))
+
+
+    let enter = updateText
+      // .data(this.wrappedItems, (d) => <ClinicalEventItemWrapper>d.item.clinicalevent+d.item.eventtime)
+      .enter()
+      .append("text")
+      .text((d) => d.item.clinicalevent)
+      .attr("x", (d, i) => this.xScale(d.itemDate) + 4)
+      .attr("y", (d, i) => this.height + 4 - this.yScale(d.yValue))
+      .attr("font-size", "14px")
+      .attr("font-family", "sans-serif")
+      .attr("fill", this.labelColor)
+      .attr("text-anchor", "right")
+      ;
+    
+
+
   }
 
   ngOnChanges() {
@@ -166,34 +297,20 @@ export class ClinicaleventChartComponent implements OnInit {
         this.wrappedItems = val;
         this.clinicalEventReport = this.tlService.clinicalEventReport;
         console.log("wrapped items");
+        console.log(val);
         if (!this.chart) {
           this.createChart();
+          this.updateChart()
         }
         else {
-          this.updateChart();
+          this.updateChart2();
         }
       })
       .subscribe()
       ;
   }
 
-  updateChart() {
-    console.log("update");
-    // this.chartContainer.nativeElement = null;
-// JOIN new data with old elements.
-    let update = this.chart.select("svg").selectAll("text");
-    // let update = this.chart.select("svg")
-    //   .data(this.wrappedItems);
 
-      // EXIT old elements not present in new data.
-      update.exit().remove();
-
-
-       // UPDATE old elements present in new data.
-
-       // ENTER new elements present in new data.
-
-  }
 
 
 }
