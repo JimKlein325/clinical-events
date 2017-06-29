@@ -20,7 +20,7 @@ body {
 }
 .d3-chart chart{
         max-height: 100vh;
-              min-height: 100vh; 
+              /*min-height: 100vh; */
         min-width: 100%;  
   
 }
@@ -28,7 +28,7 @@ app-root {
   height: 100vh; 
   min-height: 100vh;
   max-height: 100vh;
-          min-width: 100%;  
+        min-width: 100%;  
 
 }
 clinicalevent-chart {
@@ -38,8 +38,11 @@ clinicalevent-chart {
 item-select {
         overflow: auto;
 }
-md-checkbox{
-        
+md-list-item h3{
+     color: black;   
+}
+.subheader {
+     color: black;   
 }
 .example-spacer {
   flex: 1 1 auto;

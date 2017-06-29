@@ -30,6 +30,7 @@ export class ItemSelectComponent implements OnInit {
   ngOnInit() {
 
     this.service.clinicalEvents$
+      //.publishLast()//.refCount()
       .subscribe(val => {
         // console.log(val);
         if (!this.singleUseFlag) {
@@ -39,7 +40,8 @@ export class ItemSelectComponent implements OnInit {
             this.users.push(new FormControl(true));
           });
         }
-      });
+      })
+      ;
   }
 
   onCheckChange(event) {

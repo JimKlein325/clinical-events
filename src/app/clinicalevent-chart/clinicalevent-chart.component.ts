@@ -52,9 +52,9 @@ export class ClinicaleventChartComponent implements OnInit, AfterViewInit {
   private xBottomAxis: any;
   private yAxis: any;
   // private readonly verticalTextOffset: number = 4;
-  private barColor: string = "gray";
+  private barColor: string = "darkorange";
   private dotColor: string = "black";
-  private labelColor: string = "darkblue";
+  private labelColor: string = "black";
   // private numberOfVerticalEntrySlots: number = 10;
   private dateTicks: number = 5;
   // public testDataset: Observable<ClinicalEventItem[]>;
@@ -97,7 +97,7 @@ export class ClinicaleventChartComponent implements OnInit, AfterViewInit {
     // this.chart = true;
     let element = this.chartContainer.nativeElement;
     this.width = element.offsetWidth - this.margin.left - this.margin.right;
-    // console.log("width: " + this.width);
+    console.log("width: " + this.width);
     this.height = element.offsetHeight - this.margin.top - this.margin.bottom;
     this.problemName = this.clinicalEventReport.problemName;
 
@@ -108,12 +108,9 @@ export class ClinicaleventChartComponent implements OnInit, AfterViewInit {
     // chart plot area
     this.chart = svg.append('g')
       .attr('class', 'labels')
-      .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
+      .attr('transform', `translate(${this.margin.left}, 0)`);
 
     // define domains
-    // let minDate = this.minDate;// this.clinicalEventReport.minDate;
-    // let maxDate = this.clinicalEventReport.maxDate;
-
     let xDomain = [this.minDate, this.maxDate];
     let yDomain = [-40, 40];
 
@@ -137,108 +134,75 @@ export class ClinicaleventChartComponent implements OnInit, AfterViewInit {
     // x & y axis
     this.xAxis = svg.append('g')
       .attr('class', 'axis axis-yZero')
-      .attr('transform', `translate(0, ${this.yScale(0)})`)//place an axis at y=0
+      .attr('transform', `translate(${this.margin.left}, ${this.yScale(0)})`)//place an axis at y=0
       .call(xAxisGen)//style the axis
       ;
     this.xBottomAxis = svg.append('g')
       .call(xDateAxisGen)
       .attr('class', 'axis bottomAxis')
-      .attr('transform', `translate(0, ${this.height - this.margin['bottom']})`)
+      .attr('transform', `translate(${this.margin.left}, ${this.height - this.margin['bottom']})`)
       ;
   }
 
   updateChart() {
-    console.log("update");
-    // update scales and axes
-    // define domains
-    // let minDate = this.clinicalEventReport.minDate;
-    // let maxDate = this.clinicalEventReport.maxDate;
-
-    // let xDomain = [minDate, maxDate];
-    // let yDomain = [-50, 50];
-
-    // // create scales
-    // let xBottomScale = d3.scaleTime()
-    //   .domain([minDate, maxDate])
-    //   .range([this.margin.left, this.width - this.margin.right]);
-
-    // this.xScale = d3.scaleTime()
-    //   .domain([minDate, maxDate])
-    //   .range([this.margin.left, this.width - this.margin.right]);
-
-    // this.yScale = d3.scaleLinear()
-    //   .domain(yDomain)
-    //   .range([0, this.height]);
-
-    // // Date axix
-    // let xDateAxisGen = d3.axisTop(xBottomScale).ticks(this.dateTicks).tickFormat(d3.timeFormat("%b"));
-
-
-    // x & y axis
-    // this.xAxis = svg.append('g')
-    //   .attr('class', 'axis axis-yZero')
-    //   .attr('transform', `translate(0, ${this.yScale(0)})`)//place an axis at y=0
-    //   .call(d3.axisBottom(this.xScale).tickFormat((d) => "").tickSize(0))//style the axis
-    //   ;
-    // let xBottomAxis = svg.append('g')
-    //   .call(xDateAxisGen)
-    //   .attr('class', 'axis bottomAxis')
-    //   .attr('transform', `translate(0, ${this.height - this.margin['bottom']})`)
-    //   ;
-
     // update scales & axis
     let xDomain = [this.minDate, this.maxDate];
 
     this.xScale = d3.scaleTime()
       .domain(xDomain)
       .range([this.margin.left, this.width - this.margin.right]);
-    // yAxis is not dynamic
-    // this.yScale.domain([0, d3.max(this.data, d => d[1])]);
-    this.xAxis.transition().call(d3.axisBottom(this.xScale).tickFormat((d) => "").tickSize(0));
+
+    let xAxisGen = d3.axisBottom(this.xScale).tickFormat((d) => "").tickSize(0);
+    this.xAxis.transition().call(xAxisGen);
 
     let xDateAxisGen = d3.axisBottom(this.xScale).ticks(this.dateTicks).tickFormat(d3.timeFormat("%b"));
     this.xBottomAxis.transition().call(xDateAxisGen);
 
-    // .call(d3.axisBottom(this.xScale).tickFormat((d) => "").tickSize(0))//style the axis
-
-    // this.yAxis.transition().call(d3.axisLeft(this.yScale));
-
-
-    // let updateRect = this.chart.selectAll("rect")
-    //   .data(this.wrappedItems);
+    // JOIN: join elements and dataset
+    // pass key function as argument to second parameter in data function to ensure 
+    let updateRect = this.chart.selectAll("rect")
+      .data(this.wrappedItems, (d: ClinicalEventItemWrapper) => d.item.clinicalevent + d.item.eventtime);
     let updateText = this.chart.selectAll(".label")
       .data(this.wrappedItems, (d: ClinicalEventItemWrapper) => d.item.clinicalevent + d.item.eventtime);
-    // let updateCircles = this.chart.selectAll("circle")
-    //   .data(this.wrappedItems);
+    let updateCircles = this.chart.selectAll("circle")
+      .data(this.wrappedItems, (d: ClinicalEventItemWrapper) => d.item.clinicalevent + d.item.eventtime);
 
-    // remove existing items no longer part of dataset
-    //  updateRect.exit().remove();
+    // EXIT: remove existing items no longer part of dataset
+    updateRect.exit().remove();
     updateText.exit().remove();
-    //  updateCircles.exit().remove();
+    updateCircles.exit().remove();
 
-    // update existing
-    //add bars
-    // let bars = this.chart.selectAll("rect")
-    //   .data(this.wrappedItems)
-    //   .enter()
-    //   .append("rect")
-    //   .attr("x", (d, i) => this.xScale(d.itemDate))
-    //   .attr("y", (d, i) => d.item.eventtype == 1 ? this.height - this.yScale((d.yValue)) : this.yScale(0))
-    //   .attr("width", 2)
-    //   .attr("height", (d, i) => Math.abs(this.yScale(d.yValue) - this.yScale(0)))
-    //   .attr("fill", this.barColor);
-    //labels
-    //this.chart.selectAll("label")//.transition()
-    // .do(console.log(this.chart.selectAll("label")))
+    // UPDATE existing items, applying a transition
     updateText
       .transition()
       .duration(750)
       .attr("x", (d, i) => this.xScale(d.itemDate) + 4)
       .attr("y", (d, i) => this.height + 4 - this.yScale(d.yValue));
 
+    updateCircles
+      .transition()
+      .duration(750)
+      .attr("cx", (d, i) => this.xScale(d.itemDate))
+      .attr("cy", (d, i) => this.height - this.yScale(d.yValue))
 
-    let enter = updateText
-      // .data(this.wrappedItems, (d) => <ClinicalEventItemWrapper>d.item.clinicalevent+d.item.eventtime)
+    updateRect
+      .transition()
+      .duration(750)
+      .attr("x", (d, i) => this.xScale(d.itemDate))
+      .attr("y", (d, i) => d.item.eventtype == 1 ? this.height - this.yScale((d.yValue)) : this.yScale(0))
+      .attr("height", (d, i) => Math.abs(this.yScale(d.yValue) - this.yScale(0)));
+
+    // ENTER existing items, applying a transition
+    let enterRect = updateRect
+      .enter()
+      .append("rect")
+      .attr("x", (d, i) => this.xScale(d.itemDate))
+      .attr("y", (d, i) => d.item.eventtype == 1 ? this.height - this.yScale((d.yValue)) : this.yScale(0))
+      .attr("width", 2)
+      .attr("height", (d, i) => Math.abs(this.yScale(d.yValue) - this.yScale(0)))
+      .attr("fill", this.barColor);
+
+    let enterText = updateText
       .enter()
       .append("text")
       .attr('class', 'label')
@@ -250,34 +214,18 @@ export class ClinicaleventChartComponent implements OnInit, AfterViewInit {
       .attr("fill", this.labelColor)
       .attr("text-anchor", "right")
       .transition()
-      .duration(1000)
+      .duration(750)
       ;
-    // updateText
-    // .enter();
-    //add circles
-    // let dots = this.chart.selectAll("circle")
-    //   .data(this.wrappedItems)
-    //   .enter()
-    //   .append("circle")
-    //   .attr("cx", (d, i) => this.xScale(d.itemDate))
-    //   .attr("cy", (d, i) => this.height - this.yScale(d.yValue))
-    //   .attr("r", 3)
-    //   .attr("fill", this.dotColor);
-    //add new items
 
-    // this.chartContainer.nativeElement = null;
-    // JOIN new data with old elements.
-    // let update = this.chart.select("this.chart").selectAll("text");
-
-    // EXIT old elements not present in new data.
-    // update.exit().remove();
-
-
-    // UPDATE old elements present in new data.
-
-    // ENTER new elements present in new data.
-
+    let enterCircles = updateCircles
+      .enter()
+      .append("circle")
+      .attr("cx", (d, i) => this.xScale(d.itemDate))
+      .attr("cy", (d, i) => this.height - this.yScale(d.yValue))
+      .attr("r", 3)
+      .attr("fill", this.dotColor);
   }
+
   updateChart2() {
     console.log("update");
     // update scales and axes
@@ -338,32 +286,6 @@ export class ClinicaleventChartComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    // data service works.  Uncomment to use.
-    //   this.dataService.getClinicalEventData()
-    //   .subscribe(
-    //     data => this.dataset,
-    //     error => console.log("data access error"),
-    //     () => this.createChart()
-    //  );
-    // console.log("onInit chart component");
-
-    // this.tlService.wrappedEvents$
-    //   // .do(val => console.log(val))
-    //   .do(val => {
-    //     this.wrappedItems = val;
-    //     this.clinicalEventReport = this.tlService.clinicalEventReport;
-    //     console.log("wrapped items");
-    //     console.log(val);
-    //     if (!this.chart) {
-    //       this.createChart();
-    //       this.updateChart()
-    //     }
-    //     else {
-    //       this.updateChart2();
-    //     }
-    //   })
-    //   .subscribe()
-    //   ;
   }
 
 
