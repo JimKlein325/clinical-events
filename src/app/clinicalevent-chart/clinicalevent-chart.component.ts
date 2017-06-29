@@ -1,4 +1,4 @@
-import { Component, Injectable, OnInit, OnChanges, ViewChild, ElementRef, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Injectable, OnInit, OnChanges, ViewChild, ElementRef, Input, ViewEncapsulation, AfterViewInit } from '@angular/core';
 import * as d3 from 'd3';
 import * as d3TimeFormat from 'd3-time-format';
 
@@ -28,7 +28,8 @@ import { TimelineService } from "../timeline.service";
 
 })
 @Injectable()
-export class ClinicaleventChartComponent implements OnInit {
+export class ClinicaleventChartComponent implements OnInit, AfterViewInit {
+
   @ViewChild('chart') private chartContainer: ElementRef;
   // w: number = 300;
   // h: number = 300;
@@ -40,12 +41,15 @@ export class ClinicaleventChartComponent implements OnInit {
 
   private margin: any = { top: 20, bottom: 20, left: 20, right: 80 };
   private chart: any;
+  maxDate: Date;
+  minDate: Date;
   private width: number;
   private height: number;
   private xScale: any;
   private yScale: any;
   private colors: any;
   private xAxis: any;
+  private xBottomAxis: any;
   private yAxis: any;
   // private readonly verticalTextOffset: number = 4;
   private barColor: string = "gray";
@@ -59,13 +63,42 @@ export class ClinicaleventChartComponent implements OnInit {
 
   constructor(private tlService: TimelineService, public dataService: ClinicalEventDataService) { }
 
+  ngAfterViewInit(): void {
+    this.tlService.maxMinDates$
+      .map(val => {
+        this.minDate = val.minDate;
+        //console.log(this.minDate);
+        this.maxDate = val.maxDate;
+        // console.log("what");
+        // console.log(this.maxDate);
+      })
+      .subscribe();
+
+    this.tlService.wrappedEvents$
+      // .do(val => console.log(val))
+      .do(val => {
+        this.wrappedItems = val;
+        this.clinicalEventReport = this.tlService.clinicalEventReport;
+        console.log("wrapped items");
+        console.log(val);
+        if (!this.chart) {
+          this.createChart();
+          this.updateChart()
+        }
+        else {
+          this.updateChart();
+        }
+      })
+      .subscribe()
+      ;
+  }
 
   createChart() {
     // this.chart = true;
     let element = this.chartContainer.nativeElement;
-    this.width = 800;//element.offsetWidth - this.margin.left - this.margin.right;
+    this.width = element.offsetWidth - this.margin.left - this.margin.right;
     // console.log("width: " + this.width);
-    this.height = 450;//element.offsetHeight - this.margin.top - this.margin.bottom;
+    this.height = element.offsetHeight - this.margin.top - this.margin.bottom;
     this.problemName = this.clinicalEventReport.problemName;
 
     let svg = d3.select(element).append("svg")
@@ -78,19 +111,19 @@ export class ClinicaleventChartComponent implements OnInit {
       .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
 
     // define domains
-    let minDate = this.clinicalEventReport.minDate;
-    let maxDate = this.clinicalEventReport.maxDate;
+    // let minDate = this.minDate;// this.clinicalEventReport.minDate;
+    // let maxDate = this.clinicalEventReport.maxDate;
 
-    let xDomain = [minDate, maxDate];
-    let yDomain = [-50, 50];
+    let xDomain = [this.minDate, this.maxDate];
+    let yDomain = [-40, 40];
 
     // create scales
     let xBottomScale = d3.scaleTime()
-      .domain([minDate, maxDate])
+      .domain(xDomain)
       .range([this.margin.left, this.width - this.margin.right]);
 
     this.xScale = d3.scaleTime()
-      .domain([minDate, maxDate])
+      .domain(xDomain)
       .range([this.margin.left, this.width - this.margin.right]);
 
     this.yScale = d3.scaleLinear()
@@ -98,16 +131,16 @@ export class ClinicaleventChartComponent implements OnInit {
       .range([0, this.height]);
 
     // Date axix
-    let xDateAxisGen = d3.axisTop(xBottomScale).ticks(this.dateTicks).tickFormat(d3.timeFormat("%b"));
-
+    let xDateAxisGen = d3.axisBottom(xBottomScale).ticks(this.dateTicks).tickFormat(d3.timeFormat("%b"));
+    let xAxisGen = d3.axisBottom(this.xScale).tickFormat((d) => "").tickSize(0);
 
     // x & y axis
     this.xAxis = svg.append('g')
       .attr('class', 'axis axis-yZero')
       .attr('transform', `translate(0, ${this.yScale(0)})`)//place an axis at y=0
-      .call(d3.axisBottom(this.xScale).tickFormat((d) => "").tickSize(0))//style the axis
+      .call(xAxisGen)//style the axis
       ;
-    let xBottomAxis = svg.append('g')
+    this.xBottomAxis = svg.append('g')
       .call(xDateAxisGen)
       .attr('class', 'axis bottomAxis')
       .attr('transform', `translate(0, ${this.height - this.margin['bottom']})`)
@@ -118,27 +151,27 @@ export class ClinicaleventChartComponent implements OnInit {
     console.log("update");
     // update scales and axes
     // define domains
-    let minDate = this.clinicalEventReport.minDate;
-    let maxDate = this.clinicalEventReport.maxDate;
+    // let minDate = this.clinicalEventReport.minDate;
+    // let maxDate = this.clinicalEventReport.maxDate;
 
-    let xDomain = [minDate, maxDate];
-    let yDomain = [-50, 50];
+    // let xDomain = [minDate, maxDate];
+    // let yDomain = [-50, 50];
 
-    // create scales
-    let xBottomScale = d3.scaleTime()
-      .domain([minDate, maxDate])
-      .range([this.margin.left, this.width - this.margin.right]);
+    // // create scales
+    // let xBottomScale = d3.scaleTime()
+    //   .domain([minDate, maxDate])
+    //   .range([this.margin.left, this.width - this.margin.right]);
 
-    this.xScale = d3.scaleTime()
-      .domain([minDate, maxDate])
-      .range([this.margin.left, this.width - this.margin.right]);
+    // this.xScale = d3.scaleTime()
+    //   .domain([minDate, maxDate])
+    //   .range([this.margin.left, this.width - this.margin.right]);
 
-    this.yScale = d3.scaleLinear()
-      .domain(yDomain)
-      .range([0, this.height]);
+    // this.yScale = d3.scaleLinear()
+    //   .domain(yDomain)
+    //   .range([0, this.height]);
 
-    // Date axix
-    let xDateAxisGen = d3.axisTop(xBottomScale).ticks(this.dateTicks).tickFormat(d3.timeFormat("%b"));
+    // // Date axix
+    // let xDateAxisGen = d3.axisTop(xBottomScale).ticks(this.dateTicks).tickFormat(d3.timeFormat("%b"));
 
 
     // x & y axis
@@ -153,14 +186,32 @@ export class ClinicaleventChartComponent implements OnInit {
     //   .attr('transform', `translate(0, ${this.height - this.margin['bottom']})`)
     //   ;
 
+    // update scales & axis
+    let xDomain = [this.minDate, this.maxDate];
+
+    this.xScale = d3.scaleTime()
+      .domain(xDomain)
+      .range([this.margin.left, this.width - this.margin.right]);
+    // yAxis is not dynamic
+    // this.yScale.domain([0, d3.max(this.data, d => d[1])]);
+    this.xAxis.transition().call(d3.axisBottom(this.xScale).tickFormat((d) => "").tickSize(0));
+
+    let xDateAxisGen = d3.axisBottom(this.xScale).ticks(this.dateTicks).tickFormat(d3.timeFormat("%b"));
+    this.xBottomAxis.transition().call(xDateAxisGen);
+
+    // .call(d3.axisBottom(this.xScale).tickFormat((d) => "").tickSize(0))//style the axis
+
+    // this.yAxis.transition().call(d3.axisLeft(this.yScale));
+
+
     // let updateRect = this.chart.selectAll("rect")
     //   .data(this.wrappedItems);
-    let updateText = this.chart.selectAll("label")
-      .data(this.wrappedItems, (d) => <ClinicalEventItemWrapper>d.item.clinicalevent + d.item.eventtime);
+    let updateText = this.chart.selectAll(".label")
+      .data(this.wrappedItems, (d: ClinicalEventItemWrapper) => d.item.clinicalevent + d.item.eventtime);
     // let updateCircles = this.chart.selectAll("circle")
     //   .data(this.wrappedItems);
 
-    // remove existing bars
+    // remove existing items no longer part of dataset
     //  updateRect.exit().remove();
     updateText.exit().remove();
     //  updateCircles.exit().remove();
@@ -179,15 +230,18 @@ export class ClinicaleventChartComponent implements OnInit {
     //labels
     //this.chart.selectAll("label")//.transition()
     // .do(console.log(this.chart.selectAll("label")))
-    this.chart.selectAll('label').transition()
+    updateText
+      .transition()
+      .duration(750)
       .attr("x", (d, i) => this.xScale(d.itemDate) + 4)
-      .attr("y", (d, i) => this.height + 4 - this.yScale(d.yValue))
+      .attr("y", (d, i) => this.height + 4 - this.yScale(d.yValue));
 
 
     let enter = updateText
       // .data(this.wrappedItems, (d) => <ClinicalEventItemWrapper>d.item.clinicalevent+d.item.eventtime)
       .enter()
       .append("text")
+      .attr('class', 'label')
       .text((d) => d.item.clinicalevent)
       .attr("x", (d, i) => this.xScale(d.itemDate) + 4)
       .attr("y", (d, i) => this.height + 4 - this.yScale(d.yValue))
@@ -195,6 +249,8 @@ export class ClinicaleventChartComponent implements OnInit {
       .attr("font-family", "sans-serif")
       .attr("fill", this.labelColor)
       .attr("text-anchor", "right")
+      .transition()
+      .duration(1000)
       ;
     // updateText
     // .enter();
@@ -249,12 +305,12 @@ export class ClinicaleventChartComponent implements OnInit {
     let xDateAxisGen = d3.axisTop(xBottomScale).ticks(this.dateTicks).tickFormat(d3.timeFormat("%b"));
 
 
-    
+
     let updateText = this.chart.selectAll("label")
       .data(this.wrappedItems, (d) => <ClinicalEventItemWrapper>d.item.clinicalevent + d.item.eventtime);
-    
+
     updateText.exit().remove();
-    
+
     // this.chart.selectAll('label').transition()
     //   .attr("x", (d, i) => this.xScale(d.itemDate) + 4)
     //   .attr("y", (d, i) => this.height + 4 - this.yScale(d.yValue))
@@ -272,7 +328,7 @@ export class ClinicaleventChartComponent implements OnInit {
       .attr("fill", this.labelColor)
       .attr("text-anchor", "right")
       ;
-    
+
 
 
   }
@@ -291,23 +347,23 @@ export class ClinicaleventChartComponent implements OnInit {
     //  );
     // console.log("onInit chart component");
 
-    this.tlService.wrappedEvents$
-      // .do(val => console.log(val))
-      .do(val => {
-        this.wrappedItems = val;
-        this.clinicalEventReport = this.tlService.clinicalEventReport;
-        console.log("wrapped items");
-        console.log(val);
-        if (!this.chart) {
-          this.createChart();
-          this.updateChart()
-        }
-        else {
-          this.updateChart2();
-        }
-      })
-      .subscribe()
-      ;
+    // this.tlService.wrappedEvents$
+    //   // .do(val => console.log(val))
+    //   .do(val => {
+    //     this.wrappedItems = val;
+    //     this.clinicalEventReport = this.tlService.clinicalEventReport;
+    //     console.log("wrapped items");
+    //     console.log(val);
+    //     if (!this.chart) {
+    //       this.createChart();
+    //       this.updateChart()
+    //     }
+    //     else {
+    //       this.updateChart2();
+    //     }
+    //   })
+    //   .subscribe()
+    //   ;
   }
 
 

@@ -369,7 +369,7 @@ export class TimelineService {
       let min = moment(minD).format('YYYY-MM-DD');
       let max = moment(maxD).format('YYYY-MM-DD');
       //console.log(moment(maxD).format('YYYY-MM-DD'))
-      return [{ minDate: min, maxDate: max }];
+      return [{ minDate: minD, maxDate: maxD, minDateString: min, maxDateString: max }];
     });
 
 
@@ -471,6 +471,7 @@ export class TimelineService {
     // console.log(filteredList);
     const newSet = this.prepareData(filteredList);
     console.log("set filtered:  " + newSet.length);
+    this.subject.next(filteredList);
     this.wrappedSubject.next(newSet);
     // console.log("wrappedSubject emit");
   }

@@ -13,6 +13,7 @@ export class ItemSelectComponent implements OnInit {
   private labels: string[];
   private form: FormGroup;
   private fArray: FormArray = new FormArray([]);
+  private singleUseFlag = false;
 
   users: FormArray = new FormArray([
   ]);
@@ -30,11 +31,14 @@ export class ItemSelectComponent implements OnInit {
 
     this.service.clinicalEvents$
       .subscribe(val => {
-        this.labels = val;
         // console.log(val);
-        this.labels.forEach(element => {
-          this.users.push(new FormControl(true));
-        });
+        if (!this.singleUseFlag) {
+          this.singleUseFlag = true;
+          this.labels = val;
+          this.labels.forEach(element => {
+            this.users.push(new FormControl(true));
+          });
+        }
       });
   }
 

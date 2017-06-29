@@ -18,4 +18,30 @@ body {
         background:lightblue;
 
 }
+.d3-chart chart{
+        max-height: 100vh;
+              min-height: 100vh; 
+        min-width: 100%;  
+  
+}
+app-root { 
+  height: 100vh; 
+  min-height: 100vh;
+  max-height: 100vh;
+          min-width: 100%;  
+
+}
+clinicalevent-chart {
+        min-height: 100vh; 
+        min-width: 100%;  
+}
+item-select {
+        overflow: auto;
+}
+md-checkbox{
+        
+}
+.example-spacer {
+  flex: 1 1 auto;
+}
 

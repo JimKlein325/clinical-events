@@ -1,5 +1,19 @@
-<clinicalevent-chart></clinicalevent-chart>
-<!--
-<clinicalevent-chart></clinical-events>
-<text-test></text-test>
--->
+<div class="container" fxLayout="row wrap">
+  <div class="container" fxFlex="100%" fxLayout="row">
+    <div fxFlex>
+    <md-toolbar color="primary">
+      <span>Event Timeline</span>
+      <span class="example-spacer"></span>
+      <span>Problem Name here.</span>
+    </md-toolbar>
+    </div>
+  </div>
+  <div class="container" fxFlex="100%" fxLayout="row">
+    <div fxFlex="80">
+      <clinicalevent-chart></clinicalevent-chart>
+    </div>
+    <div class="control" fxFlex="20">
+      <item-select></item-select>
+    </div>
+  </div>
+</div>
