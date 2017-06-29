@@ -18,7 +18,7 @@ import { ClinicalEventItem } from './models/clinical-event-item'
 import { ClinicalEventDataService } from './models/clinical-event-data-service'
 import { ClinicalEventItemWrapper } from './models/clinical-event-item-wrapper'
 import { TimelineService } from "../timeline.service";
-
+import * as moment from 'moment';
 
 @Component({
   selector: 'clinicalevent-chart',
@@ -171,13 +171,18 @@ export class ClinicaleventChartComponent implements OnInit, AfterViewInit {
     updateRect.exit().remove();
     updateText.exit().remove();
     updateCircles.exit().remove();
+    //tooltip
+    var tooltip = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
 
     // UPDATE existing items, applying a transition
     updateText
       .transition()
       .duration(750)
       .attr("x", (d, i) => this.xScale(d.itemDate) + 4)
-      .attr("y", (d, i) => this.height + 4 - this.yScale(d.yValue));
+      .attr("y", (d, i) => this.height + 4 - this.yScale(d.yValue))
+      ;
 
     updateCircles
       .transition()
@@ -200,8 +205,9 @@ export class ClinicaleventChartComponent implements OnInit, AfterViewInit {
       .attr("y", (d, i) => d.item.eventtype == 1 ? this.height - this.yScale((d.yValue)) : this.yScale(0))
       .attr("width", 2)
       .attr("height", (d, i) => Math.abs(this.yScale(d.yValue) - this.yScale(0)))
-      .attr("fill", this.barColor);
-
+      .attr("fill", this.barColor)
+      ;
+      //Include onMouseover/Mouseout events for enabling tool tips when user hovers over text
     let enterText = updateText
       .enter()
       .append("text")
@@ -213,9 +219,20 @@ export class ClinicaleventChartComponent implements OnInit, AfterViewInit {
       .attr("font-family", "sans-serif")
       .attr("fill", this.labelColor)
       .attr("text-anchor", "right")
-      .transition()
-      .duration(750)
-      ;
+      .on("mouseover", function (d) {
+        let toolTipText = moment(d.item.eventtime).format('MMM D, YYYY');
+        tooltip.transition()
+          .duration(500)
+          .style("opacity", .9);
+        tooltip.html(toolTipText)
+          .style("left", (d3.event.pageX) + "px")
+          .style("top", (d3.event.pageY - 28) + "px");
+      })
+      .on("mouseout", function (d) {
+        tooltip.transition()
+          .duration(500)
+          .style("opacity", 0);
+      });
 
     let enterCircles = updateCircles
       .enter()
@@ -224,61 +241,6 @@ export class ClinicaleventChartComponent implements OnInit, AfterViewInit {
       .attr("cy", (d, i) => this.height - this.yScale(d.yValue))
       .attr("r", 3)
       .attr("fill", this.dotColor);
-  }
-
-  updateChart2() {
-    console.log("update");
-    // update scales and axes
-    // define domains
-    let minDate = this.clinicalEventReport.minDate;
-    let maxDate = this.clinicalEventReport.maxDate;
-
-    let xDomain = [minDate, maxDate];
-    let yDomain = [-50, 50];
-
-    // create scales
-    let xBottomScale = d3.scaleTime()
-      .domain([minDate, maxDate])
-      .range([this.margin.left, this.width - this.margin.right]);
-
-    this.xScale = d3.scaleTime()
-      .domain([minDate, maxDate])
-      .range([this.margin.left, this.width - this.margin.right]);
-
-    this.yScale = d3.scaleLinear()
-      .domain(yDomain)
-      .range([0, this.height]);
-
-    // Date axix
-    let xDateAxisGen = d3.axisTop(xBottomScale).ticks(this.dateTicks).tickFormat(d3.timeFormat("%b"));
-
-
-
-    let updateText = this.chart.selectAll("label")
-      .data(this.wrappedItems, (d) => <ClinicalEventItemWrapper>d.item.clinicalevent + d.item.eventtime);
-
-    updateText.exit().remove();
-
-    // this.chart.selectAll('label').transition()
-    //   .attr("x", (d, i) => this.xScale(d.itemDate) + 4)
-    //   .attr("y", (d, i) => this.height + 4 - this.yScale(d.yValue))
-
-
-    let enter = updateText
-      // .data(this.wrappedItems, (d) => <ClinicalEventItemWrapper>d.item.clinicalevent+d.item.eventtime)
-      .enter()
-      .append("text")
-      .text((d) => d.item.clinicalevent)
-      .attr("x", (d, i) => this.xScale(d.itemDate) + 4)
-      .attr("y", (d, i) => this.height + 4 - this.yScale(d.yValue))
-      .attr("font-size", "14px")
-      .attr("font-family", "sans-serif")
-      .attr("fill", this.labelColor)
-      .attr("text-anchor", "right")
-      ;
-
-
-
   }
 
   ngOnChanges() {
