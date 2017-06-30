@@ -79,8 +79,8 @@ export class ClinicaleventChartComponent implements OnInit, AfterViewInit {
       .do(val => {
         this.wrappedItems = val;
         this.clinicalEventReport = this.tlService.clinicalEventReport;
-        console.log("wrapped items");
-        console.log(val);
+        // console.log("wrapped items");
+        // console.log(val);
         if (!this.chart) {
           this.createChart();
           this.updateChart()
@@ -98,7 +98,9 @@ export class ClinicaleventChartComponent implements OnInit, AfterViewInit {
     let element = this.chartContainer.nativeElement;
     this.width = element.offsetWidth - this.margin.left - this.margin.right;
     console.log("width: " + this.width);
-    this.height = element.offsetHeight - this.margin.top - this.margin.bottom;
+    console.log("height: " + element.offsetHeight);
+
+    this.height = element.offsetHeight - this.margin.top - this.margin.bottom - 120;
     this.problemName = this.clinicalEventReport.problemName;
 
     let svg = d3.select(element).append("svg")

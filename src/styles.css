@@ -21,8 +21,21 @@ body {
 .d3-chart chart{
         min-height: 100vh;
         min-width: 100%;  
-  
 }
+.d3-chart {
+  width: 100%;
+        min-height: 100vh;
+  /*height: 600px;*/
+}
+
+/*.d3-chart .axis path,
+.d3-chart .axis line {
+  stroke: #999;
+}*/
+
+/*.d3-chart .axis text {
+  fill: #999;
+}*/
 app-root { 
   height: 100vh; 
   min-height: 100vh;

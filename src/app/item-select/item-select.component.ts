@@ -15,11 +15,11 @@ export class ItemSelectComponent implements OnInit {
   private fArray: FormArray = new FormArray([]);
   private singleUseFlag = false;
 
-  users: FormArray = new FormArray([
+  events: FormArray = new FormArray([
   ]);
 
-  userForm = new FormGroup({
-    users: this.users
+  eventForm = new FormGroup({
+    events: this.events
   });
 
   datesForm: FormGroup;
@@ -37,7 +37,7 @@ export class ItemSelectComponent implements OnInit {
           this.singleUseFlag = true;
           this.labels = val;
           this.labels.forEach(element => {
-            this.users.push(new FormControl(true));
+            this.events.push(new FormControl(true));
           });
         }
       })
