@@ -19,8 +19,7 @@ body {
 
 }
 .d3-chart chart{
-        max-height: 100vh;
-              /*min-height: 100vh; */
+        min-height: 100vh;
         min-width: 100%;  
   
 }
