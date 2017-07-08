@@ -27,6 +27,14 @@ export class ItemSelectComponent implements OnInit {
   constructor(private fb: FormBuilder,
     private service: TimelineService) { }
 
+  buildControls (eventLabels: string[]){
+          this.labels = eventLabels;
+          this.labels.forEach(element => {
+            this.events.push(new FormControl(true));
+          });
+    
+  }
+
   ngOnInit() {
 
     this.service.clinicalEvents$
@@ -35,10 +43,7 @@ export class ItemSelectComponent implements OnInit {
         // console.log(val);
         if (!this.singleUseFlag) {
           this.singleUseFlag = true;
-          this.labels = val;
-          this.labels.forEach(element => {
-            this.events.push(new FormControl(true));
-          });
+          this.buildControls(val);
         }
       })
       ;
@@ -49,9 +54,6 @@ export class ItemSelectComponent implements OnInit {
     id property to the service filter method.*/
     let idString = event.source.value;
     this.service.filterFromForm(idString, event.checked);
-    // console.log(event.source);
-    // console.log(event.source.value);
-    // console.log(<MdCheckbox>event.source.id);
   }
 }
 
