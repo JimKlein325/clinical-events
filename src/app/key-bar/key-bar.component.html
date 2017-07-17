@@ -1,6 +1,6 @@
 <div class="container" fxFlex>
 <form>
-  <md-select class="time-select" placeholder="Start" [(ngModel)]="selectedValue" name="food">
+  <md-select class="time-select" placeholder="Start" [(ngModel)]="selectedValue" name="food" (change)="onSelectChange()">
     <md-option class="time-select" *ngFor="let food of foods" [value]="food.value">
      {{food.viewValue}}
     </md-option>

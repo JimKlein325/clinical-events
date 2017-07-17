@@ -52,7 +52,7 @@ export class ItemSelectComponent implements OnInit, OnDestroy {
       })
       ;
   }
-
+  
   onCheckChange(event) {
     /* Checked.  Pass the label value stored in the 
     id property to the service filter method.*/

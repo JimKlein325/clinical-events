@@ -395,10 +395,10 @@ export class TimelineService {
     let date = new Date(dateString);
 
     let dates = this.dataset.map(item => new Date(item.eventtime));
-     let minD: Date = _.min(dates);
-      let maxD: Date = _.max(dates);
-      let inRange =  minD <= date && date <= maxD;
-      return inRange
+    let minD: Date = _.min(dates);
+    let maxD: Date = _.max(dates);
+    let inRange = minD <= date && date <= maxD;
+    return inRange
       ;
   }
 
@@ -406,32 +406,32 @@ export class TimelineService {
     return this.clinicalEventItems$
       .switchMap(items => {
 
-      // let minDate = this.getMinMaxDates()['minDate'];
-      // let maxDate = this.getMinMaxDates()['maxDate'];
+        // let minDate = this.getMinMaxDates()['minDate'];
+        // let maxDate = this.getMinMaxDates()['maxDate'];
 
-      let activeItems = _.filter(this.dataset, 
-        e=> this.inDateRange(e.eventtime) )
-        ;
+        let activeItems = _.filter(this.dataset,
+          e => this.inDateRange(e.eventtime))
+          ;
 
-      let inActiveItems = _.filter(this.dataset, 
-        e=> e.eventtype === 1 )
-        ;
+        let inActiveItems = _.filter(this.dataset,
+          e => e.eventtype === 1)
+          ;
 
 
-      
 
-        console.log(activeItems);
-      let i = items.map(item => {
 
-        let selectView = {
-          text: item.clinicalevent,
-          active: !_.includes(this.filterList, item.clinicalevent),
-          eventType: item.eventtype
-        };
-        console.log(selectView);
-      })
-      // .map( item => )
-      ;
+        // console.log(activeItems);
+        let i = items.map(item => {
+
+          let selectView = {
+            text: item.clinicalevent,
+            active: !_.includes(this.filterList, item.clinicalevent),
+            eventType: item.eventtype
+          };
+          // console.log(selectView);
+        })
+          // .map( item => )
+          ;
 
 
         const noDupes = _.uniqBy(items, 'clinicalevent');
@@ -549,11 +549,38 @@ export class TimelineService {
     }
     this.filterBySelectedItems();
   }
+  // Update date range based on user input
+  updateMinDateRange(date: string) {
+    //convert to date
+    let dateObj = new Date(date);
+    //filter data set using new min/max dates
+    let d = moment(date);
+    //let d2 = moment("Feb, 2012");
+    const newArray = this.dataset.map(a => Object.assign({}, a));
+    const filteredList = newArray.filter(x => {
+      // console.log(new Date(x.eventtime));
+      // console.log(new Date(date));
+      // console.log(new Date(x.eventtime) > (new Date(date)));
+      return moment(x.eventtime) < (moment(date));
+    });
+    // (x.eventtime));
+    // console.log(filteredList);
+    //console.log(moment(d).isAfter(d2));
+    //console.log(moment(date));
+    //console.log(filteredList);
+
+    const newSet = this.prepareData(filteredList);
+    this.subject.next(filteredList);
+    this.wrappedSubject.next(newSet);
+
+  }
 
   filterByDate(minDate: Date, maxDate: Date) {
+    // update filterList by adding any events that fall out of the date range
 
-    //filter copy of dataset
-    // get filterList from existing items
+    //filter copy of dataset based on new date range
+
+    // emit new event list value
   }
 
 }
