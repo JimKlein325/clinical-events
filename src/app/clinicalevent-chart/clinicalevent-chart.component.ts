@@ -1,6 +1,7 @@
-import { Component, Injectable, OnInit, OnChanges, ViewChild, ElementRef, Input, ViewEncapsulation, AfterViewInit } from '@angular/core';
+import { Component, Injectable, OnInit, OnChanges, ViewChild, ElementRef, Input, ViewEncapsulation, AfterViewInit, OnDestroy } from '@angular/core';
 import * as d3 from 'd3';
 import * as d3TimeFormat from 'd3-time-format';
+import * as moment from 'moment';
 
 //import { Observable } from 'rxjs/Observable';
 import { Observable } from "rxjs/Rx";
@@ -10,15 +11,15 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/operator/reduce';
 import 'rxjs/add/operator/scan';
-
-
+import 'rxjs/add/operator/takeUntil';
+import { Subject } from 'rxjs/Subject';
 
 import { ClinicalEventReport } from './models/clinical-event-report'
 import { ClinicalEventItem } from './models/clinical-event-item'
 import { ClinicalEventDataService } from './models/clinical-event-data-service'
 import { ClinicalEventItemWrapper } from './models/clinical-event-item-wrapper'
 import { TimelineService } from "../timeline.service";
-import * as moment from 'moment';
+
 
 @Component({
   selector: 'clinicalevent-chart',
@@ -28,11 +29,12 @@ import * as moment from 'moment';
 
 })
 @Injectable()
-export class ClinicaleventChartComponent implements OnInit, AfterViewInit {
+export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('chart') private chartContainer: ElementRef;
-  // w: number = 300;
-  // h: number = 300;
+
+  private ngUnsubscribe: Subject<void> = new Subject<void>();
+
   scalePadding: number = 15;
 
   public clinicalEventReport: ClinicalEventReport;
@@ -65,6 +67,7 @@ export class ClinicaleventChartComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.tlService.maxMinDates$
+      .takeUntil(this.ngUnsubscribe)
       .map(val => {
         this.minDate = val.minDate;
         //console.log(this.minDate);
@@ -75,6 +78,7 @@ export class ClinicaleventChartComponent implements OnInit, AfterViewInit {
       .subscribe();
 
     this.tlService.wrappedEvents$
+      .takeUntil(this.ngUnsubscribe)
       // .do(val => console.log(val))
       .do(val => {
         this.wrappedItems = val;
@@ -100,7 +104,7 @@ export class ClinicaleventChartComponent implements OnInit, AfterViewInit {
     console.log("width: " + this.width);
     console.log("height: " + element.offsetHeight);
 
-    this.height = element.offsetHeight - this.margin.top - this.margin.bottom - 120;
+    this.height = element.offsetHeight - this.margin.top - this.margin.bottom;
     this.problemName = this.clinicalEventReport.problemName;
 
     let svg = d3.select(element).append("svg")
@@ -129,7 +133,7 @@ export class ClinicaleventChartComponent implements OnInit, AfterViewInit {
       .domain(yDomain)
       .range([0, this.height]);
 
-    // Date axix
+    // Date axis
     let xDateAxisGen = d3.axisBottom(xBottomScale).ticks(this.dateTicks).tickFormat(d3.timeFormat("%b"));
     let xAxisGen = d3.axisBottom(this.xScale).tickFormat((d) => "").tickSize(0);
 
@@ -209,7 +213,7 @@ export class ClinicaleventChartComponent implements OnInit, AfterViewInit {
       .attr("height", (d, i) => Math.abs(this.yScale(d.yValue) - this.yScale(0)))
       .attr("fill", this.barColor)
       ;
-      //Include onMouseover/Mouseout events for enabling tool tips when user hovers over text
+    //Include onMouseover/Mouseout events for enabling tool tips when user hovers over text
     let enterText = updateText
       .enter()
       .append("text")
@@ -245,13 +249,10 @@ export class ClinicaleventChartComponent implements OnInit, AfterViewInit {
       .attr("fill", this.dotColor);
   }
 
-  ngOnChanges() {
-    //this.createChart();
+  ngOnDestroy(): void {
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
-
-  ngOnInit() {
-  }
-
 
 
 

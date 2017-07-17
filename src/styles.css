@@ -18,14 +18,18 @@ body {
         background:lightblue;
 
 }
-.d3-chart chart{
-        min-height: 100vh;
-        min-width: 100%;  
+.key-bar {
+        background:purple;
+
 }
+.parent {
+        /* max-height: 100vh; */
+        height: calc(100vh - 240px);
+}
+
 .d3-chart {
   width: 100%;
-        min-height: 100vh;
-  /*height: 600px;*/
+        min-height: calc(100vh - 100px); 
 }
 
 /*.d3-chart .axis path,
@@ -36,26 +40,32 @@ body {
 /*.d3-chart .axis text {
   fill: #999;
 }*/
-app-root { 
+/*app-root { 
   height: 100vh; 
   min-height: 100vh;
   max-height: 100vh;
-        min-width: 100%;  
+  min-width: 100%;  
 
 }
 clinicalevent-chart {
         min-height: 100vh; 
         min-width: 100%;  
-}
+}*/
 item-select {
         overflow: auto;
 }
-md-list-item h3{
+md-list > h3{
      color: black;   
 }
 .subheader {
      color: black;   
 }
+ .time-select {
+     color: white;   
+} 
+ .time-display {
+     color: red;   
+} 
 .example-spacer {
   flex: 1 1 auto;
 }

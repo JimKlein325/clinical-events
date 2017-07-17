@@ -1,19 +1,28 @@
-<div class="container" fxLayout="row wrap">
+<div class="container parent" fxLayout="row wrap">
   <div class="container" fxFlex="100%" fxLayout="row">
     <div fxFlex>
     <md-toolbar color="primary">
-      <span>Event Timeline</span>
-      <span class="example-spacer"></span>
       <span>Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb</span>
+      <span class="example-spacer"></span>
+      <span>Event Timeline</span>
     </md-toolbar>
     </div>
   </div>
   <div class="container" fxFlex="100%" fxLayout="row">
-    <div fxFlex="80">
-      <clinicalevent-chart></clinicalevent-chart>
+    <div fxFlex="80" class="container" fxLayout="row" fxLayoutWrap="wrap">
+      <div fxFlex="100">
+       <clinicalevent-chart></clinicalevent-chart>
+      </div>
+      <div  class="key-bar" fxFlex="100%">
+        <app-key-bar></app-key-bar>
+      </div>
     </div>
+    <!--<div fxFlex="80">
+      <clinicalevent-chart></clinicalevent-chart>
+    </div>-->
     <div class="control" fxFlex="20">
-      <item-select></item-select>
+      <event-list></event-list>
+      <!--<item-select></item-select>-->
     </div>
   </div>
 </div>

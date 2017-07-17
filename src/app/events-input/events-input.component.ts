@@ -44,7 +44,7 @@ export class EventsInputComponent implements OnInit {
     /* Checked.  Pass the label value stored in the 
     id property to the service filter method.*/
     let idString = event.source.value;
-    this.service.filterFromForm(idString, event.checked);
+    this.service.filterEvents(idString, event.checked);
     console.log(event.source.value);
   }
 }

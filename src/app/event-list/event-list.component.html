@@ -1,0 +1,12 @@
+<div class="container" fxFlex>
+<form>
+ <md-list dense>
+    <h3 md-subheader class="subheader"  style="color: black"><strong>Treatment</strong></h3>
+    <div >
+      <md-list-item *ngFor="let event of (events$ | async)">
+        <md-checkbox  align="start" (change)="onCheckChange($event)" value="{{event}}" checked="checked"><span style="color: black">{{event}} </span></md-checkbox>
+      </md-list-item>
+    </div>
+  </md-list>
+</form>
+</div>

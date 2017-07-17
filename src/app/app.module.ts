@@ -16,6 +16,8 @@ import { MaterialModule } from "./material/material.module";
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { EventsInputComponent } from './events-input/events-input.component';
 import { ItemSelectComponent } from './item-select/item-select.component';
+import { EventListComponent } from './event-list/event-list.component';
+import { KeyBarComponent } from './key-bar/key-bar.component';
 
 @NgModule({
   declarations: [
@@ -25,11 +27,15 @@ import { ItemSelectComponent } from './item-select/item-select.component';
     TextTestComponent,
     ClinicaleventChartComponent,
     EventsInputComponent,
-    ItemSelectComponent
+    ItemSelectComponent,
+    EventListComponent,
+    KeyBarComponent
   ],
   imports: [
     BrowserModule,
+    FormsModule,
     ReactiveFormsModule,
+    BrowserAnimationsModule,
     HttpModule,
     MaterialModule,
     FlexLayoutModule

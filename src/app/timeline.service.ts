@@ -24,7 +24,7 @@ export class TimelineService {
       "clinicalevent": "Diagnosis",
       "eventtime": "2010-02-01",
       "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
-      "eventtype": 1
+      "eventtype": 2
     },
     {
       "patientid": 1,
@@ -33,7 +33,7 @@ export class TimelineService {
       "clinicalevent": "Staging",
       "eventtime": "2010-02-01",
       "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
-      "eventtype": 1
+      "eventtype": 2
     },
     {
       "patientid": 1,
@@ -352,12 +352,23 @@ export class TimelineService {
 
   clinicalEvents$: Observable<string[]> = this.clinicalEventItems$
     .switchMap(items => {
+
+
+
       const noDupes = _.uniqBy(items, 'clinicalevent');
       this.clinicalEvents = noDupes.map(ce => ce.clinicalevent);
       return Observable.of(this.clinicalEvents);
     })
   ;
+  testDate(dateString): boolean {
+    let eventDate = new Date(dateString);
 
+    let allDates = this.dataset.map(item => new Date(item.eventtime));
+    let minD = _.min(allDates.map(date => date.getTime()));
+    let maxD = _.max(allDates.map(date => date.getTime()));
+
+    return minD >= eventDate <= maxD;
+  }
   dataDateRange$ = this.clinicalEventItems$
     .map(event => event.map(item => new Date(item.eventtime)));
 
@@ -368,13 +379,66 @@ export class TimelineService {
       let maxD = _.max(dates.map(date => date.getTime()));
       let min = moment(minD).format('YYYY-MM-DD');
       let max = moment(maxD).format('YYYY-MM-DD');
-      //console.log(moment(maxD).format('YYYY-MM-DD'))
-      return [{ minDate: minD, maxDate: maxD, minDateString: min, maxDateString: max }];
+      return [{
+        minDate: minD,
+        maxDate: maxD,
+        minDateString: min,
+        maxDateString: max
+      }];
     });
 
 
   constructor() {
     //this.prepareData();
+  }
+  inDateRange(dateString: string): boolean {
+    let date = new Date(dateString);
+
+    let dates = this.dataset.map(item => new Date(item.eventtime));
+     let minD: Date = _.min(dates);
+      let maxD: Date = _.max(dates);
+      let inRange =  minD <= date && date <= maxD;
+      return inRange
+      ;
+  }
+
+  getEventList(): Observable<string[]> {
+    return this.clinicalEventItems$
+      .switchMap(items => {
+
+      // let minDate = this.getMinMaxDates()['minDate'];
+      // let maxDate = this.getMinMaxDates()['maxDate'];
+
+      let activeItems = _.filter(this.dataset, 
+        e=> this.inDateRange(e.eventtime) )
+        ;
+
+      let inActiveItems = _.filter(this.dataset, 
+        e=> e.eventtype === 1 )
+        ;
+
+
+      
+
+        console.log(activeItems);
+      let i = items.map(item => {
+
+        let selectView = {
+          text: item.clinicalevent,
+          active: !_.includes(this.filterList, item.clinicalevent),
+          eventType: item.eventtype
+        };
+        console.log(selectView);
+      })
+      // .map( item => )
+      ;
+
+
+        const noDupes = _.uniqBy(items, 'clinicalevent');
+
+        this.clinicalEvents = noDupes.map(ce => ce.clinicalevent);
+        return Observable.of(this.clinicalEvents);
+      });
   }
 
   // generate the height above or below the unmarked axis based on item's index position
@@ -464,7 +528,7 @@ export class TimelineService {
 
   // always filter and emit clone of dataset
   // filter operation performed on raw event items
-  // prepareData then builds out the list with the correct offset.
+  // prepareData then builds d3 chart out the list with the correct offset.
   filterBySelectedItems() {
     const newArray = this.dataset.map(a => Object.assign({}, a));
     const filteredList = newArray.filter(x => !_.includes(this.filterList, x.clinicalevent));
@@ -475,8 +539,8 @@ export class TimelineService {
     this.wrappedSubject.next(newSet);
     // console.log("wrappedSubject emit");
   }
-
-  filterFromForm(item: string, checked: boolean) {
+  // Filter events using array of unchecked events stored in this.filterList.  This method manages the list when items are manually selected.
+  filterEvents(item: string, checked: boolean) {
     if (checked) {
       this.filterList = this.filterList.filter(element => element !== item);
     }
@@ -484,6 +548,12 @@ export class TimelineService {
       this.filterList.push(item);
     }
     this.filterBySelectedItems();
+  }
+
+  filterByDate(minDate: Date, maxDate: Date) {
+
+    //filter copy of dataset
+    // get filterList from existing items
   }
 
 }

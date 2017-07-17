@@ -27,16 +27,18 @@ describe('ItemSelectComponent', () => {
   });
 
   it('should load event items from server', () => {
-    let items = [1, 2, 3];
+    let items = ["5", "2", "3"];
     let service = TestBed.get(TimelineService);
-    spyOn(service, 'clinicalEvents$').and.returnValue(Observable.from(items));
+    spyOn(service, 'getEventList').and.returnValue(Observable.of(items));
 
     // spec generation places this code in the beforeEach() block
     // need to move it down here so that ngOnInt is called after we set up the test
     // otherwise, ngOnInit is called after the component is initialized in beforeEach()
-    fixture.detectChanges();
+     fixture.detectChanges();
     // get lenth of form group controls array
-    expect(component.events.controls.length).toBe(13);
+    //let c = <ItemSelectComponent>component;
+    expect(component.labels.length).toBe(3);
+    expect(component.events.controls.length).toBe(3);
 
     //this doesn't work because you don't give dynamically generated controls a name attribute.  just the forms module controls.
     //expect(component.eventForm.contains('0')).toBeTruthy();
