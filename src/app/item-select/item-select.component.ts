@@ -41,16 +41,17 @@ export class ItemSelectComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.eventsList = this.service.getEventList()
-      .takeUntil(this.ngUnsubscribe)
-      .subscribe(val => {
-        // console.log(val);
-        if (!this.singleUseFlag) {
-          this.singleUseFlag = true;
-          this.buildControls(val);
-        }
-      })
-      ;
+    //refactored timeline.service and this no longer compiles.
+    // this.eventsList = this.service.getEventList()
+    //   .takeUntil(this.ngUnsubscribe)
+    //   .subscribe(val => {
+    //     // console.log(val);
+    //     if (!this.singleUseFlag) {
+    //       this.singleUseFlag = true;
+    //       this.buildControls(val);
+    //     }
+    //   })
+    //   ;
   }
   
   onCheckChange(event) {

@@ -53,13 +53,10 @@ export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
   private xAxis: any;
   private xBottomAxis: any;
   private yAxis: any;
-  // private readonly verticalTextOffset: number = 4;
   private barColor: string = "darkorange";
   private dotColor: string = "black";
   private labelColor: string = "black";
-  // private numberOfVerticalEntrySlots: number = 10;
   private dateTicks: number = 5;
-  // public testDataset: Observable<ClinicalEventItem[]>;
   public problemName: string;
 
 
@@ -70,31 +67,21 @@ export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
       .takeUntil(this.ngUnsubscribe)
       .map(val => {
         this.minDate = val.minDate;
-        //console.log(this.minDate);
         this.maxDate = val.maxDate;
-        // console.log("what");
-        // console.log(this.maxDate);
       })
       .subscribe();
 
     this.tlService.wrappedEvents$
       .takeUntil(this.ngUnsubscribe)
-      // .do(val => console.log(val))
       .do(val => {
         this.wrappedItems = val;
         this.clinicalEventReport = this.tlService.clinicalEventReport;
-        // console.log("wrapped items");
-        // console.log(val);
         if (!this.chart) {
           this.createChart();
-          this.updateChart()
         }
-        else {
-          this.updateChart();
-        }
+        this.updateChart();
       })
-      .subscribe()
-      ;
+      .subscribe();
   }
 
   createChart() {
@@ -200,7 +187,7 @@ export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
       .transition()
       .duration(750)
       .attr("x", (d, i) => this.xScale(d.itemDate))
-      .attr("y", (d, i) => d.item.eventtype == 1 ? this.height - this.yScale((d.yValue)) : this.yScale(0))
+      .attr("y", (d, i) => d.item.eventtype == 1  || d.item.eventtype == 2 ? this.height - this.yScale((d.yValue)) : this.yScale(0))
       .attr("height", (d, i) => Math.abs(this.yScale(d.yValue) - this.yScale(0)));
 
     // ENTER existing items, applying a transition
@@ -208,7 +195,7 @@ export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
       .enter()
       .append("rect")
       .attr("x", (d, i) => this.xScale(d.itemDate))
-      .attr("y", (d, i) => d.item.eventtype == 1 ? this.height - this.yScale((d.yValue)) : this.yScale(0))
+      .attr("y", (d, i) => d.item.eventtype == 1  || d.item.eventtype == 2 ? this.height - this.yScale((d.yValue)) : this.yScale(0))
       .attr("width", 2)
       .attr("height", (d, i) => Math.abs(this.yScale(d.yValue) - this.yScale(0)))
       .attr("fill", this.barColor)
@@ -253,7 +240,4 @@ export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }
-
-
-
 }

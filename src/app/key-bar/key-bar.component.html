@@ -1,8 +1,8 @@
 <div class="container" fxFlex>
 <form>
-  <md-select class="time-select" placeholder="Start" [(ngModel)]="selectedValue" name="food" (change)="onSelectChange()">
-    <md-option class="time-select" *ngFor="let food of foods" [value]="food.value">
-     {{food.viewValue}}
+ <md-select class="time-select" placeholder="Feb, 2010" floatPlaceholder="never" [(ngModel)]="selectedValue" name="month" (change)="onSelectChange()">
+    <md-option class="time-select" *ngFor="let month of months" value="{{month.value}}">
+     {{month.viewValue}}
     </md-option>
   </md-select>
 </form>

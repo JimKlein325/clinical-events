@@ -30,13 +30,13 @@ export class EventsInputComponent implements OnInit {
 
   ngOnInit() {
 
-    this.service.clinicalEvents$
-      .subscribe(val => {
-        this.labels = val;
-        this.labels.forEach(element => {
-          this.users.push(new FormControl(true));
-        });
-      });
+    // this.service.clinicalEvents$
+    //   .subscribe(val => {
+    //     this.labels = val;
+    //     this.labels.forEach(element => {
+    //       this.users.push(new FormControl(true));
+    //     });
+    //   });
 
   }
 

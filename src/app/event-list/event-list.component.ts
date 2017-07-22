@@ -3,6 +3,7 @@ import { FormsModule } from "@angular/forms";
 import { MdList, MdCheckbox } from '@angular/material';
 import { TimelineService } from "../timeline.service";
 import { Observable } from "rxjs/Observable";
+import { EventItemViewmodel } from "../model/event-item-viewmodel";
 
 @Component({
   selector: 'event-list',
@@ -10,11 +11,11 @@ import { Observable } from "rxjs/Observable";
   styleUrls: ['./event-list.component.css']
 })
 export class EventListComponent implements OnInit {
-  private events$: Observable<string[]>;
+  private events$: Observable<EventItemViewmodel[]>;
   constructor(private timelineService: TimelineService) { }
 
   ngOnInit() {
-    this.events$ = this.timelineService.getEventList().take(1);
+    this.events$ = this.timelineService.getEventList();
     
   }
   onCheckChange(event) {

@@ -6,11 +6,11 @@ import { Observable, Subject, BehaviorSubject } from "rxjs/Rx";
 import * as _ from "lodash";
 import * as moment from 'moment';
 
+import { EventItemViewmodel } from "./model/event-item-viewmodel";
+
 
 @Injectable()
 export class TimelineService {
-
-
 
   public clinicalEventReport: ClinicalEventReport;
 
@@ -338,7 +338,7 @@ export class TimelineService {
   private subject = new BehaviorSubject<ClinicalEventItem[]>(this.dataset);
   private wrappedSubject = new BehaviorSubject<ClinicalEventItemWrapper[]>(this.prepareData(this.dataset));
 
-  private filterList: string[] = [];
+  private checkboxItems: string[] = [];
   private clinicalEvents: string[];
 
   clinicalEventItems$: Observable<ClinicalEventItem[]> = this.subject.asObservable();
@@ -350,16 +350,16 @@ export class TimelineService {
   // timelineEvents$ = this.clinicalEventItems$
   //   .map();
 
-  clinicalEvents$: Observable<string[]> = this.clinicalEventItems$
-    .switchMap(items => {
+  // clinicalEvents$: Observable<string[]> = this.clinicalEventItems$
+  //   .switchMap(items => {
 
 
 
-      const noDupes = _.uniqBy(items, 'clinicalevent');
-      this.clinicalEvents = noDupes.map(ce => ce.clinicalevent);
-      return Observable.of(this.clinicalEvents);
-    })
-  ;
+  //     const noDupes = _.uniqBy(items, 'clinicalevent');
+  //     this.clinicalEvents = noDupes.map(ce => ce.clinicalevent);
+  //     return Observable.of(this.clinicalEvents);
+  //   })
+  // ;
   testDate(dateString): boolean {
     let eventDate = new Date(dateString);
 
@@ -402,42 +402,27 @@ export class TimelineService {
       ;
   }
 
-  getEventList(): Observable<string[]> {
+  getEventList(): Observable<EventItemViewmodel[]> {
     return this.clinicalEventItems$
-      .switchMap(items => {
-
-        // let minDate = this.getMinMaxDates()['minDate'];
-        // let maxDate = this.getMinMaxDates()['maxDate'];
-
-        let activeItems = _.filter(this.dataset,
-          e => this.inDateRange(e.eventtime))
-          ;
-
-        let inActiveItems = _.filter(this.dataset,
-          e => e.eventtype === 1)
-          ;
-
-
+      . switchMap(items => {
 
 
         // console.log(activeItems);
-        let i = items.map(item => {
-
-          let selectView = {
-            text: item.clinicalevent,
-            active: !_.includes(this.filterList, item.clinicalevent),
+        let i = this.dataset.map(item => {
+          const event: EventItemViewmodel = 
+           { 
+            text: item.clinicalevent, 
+            isActive: !_.includes(this.checkboxItems, item.clinicalevent), 
             eventType: item.eventtype
           };
-          // console.log(selectView);
-        })
-          // .map( item => )
-          ;
+          return event;
+        })          ;
 
 
-        const noDupes = _.uniqBy(items, 'clinicalevent');
+        const noDupes = _.uniqBy(i, 'text');
 
         this.clinicalEvents = noDupes.map(ce => ce.clinicalevent);
-        return Observable.of(this.clinicalEvents);
+        return Observable.of(noDupes);
       });
   }
 
@@ -450,7 +435,7 @@ export class TimelineService {
     let multiplier: number;
     let slotsAboveOrBelowAxis = slots / 2;
     // multiplier used to position item above or below axis
-    if (eventType == 1) {
+    if (eventType == 1  || eventType == 2) {
       multiplier = 1;
     } else {
       multiplier = -1;
@@ -477,7 +462,7 @@ export class TimelineService {
 
     // use reduce(fold) to build new list of wrapper items containing the yValue for chart elements
     let treatmentItems = dataset
-      .filter(item => item.eventtype == 1)
+      .filter(item => item.eventtype == 1  || item.eventtype == 2)
       .reduce((acc, item, index) => {
         let yVal = this.genYValue(item.eventtype, slots, offset, index);
         let ce = [new ClinicalEventItemWrapper(item, yVal, this.getDate(item.eventtime))];
@@ -517,21 +502,19 @@ export class TimelineService {
     return fullList;
   }
 
-
   //Strings used to display/hide items in timeline
-  initializeClinicalEvents() {
-    const noDupes = _.uniqBy(this.dataset, 'clinicalevent');
-    this.clinicalEvents = noDupes.map(ce => ce.clinicalevent);
-    this.clinicalEvents$ = Observable.of(this.clinicalEvents);
-  }
-
+  // initializeClinicalEvents() {
+  //   const noDupes = _.uniqBy(this.dataset, 'clinicalevent');
+  //   this.clinicalEvents = noDupes.map(ce => ce.clinicalevent);
+  //   this.clinicalEvents$ = Observable.of(this.clinicalEvents);
+  // }
 
   // always filter and emit clone of dataset
   // filter operation performed on raw event items
   // prepareData then builds d3 chart out the list with the correct offset.
   filterBySelectedItems() {
     const newArray = this.dataset.map(a => Object.assign({}, a));
-    const filteredList = newArray.filter(x => !_.includes(this.filterList, x.clinicalevent));
+    const filteredList = newArray.filter(x => !_.includes(this.checkboxItems, x.clinicalevent));
     // console.log(filteredList);
     const newSet = this.prepareData(filteredList);
     console.log("set filtered:  " + newSet.length);
@@ -539,13 +522,13 @@ export class TimelineService {
     this.wrappedSubject.next(newSet);
     // console.log("wrappedSubject emit");
   }
-  // Filter events using array of unchecked events stored in this.filterList.  This method manages the list when items are manually selected.
+  // Filter events using array of unchecked events stored in this.checkboxItems.  This method manages the list when items are manually selected.
   filterEvents(item: string, checked: boolean) {
     if (checked) {
-      this.filterList = this.filterList.filter(element => element !== item);
+      this.checkboxItems = this.checkboxItems.filter(element => element !== item);
     }
     else {
-      this.filterList.push(item);
+      this.checkboxItems.push(item);
     }
     this.filterBySelectedItems();
   }
@@ -555,13 +538,14 @@ export class TimelineService {
     let dateObj = new Date(date);
     //filter data set using new min/max dates
     let d = moment(date);
-    //let d2 = moment("Feb, 2012");
+
+    // clone dataset
     const newArray = this.dataset.map(a => Object.assign({}, a));
     const filteredList = newArray.filter(x => {
       // console.log(new Date(x.eventtime));
       // console.log(new Date(date));
       // console.log(new Date(x.eventtime) > (new Date(date)));
-      return moment(x.eventtime) < (moment(date));
+      return moment(x.eventtime) > (moment(date));
     });
     // (x.eventtime));
     // console.log(filteredList);
@@ -569,10 +553,24 @@ export class TimelineService {
     //console.log(moment(date));
     //console.log(filteredList);
 
+    // update the filter list before emitting new value
+    this.addFilteredValuesToFilterList(newArray);
+
+    // emit new list of clinical events
     const newSet = this.prepareData(filteredList);
     this.subject.next(filteredList);
     this.wrappedSubject.next(newSet);
 
+  }
+
+  addFilteredValuesToFilterList(items: ClinicalEventItem[]){
+    const noDupes = _.uniqBy(items, 'clinicalevent');
+    let filterResult = noDupes.map(ce => ce.clinicalevent);
+    // the new values are the difference between existing filterEvents and current event items
+    let newEvents = _.difference(this.filterEvents, filterResult);
+    console.log(newEvents);
+    this.checkboxItems.concat(newEvents);
+    console.log(this.checkboxItems);
   }
 
   filterByDate(minDate: Date, maxDate: Date) {
