@@ -23,7 +23,7 @@ export class TimelineService {
       "semantictype": "DiagnosticProcedure",
       "clinicalevent": "Diagnosis",
       "eventtime": "2010-02-01",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 2
     },
     {
@@ -32,7 +32,7 @@ export class TimelineService {
       "semantictype": "DiagnosticProcedure",
       "clinicalevent": "Staging",
       "eventtime": "2010-02-01",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 2
     },
     {
@@ -41,7 +41,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Aloxi",
       "eventtime": "2010-03-18",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -50,7 +50,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Taxotere",
       "eventtime": "2010-03-18",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -59,7 +59,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Tarceva",
       "eventtime": "2010-05-20",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -68,7 +68,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Tarceva",
       "eventtime": "2010-06-16",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -77,7 +77,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Gemzar",
       "eventtime": "2010-06-17",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -86,7 +86,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Navelbine",
       "eventtime": "2010-06-17",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -95,7 +95,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Aloxi",
       "eventtime": "2010-06-27",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -104,7 +104,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Gemzar",
       "eventtime": "2010-06-27",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -113,7 +113,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Navelbine",
       "eventtime": "2010-06-27",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -122,7 +122,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Emend",
       "eventtime": "2010-07-11",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -131,7 +131,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Gemzar",
       "eventtime": "2010-07-11",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -140,7 +140,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Navelbine",
       "eventtime": "2010-07-11",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -149,7 +149,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Emend",
       "eventtime": "2010-07-21",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -158,7 +158,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Gemzar",
       "eventtime": "2010-07-21",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -167,7 +167,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Navelbine",
       "eventtime": "2010-07-21",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -176,7 +176,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Emend",
       "eventtime": "2010-08-07",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -185,7 +185,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Gemzar",
       "eventtime": "2010-08-07",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -194,7 +194,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Navelbine",
       "eventtime": "2010-08-07",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -203,7 +203,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Emend",
       "eventtime": "2010-08-14",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -212,7 +212,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Gemzar",
       "eventtime": "2010-08-14",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -221,7 +221,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Navelbine",
       "eventtime": "2010-08-14",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -230,7 +230,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Emend",
       "eventtime": "2010-08-28",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -239,7 +239,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Gemzar",
       "eventtime": "2010-08-28",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -248,7 +248,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Navelbine",
       "eventtime": "2010-08-28",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 1
     },
     {
@@ -257,7 +257,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Dexamethasone p.o.",
       "eventtime": "2010-03-18",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 0
     },
     {
@@ -266,7 +266,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Neulasta",
       "eventtime": "2010-03-19",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 0
     },
     {
@@ -275,7 +275,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Dexamethasone i.v.",
       "eventtime": "2010-06-27",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 0
     },
     {
@@ -284,7 +284,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Neupogen",
       "eventtime": "2010-07-04",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 0
     },
     {
@@ -293,7 +293,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Zofran",
       "eventtime": "2010-07-11",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 0
     },
     {
@@ -302,7 +302,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Zofran",
       "eventtime": "2010-07-21",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 0
     }
     ,
@@ -312,7 +312,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Zofran",
       "eventtime": "2010-08-07",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 0
     },
     {
@@ -321,7 +321,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Zofran",
       "eventtime": "2010-08-14",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 0
     },
     {
@@ -330,7 +330,7 @@ export class TimelineService {
       "semantictype": "Medication",
       "clinicalevent": "Zofran",
       "eventtime": "2010-08-28",
-      "problem": "Non-Small-Cell Lung Cancer, EGRF Mutation Positive, Stage IIIb",
+      "problem": "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb",
       "eventtype": 0
     }
   ];
@@ -343,23 +343,9 @@ export class TimelineService {
 
   clinicalEventItems$: Observable<ClinicalEventItem[]> = this.subject.asObservable();
 
-  // wrappedEvents$ = this.clinicalEventItems$
-  //   .map(items => this.prepareData(items));
   wrappedEvents$ = this.wrappedSubject.asObservable();
 
-  // timelineEvents$ = this.clinicalEventItems$
-  //   .map();
 
-  // clinicalEvents$: Observable<string[]> = this.clinicalEventItems$
-  //   .switchMap(items => {
-
-
-
-  //     const noDupes = _.uniqBy(items, 'clinicalevent');
-  //     this.clinicalEvents = noDupes.map(ce => ce.clinicalevent);
-  //     return Observable.of(this.clinicalEvents);
-  //   })
-  // ;
   testDate(dateString): boolean {
     let eventDate = new Date(dateString);
 
@@ -404,38 +390,34 @@ export class TimelineService {
 
   getEventList(): Observable<EventItemViewmodel[]> {
     return this.clinicalEventItems$
-      . switchMap(items => {
-
-
-        // console.log(activeItems);
+      .switchMap(items => {
         let i = this.dataset.map(item => {
-          const event: EventItemViewmodel = 
-           { 
-            text: item.clinicalevent, 
-            isActive: !_.includes(this.checkboxItems, item.clinicalevent), 
-            eventType: item.eventtype
-          };
+          const event: EventItemViewmodel =
+            {
+              text: item.clinicalevent,
+              isActive: !_.includes(this.checkboxItems, item.clinicalevent),
+              eventType: item.eventtype
+            };
           return event;
-        })          ;
-
+        });
 
         const noDupes = _.uniqBy(i, 'text');
-
         this.clinicalEvents = noDupes.map(ce => ce.clinicalevent);
         return Observable.of(noDupes);
       });
   }
 
   // generate the height above or below the unmarked axis based on item's index position
-  genYValue(eventType: number,
-    slots: number,
-    offset: number,
-    index: number
-  ): number {
+  genYValue(
+      eventType: number,
+      slots: number,
+      offset: number,
+      index: number
+    ): number {
     let multiplier: number;
     let slotsAboveOrBelowAxis = slots / 2;
     // multiplier used to position item above or below axis
-    if (eventType == 1  || eventType == 2) {
+    if (eventType == 1 || eventType == 2) {
       multiplier = 1;
     } else {
       multiplier = -1;
@@ -462,7 +444,7 @@ export class TimelineService {
 
     // use reduce(fold) to build new list of wrapper items containing the yValue for chart elements
     let treatmentItems = dataset
-      .filter(item => item.eventtype == 1  || item.eventtype == 2)
+      .filter(item => item.eventtype == 1 || item.eventtype == 2)
       .reduce((acc, item, index) => {
         let yVal = this.genYValue(item.eventtype, slots, offset, index);
         let ce = [new ClinicalEventItemWrapper(item, yVal, this.getDate(item.eventtime))];
@@ -536,22 +518,13 @@ export class TimelineService {
   updateMinDateRange(date: string) {
     //convert to date
     let dateObj = new Date(date);
-    //filter data set using new min/max dates
-    let d = moment(date);
 
     // clone dataset
     const newArray = this.dataset.map(a => Object.assign({}, a));
     const filteredList = newArray.filter(x => {
-      // console.log(new Date(x.eventtime));
-      // console.log(new Date(date));
-      // console.log(new Date(x.eventtime) > (new Date(date)));
-      return moment(x.eventtime) > (moment(date));
+      let isLater = moment(x.eventtime) > moment(date);
+      return isLater;
     });
-    // (x.eventtime));
-    // console.log(filteredList);
-    //console.log(moment(d).isAfter(d2));
-    //console.log(moment(date));
-    //console.log(filteredList);
 
     // update the filter list before emitting new value
     this.addFilteredValuesToFilterList(newArray);
@@ -560,10 +533,29 @@ export class TimelineService {
     const newSet = this.prepareData(filteredList);
     this.subject.next(filteredList);
     this.wrappedSubject.next(newSet);
+  }
+  // Only comparison opertate is diffent in Min and Max version of this method
+  updateMaxDateRange(date: string) {
+    //convert to date
+    let dateObj = new Date(date);
 
+    // clone dataset
+    const newArray = this.dataset.map(a => Object.assign({}, a));
+    const filteredList = newArray.filter(x => {
+      let isLater = moment(x.eventtime) < moment(date);
+      return isLater;
+    });
+
+    // update the filter list before emitting new value
+    this.addFilteredValuesToFilterList(newArray);
+
+    // emit new list of clinical events
+    const newSet = this.prepareData(filteredList);
+    this.subject.next(filteredList);
+    this.wrappedSubject.next(newSet);
   }
 
-  addFilteredValuesToFilterList(items: ClinicalEventItem[]){
+  addFilteredValuesToFilterList(items: ClinicalEventItem[]) {
     const noDupes = _.uniqBy(items, 'clinicalevent');
     let filterResult = noDupes.map(ce => ce.clinicalevent);
     // the new values are the difference between existing filterEvents and current event items

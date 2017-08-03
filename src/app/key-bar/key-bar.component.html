@@ -1,14 +1,40 @@
 <div class="container" fxFlex>
-<form>
- <md-select class="time-select" placeholder="Feb, 2010" floatPlaceholder="never" [(ngModel)]="selectedValue" name="month" (change)="onSelectChange()">
-    <md-option class="time-select" *ngFor="let month of months" value="{{month.value}}">
+<!-- <form>
+ <md-select class="time-select" floatPlaceholder="never" (change)="onSelectChange()">
+    <md-option class="time-select" *ngFor="let month of months; let i=index" value="{{month.value}}" >
      {{month.viewValue}}
     </md-option>
   </md-select>
 </form>
-    <!-- <form>
- <input id="date" type="date">
+     <form>
+ <select id="date" >
+    <option  *ngFor="let month of months; let i=index" value="{{month.value}}" >
+     {{month.viewValue}}
+    </option>
+ </select>
+ <select id="date2" >
+    <option  *ngFor="let month of this.reversedDates; let i=index" value="{{month.value}}" >
+     {{month.viewValue}}
+    </option>
+ </select>
+</form>  -->
+<form [formGroup]="datesForm">
+  <!-- MD Select -Can't set default value, even though it works in Plunker!  -->
+   <!-- <md-select  formGroupName="monthSelect_start" floatPlaceholder="never" (change)="onSelectChange_start($event)">
+    <md-option *ngFor="let month of months; let i=index" value="{{month.value}}" >
+     {{month.viewValue}}
+    </md-option>
+  </md-select> -->
 
-
-</form> -->
+   <select formGroupName="monthSelect_start" (change)="onSelectChange_start($event)">
+    <option  *ngFor="let month of months; let i=index" value="{{month.value}}" >
+     {{month.viewValue}}
+    </option>
+  </select> 
+  <select formGroupName="monthSelect_end" (change)="onSelectChange_end($event)">
+    <option  *ngFor="let month of this.reversedDates" value="{{month.value}}" >
+     {{month.viewValue}}
+    </option>
+  </select>
+</form>
 </div>

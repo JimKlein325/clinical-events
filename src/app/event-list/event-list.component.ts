@@ -11,13 +11,13 @@ import { EventItemViewmodel } from "../model/event-item-viewmodel";
   styleUrls: ['./event-list.component.css']
 })
 export class EventListComponent implements OnInit {
-  private events$: Observable<EventItemViewmodel[]>;
+  public events$: Observable<EventItemViewmodel[]>;
   constructor(private timelineService: TimelineService) { }
 
   ngOnInit() {
     this.events$ = this.timelineService.getEventList();
-    
   }
+  
   onCheckChange(event) {
     /* Checked.  Pass the label value stored in the 
     id property to the service filter method.*/

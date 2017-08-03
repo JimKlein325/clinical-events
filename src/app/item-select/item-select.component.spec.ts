@@ -4,7 +4,7 @@ import { ItemSelectComponent } from './item-select.component';
 import { MaterialModule } from "../material/material.module";
 import { MdList, MdCheckbox } from '@angular/material';
 import { Observable } from "rxjs";
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { TimelineService } from "../timeline.service";
 
 
@@ -17,7 +17,7 @@ describe('ItemSelectComponent', () => {
   beforeEach(async(() => {
     component = new ItemSelectComponent(new FormBuilder(), new TimelineService());
     TestBed.configureTestingModule({
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      schemas: [NO_ERRORS_SCHEMA],
       imports: [ReactiveFormsModule, MaterialModule],
       declarations: [ItemSelectComponent],
       providers: [TimelineService]
