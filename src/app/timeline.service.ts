@@ -7,7 +7,7 @@ import * as _ from "lodash";
 import * as moment from 'moment';
 
 import { EventItemViewmodel } from "./model/event-item-viewmodel";
-
+import { MonthViewmodel } from "./model/month-viewmodel";
 
 @Injectable()
 export class TimelineService {
@@ -345,6 +345,20 @@ export class TimelineService {
 
   wrappedEvents$ = this.wrappedSubject.asObservable();
 
+  private startMonth: string;
+  private endMonth: string;
+
+  private startSelectValues: Array<Date>;
+  private endSelectValues: Array<Date>;
+
+  // date selection
+  startMonth$ = this.wrappedEvents$
+    // .switchMap((value, index) => value.reduce((acc, item) =>
+    //     acc.itemDate < item.itemDate ? acc : item
+    .map(events => events.reduce((acc, item) =>
+      acc.itemDate < item.itemDate ? acc : item)
+    )
+    .map(event => ({ value: event.item.eventtime, viewValue: moment(event.item.eventtime).format("MMM, YYYY") })) ;
 
   testDate(dateString): boolean {
     let eventDate = new Date(dateString);
@@ -365,6 +379,8 @@ export class TimelineService {
       let maxD = _.max(dates.map(date => date.getTime()));
       let min = moment(minD).format('YYYY-MM-DD');
       let max = moment(maxD).format('YYYY-MM-DD');
+
+      //let test = 
       return [{
         minDate: minD,
         maxDate: maxD,
@@ -373,6 +389,33 @@ export class TimelineService {
       }];
     });
 
+  startDateSelect$: Observable<Array<MonthViewmodel>> = this.wrappedEvents$
+    .map(event => event.map(wrapper => new Date(wrapper.item.eventtime)))
+    .switchMap(dates => {
+      let minD = _.min(dates.map(date => date.getTime()));
+      let maxD = _.max(dates.map(date => date.getTime()));
+      let min = moment(minD).format('YYYY-MM-DD');
+      let max = moment(maxD).format('YYYY-MM-DD');
+
+      //let test = 
+      return [{
+        minDate: min,
+        maxDate: max
+      }];
+    })
+    //next get array of MonthViewmodel items
+    .map(dateTuple => {
+      return this.getMonthRange(dateTuple)
+    })
+    //next filter if the user has selected a different end date
+    .map( items => items.filter(item => {
+      let current = moment(item.value);
+      let endSelection = moment(this.endMonth);
+      return current <= endSelection;
+    }))
+    ;
+  
+    
 
   constructor() {
     //this.prepareData();
@@ -409,19 +452,15 @@ export class TimelineService {
 
   // generate the height above or below the unmarked axis based on item's index position
   genYValue(
-      eventType: number,
-      slots: number,
-      offset: number,
-      index: number
-    ): number {
-    let multiplier: number;
+            eventType: number,
+            slots: number,
+            offset: number,
+            index: number
+            ): number {
     let slotsAboveOrBelowAxis = slots / 2;
-    // multiplier used to position item above or below axis
-    if (eventType == 1 || eventType == 2) {
-      multiplier = 1;
-    } else {
-      multiplier = -1;
-    }
+
+    let multiplier = (eventType == 1 || eventType == 2) ? 1 : -1; // multiplier used to position item above or below axis
+
     return multiplier * (slotsAboveOrBelowAxis - (index % (slots / 2))) * offset
   };
   getDate(s): Date {
@@ -484,13 +523,6 @@ export class TimelineService {
     return fullList;
   }
 
-  //Strings used to display/hide items in timeline
-  // initializeClinicalEvents() {
-  //   const noDupes = _.uniqBy(this.dataset, 'clinicalevent');
-  //   this.clinicalEvents = noDupes.map(ce => ce.clinicalevent);
-  //   this.clinicalEvents$ = Observable.of(this.clinicalEvents);
-  // }
-
   // always filter and emit clone of dataset
   // filter operation performed on raw event items
   // prepareData then builds d3 chart out the list with the correct offset.
@@ -514,35 +546,17 @@ export class TimelineService {
     }
     this.filterBySelectedItems();
   }
-  // Update date range based on user input
-  updateMinDateRange(date: string) {
+
+  // 
+  updateDateRange(startDate: string, endDate: string) {
     //convert to date
-    let dateObj = new Date(date);
+    let dateObj = new Date(startDate);
 
     // clone dataset
     const newArray = this.dataset.map(a => Object.assign({}, a));
     const filteredList = newArray.filter(x => {
-      let isLater = moment(x.eventtime) > moment(date);
-      return isLater;
-    });
-
-    // update the filter list before emitting new value
-    this.addFilteredValuesToFilterList(newArray);
-
-    // emit new list of clinical events
-    const newSet = this.prepareData(filteredList);
-    this.subject.next(filteredList);
-    this.wrappedSubject.next(newSet);
-  }
-  // Only comparison opertate is diffent in Min and Max version of this method
-  updateMaxDateRange(date: string) {
-    //convert to date
-    let dateObj = new Date(date);
-
-    // clone dataset
-    const newArray = this.dataset.map(a => Object.assign({}, a));
-    const filteredList = newArray.filter(x => {
-      let isLater = moment(x.eventtime) < moment(date);
+      let d = moment(x.eventtime);
+      let isLater = d > moment(startDate) && d < moment(endDate);
       return isLater;
     });
 
@@ -573,4 +587,28 @@ export class TimelineService {
     // emit new event list value
   }
 
+  // key Bar helper functions
+  getMonthRange({minDate, maxDate}): Array<MonthViewmodel>{
+    let min=moment(minDate).month();
+  let max=moment(maxDate).month();
+  let year=moment(minDate).year();
+
+  let range = _.range(min,max+1);
+
+  let viewItems = range.reduce( 
+    function( acc, item, index, array) {
+              let monthIndex = item+1;
+              let monthValue = monthIndex < 10 ? "0"+monthIndex : monthIndex;
+              let viewItem: MonthViewmodel = {
+                viewValue: moment(`${year}-${monthValue}-01`).format("MMM, YYYY"), 
+                value: `${year}-${monthValue}-01`, 
+                id: index}
+              return _.concat(acc, [viewItem]);
+  }, new Array<MonthViewmodel>() );
+
+  let initialMonth = moment(minDate).month();
+  let viewMonth = moment(minDate).format("MMM, YYYY");  
+  
+  return viewItems;
+  }
 }

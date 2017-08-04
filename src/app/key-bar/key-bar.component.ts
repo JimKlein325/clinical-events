@@ -4,13 +4,18 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { TimelineService } from "../timeline.service";
 import { } from "";
 import { FormGroup, FormControl } from "@angular/forms";
+import { MonthViewmodel } from "../model/month-viewmodel";
 @Component({
   selector: 'app-key-bar',
   templateUrl: './key-bar.component.html',
   styleUrls: ['./key-bar.component.css']
 })
 export class KeyBarComponent implements OnInit, AfterViewInit {
-  public selectedValue;// = "Feb, 2010";
+  public selectedStartDate;
+  public selectedEndDate;
+  public startSelectValues: Array<MonthViewmodel>;
+  public endSelectValues: Array<Date>;
+
   months = [
     { value: '2010-02-01', viewValue: 'Feb, 2010' },
     { value: '2010-03-01', viewValue: 'Mar, 2010' },
@@ -28,31 +33,31 @@ export class KeyBarComponent implements OnInit, AfterViewInit {
   }
   ngOnInit() {
     this.datesForm = new FormGroup({
-      monthSelect_start: new FormControl(),
+      monthSelect_start: new FormControl(this.months[2].value),
       monthSelect_end: new FormControl()
-      // this isn't working!
-      // monthSelect_start: new FormControl(this.months[0].value),
-      // monthSelect_end: new FormControl(this.months[2].value)
     });
-    // this.selectedValue = this.months[0].value;
-    // const textInput = this.datesForm.get('monthSelect_end');
-    // textInput.valueChanges.subscribe(value => this.logChange(value));
-  //this.datesForm.patchValue({foodSelect: this.months[1].value}) 
 
+    this.service.startDateSelect$
+      .subscribe(dateItems => {
+
+        this.startSelectValues = dateItems;
+        this.selectedStartDate = dateItems[0].value;
+
+        console.log(this.startSelectValues);
+      });
   }
   ngAfterViewInit(): void {
+    //this.datesForm.patchValue({monthSelect_start: this.months[1].value}) 
   }
-  logChange(value) {
-    console.log(value);
-  }
+
   onSelectChange_start(event) {
     // MD emits event.value
     //html select it's event.target.value
-    this.service.updateMinDateRange(event.target.value);
-    this.logChange(event.target.value);
+    let endMonth = this.datesForm.get('monthSelect_end').value;
+    this.service.updateDateRange(event.target.value, endMonth);
   }
   onSelectChange_end(event) {
-    this.service.updateMaxDateRange(event.target.value);
-    this.logChange(event.target.value);
+    let startDate = this.datesForm.get('monthSelect_start').value;
+    this.service.updateDateRange(startDate, event.target.value);
   }
 }
