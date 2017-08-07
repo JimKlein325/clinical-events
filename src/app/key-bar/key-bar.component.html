@@ -1,5 +1,5 @@
 <div class="container" fxFlex>
-<!-- <form>
+  <!-- <form>
  <md-select class="time-select" floatPlaceholder="never" (change)="onSelectChange()">
     <md-option class="time-select" *ngFor="let month of months; let i=index" value="{{month.value}}" >
      {{month.viewValue}}
@@ -18,36 +18,38 @@
     </option>
  </select>
 </form>  -->
-<form [formGroup]="datesForm">
-  <!-- MD Select -Can't set default value, even though it works in Plunker!  -->
-   <!-- <md-select  formGroupName="monthSelect_start" floatPlaceholder="never" (change)="onSelectChange_start($event)">
+  <!-- <form
+     [formGroup]="datesForm"> -->
+    <!-- MD Select -Can't set default value, even though it works in Plunker!  -->
+    <!-- <md-select  formGroupName="monthSelect_start" floatPlaceholder="never" (change)="onSelectChange_start($event)">
     <md-option *ngFor="let month of months; let i=index" value="{{month.value}}" >
      {{month.viewValue}}
     </md-option>
   </md-select> -->
-
-   <select formGroupName="monthSelect_start" (change)="onSelectChange_start($event)">
-    <option  *ngFor="let month of months; let i=index" value="{{month.value}}" >
+<!-- 
+    <select (change)="onSelectChange_start($event)">
+    <option  *ngFor="let month of months; let i=index" >
      {{month.viewValue}}
     </option>
-  </select> 
-  <select formGroupName="monthSelect_end" (change)="onSelectChange_end($event)">
+  </select>
+    <select  (change)="onSelectChange_end($event)">
     <option  *ngFor="let month of this.reversedDates" value="{{month.value}}" >
      {{month.viewValue}}
     </option>
   </select>
-</form>
-</div>
-<div>
-  <form >
-    <form >
-    <md-select placeholder="Favorite food" [(ngModel)]="selectedStartDate" name="month">
-    <md-option *ngFor="let month of startSelectValues" [value]="month.value">
-      {{month.viewValue}}
-    </md-option>
-  </md-select>
-
-  <p> Selected value: {{selectedStartDate}} </p>
   </form>
+</div> -->
+<!-- <div> -->
+  <form>
+     <md-select  name="monthSelect_start" [(ngModel)]="selectedStartDate"  (change)="onSelectChange_start($event)">
+      <md-option *ngFor="let month of startSelectValues" [value]="month.value">
+        {{month.viewValue}}
+      </md-option>
+    </md-select> 
+     <md-select  name="monthSelect_end" [(ngModel)]="selectedEndDate" (change)="onSelectChange_end($event)">
+      <md-option *ngFor="let month of endSelectValues" [value]="month.value">
+        {{month.viewValue}}
+      </md-option>
+    </md-select> 
   </form>
 </div>

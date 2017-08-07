@@ -14,36 +14,25 @@ export class KeyBarComponent implements OnInit, AfterViewInit {
   public selectedStartDate;
   public selectedEndDate;
   public startSelectValues: Array<MonthViewmodel>;
-  public endSelectValues: Array<Date>;
+  public endSelectValues: Array<MonthViewmodel>;
 
-  months = [
-    { value: '2010-02-01', viewValue: 'Feb, 2010' },
-    { value: '2010-03-01', viewValue: 'Mar, 2010' },
-    { value: '2010-04-01', viewValue: 'Apr, 2010' },
-    { value: '2010-05-01', viewValue: 'May, 2010' },
-    { value: '2010-06-01', viewValue: 'Jun, 2010' },
-    { value: '2010-07-01', viewValue: 'Jul, 2010' },
-    { value: '2010-08-01', viewValue: 'Aug, 2010' }
-  ];
   datesForm: FormGroup;
 
   constructor(private service: TimelineService) { }
-  get reversedDates(): any {
-    return this.months.reverse();
-  }
+  // get reversedDates(): any {
+  //   return this.months.reverse();
+  // }
   ngOnInit() {
-    this.datesForm = new FormGroup({
-      monthSelect_start: new FormControl(this.months[2].value),
-      monthSelect_end: new FormControl()
-    });
 
     this.service.startDateSelect$
       .subscribe(dateItems => {
-
         this.startSelectValues = dateItems;
-        this.selectedStartDate = dateItems[0].value;
-
-        console.log(this.startSelectValues);
+        this.selectedStartDate = this.startSelectValues[0].value;
+      });
+    this.service.endDateSelect$
+      .subscribe(dateItems => {
+        this.endSelectValues = dateItems;
+        this.selectedEndDate = this.endSelectValues[this.endSelectValues.length-1].value;
       });
   }
   ngAfterViewInit(): void {
@@ -53,11 +42,13 @@ export class KeyBarComponent implements OnInit, AfterViewInit {
   onSelectChange_start(event) {
     // MD emits event.value
     //html select it's event.target.value
-    let endMonth = this.datesForm.get('monthSelect_end').value;
-    this.service.updateDateRange(event.target.value, endMonth);
+    // let endMonth = this.datesForm.get('monthSelect_end').value;
+    // this.service.updateDateRange(event.value, endMonth);
+    let endDate = this.selectedEndDate;
+    this.service.updateDateRange(event.value, endDate);
   }
   onSelectChange_end(event) {
-    let startDate = this.datesForm.get('monthSelect_start').value;
-    this.service.updateDateRange(startDate, event.target.value);
+    let startDate = this.selectedStartDate;
+    this.service.updateDateRange(startDate, event.value);
   }
 }
