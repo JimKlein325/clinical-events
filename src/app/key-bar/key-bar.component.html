@@ -42,14 +42,14 @@
 <!-- <div> -->
   <form>
      <md-select  name="monthSelect_start" [(ngModel)]="selectedStartDate"  (change)="onSelectChange_start($event)">
-      <md-option *ngFor="let month of startSelectValues" [value]="month.value">
+      <md-option *ngFor="let month of (model | async).startMonthOptions" [value]="month.value">
         {{month.viewValue}}
       </md-option>
     </md-select> 
-     <md-select  name="monthSelect_end" [(ngModel)]="selectedEndDate" (change)="onSelectChange_end($event)">
-      <md-option *ngFor="let month of endSelectValues" [value]="month.value">
+      <md-select  name="monthSelect_end" [(ngModel)]="selectedEndDate" (change)="onSelectChange_end($event)">
+      <md-option *ngFor="let month of (model | async).endMonthOptions" [value]="month.value">
         {{month.viewValue}}
       </md-option>
-    </md-select> 
+    </md-select>  
   </form>
 </div>

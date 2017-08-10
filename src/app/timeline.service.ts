@@ -9,6 +9,7 @@ import { ClinicalEventItemWrapper } from "./clinicalevent-chart/models/clinical-
 import { EventItemViewmodel } from "./model/event-item-viewmodel";
 import { MonthViewmodel } from "./model/month-viewmodel";
 import { TestData } from "./model/test-data";
+import { KeyBarViewmodel } from "./model/key-bar-viewmodel";
 
 @Injectable()
 export class TimelineService {
@@ -35,32 +36,31 @@ export class TimelineService {
     }
     );
 
-  private startMonth: string;
-  private endMonth: string;
+  private datasetStartMonth: string;
+  private datasetEndMonth: string;
 
+  private datasetMonthValues: Array<MonthViewmodel>;
   private startSelectValues: Array<Date>;
   private endSelectValues: Array<Date>;
 
   // date selection
-  startMonth$ = this.wrappedEvents$
-    // .switchMap((value, index) => value.reduce((acc, item) =>
-    //     acc.itemDate < item.itemDate ? acc : item
-    .map(events => events.reduce((acc, item) =>
-      acc.itemDate < item.itemDate ? acc : item)
-    )
-    .map(event => ({ value: event.item.eventtime, viewValue: moment(event.item.eventtime).format("MMM, YYYY") }));
+  // startMonth$ = this.wrappedEvents$
+  //   // .switchMap((value, index) => value.reduce((acc, item) =>
+  //   //     acc.itemDate < item.itemDate ? acc : item
+  //   .map(events => events.reduce((acc, item) =>
+  //     acc.itemDate < item.itemDate ? acc : item)
+  //   )
+  //   .map(event => ({ value: event.item.eventtime, viewValue: moment(event.item.eventtime).format("MMM, YYYY") }));
 
-  testDate(dateString): boolean {
-    let eventDate = new Date(dateString);
+  // testDate(dateString): boolean {
+  //   let eventDate = new Date(dateString);
 
-    let allDates = this.dataset.map(item => new Date(item.eventtime));
-    let minD = _.min(allDates.map(date => date.getTime()));
-    let maxD = _.max(allDates.map(date => date.getTime()));
+  //   let allDates = this.dataset.map(item => new Date(item.eventtime));
+  //   let minD = _.min(allDates.map(date => date.getTime()));
+  //   let maxD = _.max(allDates.map(date => date.getTime()));
 
-    return minD >= eventDate <= maxD;
-  }
-  dataDateRange$ = this.clinicalEventItems$
-    .map(event => event.map(item => new Date(item.eventtime)));
+  //   return minD >= eventDate <= maxD;
+  // }
 
   maxMinDates$ = this.clinicalEventItems$
     .map(event => event.map(item => new Date(item.eventtime)))
@@ -70,7 +70,6 @@ export class TimelineService {
       let min = moment(minD).format('YYYY-MM-DD');
       let max = moment(maxD).format('YYYY-MM-DD');
 
-      //let test = 
       return [{
         minDate: minD,
         maxDate: maxD,
@@ -79,17 +78,21 @@ export class TimelineService {
       }];
     });
 
+
   monthViewItems$: Observable<Array<MonthViewmodel>> = this.wrappedEvents$
     .map(event => event.map(wrapper => new Date(wrapper.item.eventtime)))
     .switchMap(dates => {
+
       let minD = _.min(dates.map(date => date.getTime()));
       let maxD = _.max(dates.map(date => date.getTime()));
       let min = moment(minD).format('YYYY-MM-DD');
       let max = moment(maxD).format('YYYY-MM-DD');
 
-      //set the selected start and end month based on the dataset
-      // this.startMonth = min;
-      // this.endMonth = max;
+      if (!this.datasetStartMonth) {
+        // values set to dataset min and max dates
+        this.datasetStartMonth = min;
+        this.datasetEndMonth = max;
+      }
 
       //emit min and max dates for current data set 
       return [{
@@ -103,22 +106,124 @@ export class TimelineService {
     })
 
   ;
+  getMinMaxClinicalEvents(clinicalEventItems: Array<ClinicalEventItem>) {
+    const dates = clinicalEventItems
+      .map(item => new Date(item.eventtime));
+    // .switchMap(dates => {
 
-  startDateSelect$: Observable<Array<MonthViewmodel>> = this.monthViewItems$
+    let minD = _.min(dates.map(date => date.getTime()));
+    let maxD = _.max(dates.map(date => date.getTime()));
+    let min = moment(minD).format('YYYY-MM-DD');
+    let max = moment(maxD).format('YYYY-MM-DD');
+
+    if (!this.datasetStartMonth) {
+      // values set to dataset min and max dates
+      this.datasetStartMonth = min;
+      this.datasetEndMonth = max;
+    }
+    const minMaxDates =
+      //emit min and max dates for current data set 
+      {
+        minDate: min,
+        maxDate: max
+      };
+    return minMaxDates;
+  }
+
+  initializeMonthViewModel(clinicalEventItems: Array<ClinicalEventItem>): Array<MonthViewmodel> {
+
+    const minMaxDates = this.getMinMaxDates(clinicalEventItems);
+
+    // this.datasetMonthValues = this.getMonthRange(minMaxDates);
+    return this.getMonthRange(minMaxDates);
+    // console.log(this.datasetMonthValues);
+  }
+  getStartDateOptions(): Observable<KeyBarViewmodel> {
+
+    //initialize Month view item list -- hack
+    this.clinicalEventItems$
+      .do(items => {
+        if (this.datasetMonthValues === undefined) {
+          this.datasetMonthValues = this.initializeMonthViewModel(items);
+        }
+      }).subscribe();
+
+    let initialSetofMonths = this.datasetMonthValues;
+
+    return this.clinicalEventItems$
+      .switchMap((items) => {
+        let minMaxMonths = this.getMinMaxDates(items);// = this.initializeMonthViewModel(items);
+        let a = moment(minMaxMonths.maxDate).month();
+        const startOptions = _.takeWhile(this.datasetMonthValues, (element) => (element.id <= endIndex));
+        const startIndex = _.findIndex(initialSetofMonths, (item) => moment(minMaxMonths.minDate).month() === moment(item.value).month());
+
+        const endOptions = _.slice(this.datasetMonthValues, startIndex, initialSetofMonths.length);
+        const endIndex = _.findIndex(endOptions, (item) => moment(minMaxMonths.maxDate).month() === moment(item.value).month());
+        //gets the min and max selected dates
+        const dates = this.getMinMaxDates(items);
+        const monthVMID_start = initialSetofMonths[0].id;
+        const monthVMID_end = initialSetofMonths[initialSetofMonths.length - 1].id;
+
+        //let current = moment(item.value);
+        // adding one month to the selected end month, then using < comparison will capture any month before the selected month
+        let endSelection = moment(this.datasetEndMonth);
+        let subsequentMonth = endSelection.add(1, 'M');
+        const viewModel: KeyBarViewmodel = {
+          startMonthID: startIndex,
+          startMonthOptions: initialSetofMonths,//startOptions,
+          endMonthID: endIndex,
+          endMonthOptions: initialSetofMonths
+        }
+        return Observable.of(viewModel);
+
+      });
+  }
+
+
+  intermediateStep$: Observable<ClinicalEventItem[]> = this.clinicalEventItems$
+    .do(items => {
+      if (this.datasetMonthValues === undefined) {
+        this.datasetMonthValues = this.initializeMonthViewModel(items);
+      }
+    })
+
+
+  startDateSelect$: Observable<KeyBarViewmodel> = this.intermediateStep$
     // filter if the user has selected a different end date
-    .map(items => items.filter(item => {
-      let current = moment(item.value);
+    .switchMap((items) => {
+      let monthValues;// = this.initializeMonthViewModel(items);
+      if (this.datasetMonthValues === undefined) {
+        monthValues = this.initializeMonthViewModel(items);
+
+
+      } else {
+
+        //monthValues = this.datasetMonthValues;// = this.initializeMonthViewModel(items);
+      }
+      //gets the min and max selected dates
+      const dates = this.getMinMaxDates(items);
+      const monthVMID_start = this.datasetMonthValues.filter(item => moment(item.value) <= moment(dates.minDate))[0].id;
+      const monthVMID_end = this.datasetMonthValues.filter(item => moment(item.value).month() === moment(dates.maxDate).month())[0].id;
+
+      //let current = moment(item.value);
       // adding one month to the selected end month, then using < comparison will capture any month before the selected month
-      let endSelection = moment(this.endMonth);
+      let endSelection = moment(this.datasetEndMonth);
       let subsequentMonth = endSelection.add(1, 'M');
-      return current < subsequentMonth;
-    }))
-  ;
+      const viewModel: KeyBarViewmodel = {
+        startMonthID: monthVMID_start,
+        startMonthOptions: _.takeWhile(this.datasetMonthValues, (element) => !(element.id === monthVMID_end)),
+        endMonthID: monthVMID_end,
+        endMonthOptions: _.skipWhile(this.datasetMonthValues, (element) => !(element.id === monthVMID_start))
+      }
+      return Observable.of(viewModel);
+
+    });
+
   endDateSelect$: Observable<Array<MonthViewmodel>> = this.monthViewItems$
     // filter if the user has selected a different end date
     .map(items => items.filter(item => {
       let current = moment(item.value);
-      let minDate = this.getMinMaxDataSetDates();
+      let minDate = this.getMinMaxDates(this.dataset);
       let startSelection = moment(minDate.minDate);
       let keepItem = current > startSelection;
       return keepItem;
@@ -140,28 +245,12 @@ export class TimelineService {
   }
   private eventCheckboxViewItems: Array<EventItemViewmodel>;
 
-  // initializeEventItemViewModel(items: ClinicalEventItem[]) {
-  //   const viewItems = this.dataset.map(item => {
-  //     const event: EventItemViewmodel =
-  //       {
-  //         text: item.clinicalevent,
-  //         isActive: true,
-  //         eventType: item.eventtype
-  //       };
-  //     return event;
-  //   });
-  //   const noDupes = _.uniqBy(viewItems, 'text');
-  //   this.clinicalEvents = noDupes.map(ce => ce.clinicalevent);
-  //   this.
-  //   return Observable.of(noDupes);
-  // }
-
   getEventList(): Observable<EventItemViewmodel[]> {
 
     return this.clinicalEventItems$
       .switchMap(items => {
         //first access initialize eventCheckboxViewItems
-        if (!this.eventCheckboxViewItems) {
+        if (this.eventCheckboxViewItems === undefined) {
           const viewItems = this.dataset.map(item => {
             const event: EventItemViewmodel =
               {
@@ -176,10 +265,11 @@ export class TimelineService {
           return Observable.of(noDupes.map(a => Object.assign({}, a)));//this.clinicalEvents.map(a => Object.assign({}, a)));
         }
         //subsequent filtering of dataset in view:  update state of eventCheckboxViewItems list
+        let eventsNotInCurrentView = this.getEventsNotInView(items);
         const viewItemsClone = this.eventCheckboxViewItems
           .map(a => Object.assign({}, a))
           .map(item => {
-            let checkboxState = !_.includes(this.checkboxItems, item.text);
+            let checkboxState = !_.includes(this.checkboxItems, item.text) && !_.includes(eventsNotInCurrentView, item.text);
             const event: EventItemViewmodel =
               {
                 text: item.text,
@@ -193,23 +283,18 @@ export class TimelineService {
       });
   }
 
-  getEventList_old(): Observable<EventItemViewmodel[]> {
-    return this.clinicalEventItems$
-      .switchMap(items => {
-        let i = this.dataset.map(item => {
-          const event: EventItemViewmodel =
-            {
-              text: item.clinicalevent,
-              isActive: !_.includes(this.checkboxItems, item.clinicalevent),
-              eventType: item.eventtype
-            };
-          return event;
-        });
+  getEventsNotInView(events: ClinicalEventItem[]): Array<string> {
+    //map ce's to viewItems
+    const eventsInView = this.dataset.map(item => item.clinicalevent);
 
-        const noDupes = _.uniqBy(i, 'text');
-        this.clinicalEvents = noDupes.map(ce => ce.clinicalevent);
-        return Observable.of(noDupes);
-      });
+    const fullListOfEventsStrings = _.map(this.eventCheckboxViewItems, (event) => event.clinicalevent);
+    const fullListOfEvents = _.uniq(fullListOfEventsStrings);
+    //de-dupe
+    const currentEvents = _.uniq(eventsInView);
+    //compare to full list of items in dataset: eventCheckboxViewItems
+    const eventsNotInCurrentView = _.difference(fullListOfEvents, currentEvents);
+    //return a difference between full list and current view
+    return eventsNotInCurrentView;
   }
 
   // generate the height above or below the unmarked axis based on item's index position
@@ -313,13 +398,18 @@ export class TimelineService {
     // this.wrappedSubject.next(newClinicalEventList);
   }
 
+  updateDate_Start(startDate: string, endDate: string) {
+    this.updateDateRange(startDate, endDate);
+  }
+
+  updateDate_End(endDate: string) {
+
+  }
 
   // 
   updateDateRange(startDate: string, endDate: string) {
     //convert to date
     let dateObj = new Date(startDate);
-    this.startMonth = startDate;
-    this.endMonth = endDate;
 
     // clone dataset
     const newArray = this.dataset.map(a => Object.assign({}, a));
@@ -381,8 +471,8 @@ export class TimelineService {
 
     return viewItems;
   }
-  getMinMaxDataSetDates() {
-    let dates = this.dataset
+  getMinMaxDates(clinicalEvents: Array<ClinicalEventItem>) {
+    let dates = clinicalEvents
       .map(event => new Date(event.eventtime));
     let minD = _.min(dates.map(date => date.getTime()));
     let maxD = _.max(dates.map(date => date.getTime()));
