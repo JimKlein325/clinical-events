@@ -22,21 +22,9 @@ export class TimelineService {
 
   private wrappedSubject = new BehaviorSubject<ClinicalEventItemWrapper[]>(this.prepareData(this.dataset));
 
-
-
   private eventsNotInTimeFrame: string[] = [];
   private uncheckedEvents: string[] = [];
   private clinicalEvents: string[];
-
-  clinicalEventItems$: Observable<ClinicalEventItem[]> = this.subject.asObservable();
-
-  // wrappedEvents$ = this.wrappedSubject.asObservable();
-  wrappedEvents$: Observable<ClinicalEventItemWrapper[]> = this.clinicalEventItems$
-    .switchMap(events => {
-      return Observable.of(this.prepareData(events));
-    }
-    );
-
   private datasetStartMonth: string;
   private datasetEndMonth: string;
 
@@ -44,24 +32,13 @@ export class TimelineService {
   private startSelectValues: Array<Date>;
   private endSelectValues: Array<Date>;
 
-  // date selection
-  // startMonth$ = this.wrappedEvents$
-  //   // .switchMap((value, index) => value.reduce((acc, item) =>
-  //   //     acc.itemDate < item.itemDate ? acc : item
-  //   .map(events => events.reduce((acc, item) =>
-  //     acc.itemDate < item.itemDate ? acc : item)
-  //   )
-  //   .map(event => ({ value: event.item.eventtime, viewValue: moment(event.item.eventtime).format("MMM, YYYY") }));
+  clinicalEventItems$: Observable<ClinicalEventItem[]> = this.subject.asObservable();
 
-  // testDate(dateString): boolean {
-  //   let eventDate = new Date(dateString);
-
-  //   let allDates = this.dataset.map(item => new Date(item.eventtime));
-  //   let minD = _.min(allDates.map(date => date.getTime()));
-  //   let maxD = _.max(allDates.map(date => date.getTime()));
-
-  //   return minD >= eventDate <= maxD;
-  // }
+  
+  wrappedEvents$: Observable<ClinicalEventItemWrapper[]> = this.clinicalEventItems$
+    .switchMap(events => {
+      return Observable.of(this.prepareData(events));
+    });
 
   maxMinDates$ = this.clinicalEventItems$
     .map(event => event.map(item => new Date(item.eventtime)))
@@ -189,37 +166,6 @@ export class TimelineService {
     })
 
 
-  // startDateSelect$: Observable<KeyBarViewmodel> = this.intermediateStep$
-  //   // filter if the user has selected a different end date
-  //   .switchMap((items) => {
-  //     let monthValues;// = this.initializeMonthViewModel(items);
-  //     if (this.datasetMonthValues === undefined) {
-  //       monthValues = this.initializeMonthViewModel(items);
-
-
-  //     } else {
-
-  //       //monthValues = this.datasetMonthValues;// = this.initializeMonthViewModel(items);
-  //     }
-  //     //gets the min and max selected dates
-  //     const dates = this.getMinMaxDates(items);
-  //     const monthVMID_start = this.datasetMonthValues.filter(item => moment(item.value) <= moment(dates.minDate))[0].id;
-  //     const monthVMID_end = this.datasetMonthValues.filter(item => moment(item.value).month() === moment(dates.maxDate).month())[0].id;
-
-  //     //let current = moment(item.value);
-  //     // adding one month to the selected end month, then using < comparison will capture any month before the selected month
-  //     let endSelection = moment(this.datasetEndMonth);
-  //     let subsequentMonth = endSelection.add(1, 'M');
-  //     const viewModel: KeyBarViewmodel = {
-  //       selectedStartMonth: monthVMID_start,
-  //       startMonthOptions: _.takeWhile(this.datasetMonthValues, (element) => !(element.id === monthVMID_end)),
-  //       endMontselectedEndMonthhID: monthVMID_end,
-  //       endMonthOptions: _.skipWhile(this.datasetMonthValues, (element) => !(element.id === monthVMID_start))
-  //     }
-  //     return Observable.of(viewModel);
-
-  //   });
-
   endDateSelect$: Observable<Array<MonthViewmodel>> = this.monthViewItems$
     // filter if the user has selected a different end date
     .map(items => items.filter(item => {
@@ -231,9 +177,7 @@ export class TimelineService {
     }))
   ;
 
-  constructor() {
-    //this.prepareData();
-  }
+  constructor() {}
   inDateRange(dateString: string): boolean {
     let date = new Date(dateString);
 
@@ -403,11 +347,6 @@ export class TimelineService {
     //const newClinicalEventList = this.prepareData(filteredList);
 
     this.subject.next(filteredList);
-    // this.wrappedSubject.next(newClinicalEventList);
-    // const newClinicalEventList = this.prepareData(newEvents);
-    // console.log("set filtered:  " + newClinicalEventList.length);
-    // this.subject.next(newEvents);
-    // this.wrappedSubject.next(newClinicalEventList);
   }
 
   updateDate_Start(startDate: string) {
