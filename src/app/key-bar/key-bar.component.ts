@@ -32,10 +32,10 @@ export class KeyBarComponent implements OnInit, AfterViewInit {
     this.model = this.service.getStartDateOptions();
     // this.service.getStartDateOptions()
     //   .subscribe(model => this.startSelectValues = model.startMonthOptions);
-    this.service.getStartDateOptions()
-      .subscribe(model => this.selectedStartDate = model.startMonthOptions[model.startMonthID].value);
-    this.service.getStartDateOptions()
-      .subscribe(model => this.selectedEndDate = model.endMonthOptions[model.endMonthID].value);
+    // this.service.getStartDateOptions()
+    //   .subscribe(model => this.selectedStartDate = model.selectedStartMonth.value);
+    // this.service.getStartDateOptions()
+    //   .subscribe(model => this.selectedEndDate = model.selectedEndMonth.value);
     // this.service.getStartDateOptions()
     //   .subscribe(model => this.viewModel = model);
 
@@ -99,10 +99,10 @@ export class KeyBarComponent implements OnInit, AfterViewInit {
     // let endMonth = this.datesForm.get('monthSelect_end').value;
     // this.service.updateDateRange(event.value, endMonth);
     //let endDate = this.selectedEndDate;
-    this.service.updateDate_Start(event.value, this.selectedEndDate);
+    this.service.updateDate_Start(event.value);
   }
   onSelectChange_end(event) {
     //let startDate = this.selectedStartDate;
-    this.service.updateDate_Start(this.selectedStartDate, event.value);
+    this.service.updateDate_End( event.value);
   }
 }

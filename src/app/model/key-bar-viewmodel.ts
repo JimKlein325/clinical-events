@@ -1,8 +1,8 @@
 import { MonthViewmodel } from "./month-viewmodel";
 
 export class KeyBarViewmodel {
-    startMonthID: number;
+    selectedStartMonth: MonthViewmodel;
     startMonthOptions: Array<MonthViewmodel>;
-    endMonthID: number;
+    selectedEndMonth: MonthViewmodel;
     endMonthOptions: Array<MonthViewmodel>;
 }

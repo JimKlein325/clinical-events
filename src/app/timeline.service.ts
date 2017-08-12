@@ -24,7 +24,8 @@ export class TimelineService {
 
 
 
-  private checkboxItems: string[] = [];
+  private eventsNotInTimeFrame: string[] = [];
+  private uncheckedEvents: string[] = [];
   private clinicalEvents: string[];
 
   clinicalEventItems$: Observable<ClinicalEventItem[]> = this.subject.asObservable();
@@ -153,26 +154,26 @@ export class TimelineService {
     return this.clinicalEventItems$
       .switchMap((items) => {
         let minMaxMonths = this.getMinMaxDates(items);// = this.initializeMonthViewModel(items);
-        let a = moment(minMaxMonths.maxDate).month();
-        const startOptions = _.takeWhile(this.datasetMonthValues, (element) => (element.id <= endIndex));
-        const startIndex = _.findIndex(initialSetofMonths, (item) => moment(minMaxMonths.minDate).month() === moment(item.value).month());
 
-        const endOptions = _.slice(this.datasetMonthValues, startIndex, initialSetofMonths.length);
-        const endIndex = _.findIndex(endOptions, (item) => moment(minMaxMonths.maxDate).month() === moment(item.value).month());
-        //gets the min and max selected dates
-        const dates = this.getMinMaxDates(items);
-        const monthVMID_start = initialSetofMonths[0].id;
-        const monthVMID_end = initialSetofMonths[initialSetofMonths.length - 1].id;
+        const startIndex = _.findIndex(initialSetofMonths, (item) => moment(minMaxMonths.minDate).month() === moment(item.value).month());
+        const endIndex = _.findIndex(initialSetofMonths, (item) => moment(minMaxMonths.maxDate).month() === moment(item.value).month());
+
+        const startOptions = _.takeWhile(initialSetofMonths, (element) => (element.id <= endIndex));
+        const endOptions = _.slice(initialSetofMonths, startIndex, initialSetofMonths.length);
+
+        const selectedStartMonthIndex = _.findIndex(startOptions, item => item.id === initialSetofMonths[startIndex].id);
+        const selectedEndMonthIndex = _.findIndex(endOptions, item => item.id === initialSetofMonths[endIndex].id);
+
 
         //let current = moment(item.value);
         // adding one month to the selected end month, then using < comparison will capture any month before the selected month
         let endSelection = moment(this.datasetEndMonth);
         let subsequentMonth = endSelection.add(1, 'M');
         const viewModel: KeyBarViewmodel = {
-          startMonthID: startIndex,
-          startMonthOptions: initialSetofMonths,//startOptions,
-          endMonthID: endIndex,
-          endMonthOptions: initialSetofMonths
+          selectedStartMonth: startOptions[selectedStartMonthIndex],
+          startMonthOptions: startOptions,//startOptions,
+          selectedEndMonth: endOptions[selectedEndMonthIndex],
+          endMonthOptions: endOptions
         }
         return Observable.of(viewModel);
 
@@ -188,36 +189,36 @@ export class TimelineService {
     })
 
 
-  startDateSelect$: Observable<KeyBarViewmodel> = this.intermediateStep$
-    // filter if the user has selected a different end date
-    .switchMap((items) => {
-      let monthValues;// = this.initializeMonthViewModel(items);
-      if (this.datasetMonthValues === undefined) {
-        monthValues = this.initializeMonthViewModel(items);
+  // startDateSelect$: Observable<KeyBarViewmodel> = this.intermediateStep$
+  //   // filter if the user has selected a different end date
+  //   .switchMap((items) => {
+  //     let monthValues;// = this.initializeMonthViewModel(items);
+  //     if (this.datasetMonthValues === undefined) {
+  //       monthValues = this.initializeMonthViewModel(items);
 
 
-      } else {
+  //     } else {
 
-        //monthValues = this.datasetMonthValues;// = this.initializeMonthViewModel(items);
-      }
-      //gets the min and max selected dates
-      const dates = this.getMinMaxDates(items);
-      const monthVMID_start = this.datasetMonthValues.filter(item => moment(item.value) <= moment(dates.minDate))[0].id;
-      const monthVMID_end = this.datasetMonthValues.filter(item => moment(item.value).month() === moment(dates.maxDate).month())[0].id;
+  //       //monthValues = this.datasetMonthValues;// = this.initializeMonthViewModel(items);
+  //     }
+  //     //gets the min and max selected dates
+  //     const dates = this.getMinMaxDates(items);
+  //     const monthVMID_start = this.datasetMonthValues.filter(item => moment(item.value) <= moment(dates.minDate))[0].id;
+  //     const monthVMID_end = this.datasetMonthValues.filter(item => moment(item.value).month() === moment(dates.maxDate).month())[0].id;
 
-      //let current = moment(item.value);
-      // adding one month to the selected end month, then using < comparison will capture any month before the selected month
-      let endSelection = moment(this.datasetEndMonth);
-      let subsequentMonth = endSelection.add(1, 'M');
-      const viewModel: KeyBarViewmodel = {
-        startMonthID: monthVMID_start,
-        startMonthOptions: _.takeWhile(this.datasetMonthValues, (element) => !(element.id === monthVMID_end)),
-        endMonthID: monthVMID_end,
-        endMonthOptions: _.skipWhile(this.datasetMonthValues, (element) => !(element.id === monthVMID_start))
-      }
-      return Observable.of(viewModel);
+  //     //let current = moment(item.value);
+  //     // adding one month to the selected end month, then using < comparison will capture any month before the selected month
+  //     let endSelection = moment(this.datasetEndMonth);
+  //     let subsequentMonth = endSelection.add(1, 'M');
+  //     const viewModel: KeyBarViewmodel = {
+  //       selectedStartMonth: monthVMID_start,
+  //       startMonthOptions: _.takeWhile(this.datasetMonthValues, (element) => !(element.id === monthVMID_end)),
+  //       endMontselectedEndMonthhID: monthVMID_end,
+  //       endMonthOptions: _.skipWhile(this.datasetMonthValues, (element) => !(element.id === monthVMID_start))
+  //     }
+  //     return Observable.of(viewModel);
 
-    });
+  //   });
 
   endDateSelect$: Observable<Array<MonthViewmodel>> = this.monthViewItems$
     // filter if the user has selected a different end date
@@ -269,7 +270,7 @@ export class TimelineService {
         const viewItemsClone = this.eventCheckboxViewItems
           .map(a => Object.assign({}, a))
           .map(item => {
-            let checkboxState = !_.includes(this.checkboxItems, item.text) && !_.includes(eventsNotInCurrentView, item.text);
+            let checkboxState = !_.includes(this.uncheckedEvents, item.text) && !_.includes(eventsNotInCurrentView, item.text);
             const event: EventItemViewmodel =
               {
                 text: item.text,
@@ -285,12 +286,21 @@ export class TimelineService {
 
   getEventsNotInView(events: ClinicalEventItem[]): Array<string> {
     //map ce's to viewItems
-    const eventsInView = this.dataset.map(item => item.clinicalevent);
+    const eventsInView = events.map(item => {
+            const event: EventItemViewmodel =
+              {
+                text: item.clinicalevent,
+                isActive: true,
+                eventType: item.eventtype
+              };
+            return event;
+          });
 
-    const fullListOfEventsStrings = _.map(this.eventCheckboxViewItems, (event) => event.clinicalevent);
+    const fullListOfEventsStrings = _.map(this.eventCheckboxViewItems, (event) => event.text);
     const fullListOfEvents = _.uniq(fullListOfEventsStrings);
     //de-dupe
-    const currentEvents = _.uniq(eventsInView);
+    const eventsInViewStrings = _.map(eventsInView, (event) => event.text);
+    const currentEvents = _.uniq(eventsInViewStrings);
     //compare to full list of items in dataset: eventCheckboxViewItems
     const eventsNotInCurrentView = _.difference(fullListOfEvents, currentEvents);
     //return a difference between full list and current view
@@ -370,15 +380,16 @@ export class TimelineService {
     return fullList;
   }
 
-  // Filter events using array of unchecked events stored in this.checkboxItems.  This method manages the list when items are manually selected.
+  // Filter events using array of unchecked events stored in this.uncheckedEvents.  This method manages the list when items are manually selected.
   filterEvents(item: string, checked: boolean) {
     if (checked) {
-      this.checkboxItems = this.checkboxItems.filter(element => element !== item);
+      this.uncheckedEvents = this.uncheckedEvents.filter(element => element !== item);
     }
     else {
-      this.checkboxItems.push(item);
+      this.uncheckedEvents.push(item);
     }
-    this.filterBySelectedItems();
+    // this.filterBySelectedItems();
+    this.emitNewClinicalEventsSet();
   }
 
   // always filter and emit clone of dataset
@@ -386,10 +397,11 @@ export class TimelineService {
   // prepareData then builds d3 chart out the list with the correct offset.
   filterBySelectedItems() {
     const datasetClone = this.dataset.map(a => Object.assign({}, a));
-    const filteredList = datasetClone.filter(x => !_.includes(this.checkboxItems, x.clinicalevent));
 
-    const newClinicalEventList = this.prepareData(filteredList);
-    console.log("set filtered:  " + newClinicalEventList.length);
+    const filteredList = datasetClone.filter(x => !_.includes(this.uncheckedEvents, x.clinicalevent));
+
+    //const newClinicalEventList = this.prepareData(filteredList);
+
     this.subject.next(filteredList);
     // this.wrappedSubject.next(newClinicalEventList);
     // const newClinicalEventList = this.prepareData(newEvents);
@@ -398,20 +410,17 @@ export class TimelineService {
     // this.wrappedSubject.next(newClinicalEventList);
   }
 
-  updateDate_Start(startDate: string, endDate: string) {
-    this.updateDateRange(startDate, endDate);
+  updateDate_Start(startDate: string) {
+    this.updateDateRange(startDate, this.datasetMonthValues[this.datasetMonthValues.length -1].value);
   }
 
   updateDate_End(endDate: string) {
-
+    this.updateDateRange(this.datasetMonthValues[0].value, endDate );
   }
 
   // 
   updateDateRange(startDate: string, endDate: string) {
-    //convert to date
-    let dateObj = new Date(startDate);
-
-    // clone dataset
+    // clone dataset and filter
     const newArray = this.dataset.map(a => Object.assign({}, a));
     const filteredList = newArray.filter(x => {
       let d = moment(x.eventtime);
@@ -420,30 +429,33 @@ export class TimelineService {
     });
 
     // update the filter list before emitting new value
-    this.addFilteredValuesToFilterList(newArray);
+    this.addEventsNotInTimeframeToList(newArray);
 
     // emit new list of clinical events
-    const newSet = this.prepareData(filteredList);
-    this.subject.next(filteredList);
+    this.emitNewClinicalEventsSet();
+  }
+
+  emitNewClinicalEventsSet(){
+    const datasetClone = this.dataset.map(a => Object.assign({}, a));
+
+    const filteredList_checkedItems = datasetClone
+    .filter(x => !_.includes(this.uncheckedEvents, x.clinicalevent));
+console.log(filteredList_checkedItems);
+    const filteredList_checkItems_dateRange =  filteredList_checkedItems.filter(x => !_.includes(this.eventsNotInTimeFrame, x.clinicalevent));
+console.log(filteredList_checkItems_dateRange);
+
+    const newSet = this.prepareData(filteredList_checkItems_dateRange);
+    this.subject.next(filteredList_checkItems_dateRange);
     this.wrappedSubject.next(newSet);
   }
 
-  addFilteredValuesToFilterList(items: ClinicalEventItem[]) {
+  addEventsNotInTimeframeToList(items: ClinicalEventItem[]) {
+    const fullListOfEvents = _.uniqBy(this.dataset, 'clinicalevent')
+      .map(ce => ce.clinicalevent);
     const noDupes = _.uniqBy(items, 'clinicalevent');
     let filterResult = noDupes.map(ce => ce.clinicalevent);
     // the new values are the difference between existing filterEvents and current event items
-    let newEvents = _.difference(this.filterEvents, filterResult);
-    //console.log(newEvents);
-    this.checkboxItems.concat(newEvents);
-    //console.log(this.checkboxItems);
-  }
-
-  filterByDate(minDate: Date, maxDate: Date) {
-    // update filterList by adding any events that fall out of the date range
-
-    //filter copy of dataset based on new date range
-
-    // emit new event list value
+    this.eventsNotInTimeFrame = _.difference(fullListOfEvents, filterResult);
   }
 
   // key Bar helper functions
