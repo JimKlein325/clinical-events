@@ -22,12 +22,14 @@ export class KeyBarComponent implements OnInit {
   datesForm: FormGroup;
   private viewModel: KeyBarViewmodel;
   private selectedStartIndex: number;
-  
+
+  monthViewItems: Observable<Array<MonthViewmodel>>;
 
   constructor(private service: TimelineService) { }
 
   ngOnInit() {
-    this.model = this.service.getStartDateOptions();
+    this.model = this.service.keyBarModel$;
+    this.monthViewItems = this.service.monthViewItems$;
   }
 
   onSelectChange_start(event) {
