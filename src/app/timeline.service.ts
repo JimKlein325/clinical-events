@@ -19,7 +19,7 @@ export class TimelineService {
 
   private dataset = TestData.dataset;
 
-  private subject = new BehaviorSubject<ClinicalEventItem[]>(this.dataset);
+  private subject = new BehaviorSubject<ClinicalEventItem[]>(this.initializeService(this.dataset));
 
   private wrappedSubject = new BehaviorSubject<ClinicalEventItemWrapper[]>(this.prepareData(this.dataset));
 
@@ -41,7 +41,7 @@ export class TimelineService {
 
   clinicalEventItems$: Observable<ClinicalEventItem[]> = this.subject.asObservable();
 
-  testStuff(): Array<ClinicalEventItem>{
+  testStuff(): Array<ClinicalEventItem> {
     this.clinicalEventItems$
       .take(1)
       .subscribe(value => this.test);
@@ -72,64 +72,78 @@ export class TimelineService {
       }];
     });
 
-  clinicalEvents_Initialized$ = this.clinicalEventItems$
-    .do( items => {
-      // initialize Key-Bar state items
-      this.datasetMinMaxDates = this.getMinMaxDates(items);
-      this.datasetMonthValues = this.getMonthRange(this.datasetMinMaxDates.minDate, this.datasetMinMaxDates.maxDate);
+  // clinicalEvents_Initialized$ = this.clinicalEventItems$
+  //   .do(items => {
+  //     // initialize Key-Bar state items
+  //     this.datasetMinMaxDates = this.getMinMaxDates(items);
+  //     this.datasetMonthValues = this.getMonthRange(this.datasetMinMaxDates.minDate, this.datasetMinMaxDates.maxDate);
+  //     this.selectedStartMonth =this.datasetMinMaxDates.minDate;
+  //     this.selectedEndMonth =  this.datasetMinMaxDates.maxDate;
 
-      //initialize event-list state items
+  //     //initialize event-list state items
 
-});
-  keyBarModel$: Observable<KeyBarViewmodel> = this.clinicalEvents_Initialized$
-    .switchMap( events => {
+  //   });
+  keyBarModel$: Observable<KeyBarViewmodel> = this.clinicalEventItems$
+    .switchMap(events => {
       return Observable.of(
         this.getKeyBarModel(
           events,
-          this.datasetMinMaxDates,
-          this.datasetMonthValues,
+          // this.datasetMinMaxDates,//no this value needs to b e computed from currrent events
+          // this.datasetMonthValues,//
           this.selectedStartMonth,
           this.selectedEndMonth
         )
       );
     });
+  initializeService(clinicalEvents: Array<ClinicalEventItem>): Array<ClinicalEventItem> {
+          // initialize Key-Bar state items
+      this.datasetMinMaxDates = this.getMinMaxDates(clinicalEvents);
+      this.datasetMonthValues = this.getMonthRange(this.datasetMinMaxDates.minDate, this.datasetMinMaxDates.maxDate);
+      this.selectedStartMonth =this.datasetMinMaxDates.minDate;
+      this.selectedEndMonth =  this.datasetMinMaxDates.maxDate;
 
+      //initialize event-list state items
+
+    return clinicalEvents;
+  }
   getKeyBarModel(
     items: Array<ClinicalEventItem>,
-    datasetMaxMinDates: MinmaxDates,
-    datasetViewModelArray: Array<MonthViewmodel>,
+    // datasetMaxMinDates: MinmaxDates,
+    // datasetViewModelArray: Array<MonthViewmodel>,
     selectedStartMonth: string,
     selectedEndMonth: string
-  ): KeyBarViewmodel{
-        let minMaxMonths = this.datasetMinMaxDates;//this.getMinMaxDates(items);// = this.initializeMonthViewModel(items);
+  ): KeyBarViewmodel {
+    let minMaxMonths = this.getMinMaxDates(items);// = this.initializeMonthViewModel(items);
+
+   
+    const viewModelClone_Start = this.datasetMonthValues.map(item => Object.assign({}, item));
+    const viewModelClone = this.datasetMonthValues.map(item => Object.assign({}, item));
+
+    const startIndex = _.findIndex(viewModelClone_Start, (item) => moment(minMaxMonths.minDate).month() === moment(item.value).month());
+    const endIndex = _.findIndex(viewModelClone, (item) => moment(minMaxMonths.maxDate).month() === moment(item.value).month());
+
+
+    const startOptions = _.takeWhile(viewModelClone_Start, (element) => (element.id <= endIndex));
+    const endOptions = _.slice(viewModelClone, startIndex, viewModelClone.length);
     
-        if(this.selectedStartMonth!=undefined){
-          this.datasetMinMaxDates.minDate = this.selectedStartMonth;
-        }
-        if(this.selectedEndMonth!=undefined){
-          this.datasetMinMaxDates.maxDate = this.selectedEndMonth;
-        }
-        const startIndex = _.findIndex(datasetViewModelArray, (item) => moment(minMaxMonths.minDate).month() === moment(item.value).month());
-        const endIndex = _.findIndex(datasetViewModelArray, (item) => moment(minMaxMonths.maxDate).month() === moment(item.value).month());
+    console.log(viewModelClone_Start);
+    console.log(endOptions);
 
-        const startOptions = _.takeWhile(datasetViewModelArray, (element) => (element.id <= endIndex));
-        const endOptions = _.slice(datasetViewModelArray, startIndex, datasetViewModelArray.length);
-
-        const selectedStartMonthIndex = _.findIndex(startOptions, item => item.id === datasetViewModelArray[startIndex].id);
-        const selectedEndMonthIndex = _.findIndex(endOptions, item => item.id === datasetViewModelArray[endIndex].id);
+    const selectedStartMonthIndex = _.findIndex(startOptions, item => item.id === viewModelClone_Start[startIndex].id);
+    const selectedEndMonthIndex = _.findIndex(endOptions, item => item.id === viewModelClone[endIndex].id);
 
 
-        //let current = moment(item.value);
-        // adding one month to the selected end month, then using < comparison will capture any month before the selected month
-        let endSelection = moment(this.datasetEndMonth);
-        let subsequentMonth = endSelection.add(1, 'M');
-        const viewModel: KeyBarViewmodel = {
-          selectedStartMonth: startOptions[selectedStartMonthIndex],
-          startMonthOptions: startOptions,//startOptions,
-          selectedEndMonth: endOptions[selectedEndMonthIndex],
-          endMonthOptions: endOptions
-        }
-        return viewModel;
+    //let current = moment(item.value);
+    // adding one month to the selected end month, then using < comparison will capture any month before the selected month
+    let endSelection = moment(this.datasetEndMonth);
+    let subsequentMonth = endSelection.add(1, 'M');
+    const viewModel: KeyBarViewmodel = {
+      selectedStartMonth: startOptions[selectedStartMonthIndex],
+      startMonthOptions: startOptions,//startOptions,
+      selectedEndMonth: endOptions[selectedEndMonthIndex],
+      endMonthOptions: endOptions
+    }
+    return viewModel;
 
   }
 
@@ -429,11 +443,15 @@ export class TimelineService {
   }
 
   updateDate_Start(startDate: string) {
-    this.updateDateRange(startDate, this.datasetMonthValues[this.datasetMonthValues.length - 1].value);
+    this.selectedStartMonth = startDate;
+    this.emitNewClinicalEventsSet();
+    // this.updateDateRange(startDate, this.datasetMonthValues[this.datasetMonthValues.length - 1].value);
   }
 
   updateDate_End(endDate: string) {
-    this.updateDateRange(this.datasetMonthValues[0].value, endDate);
+    this.selectedEndMonth = endDate;
+    this.emitNewClinicalEventsSet();
+    // this.updateDateRange(this.datasetMonthValues[0].value, endDate);
   }
 
   // 
@@ -455,15 +473,19 @@ export class TimelineService {
 
   emitNewClinicalEventsSet() {
     const datasetClone = this.dataset.map(a => Object.assign({}, a));
+    const filteredList = datasetClone.filter(x => {
+      let d = moment(x.eventtime);
+      let isLater = d > moment(this.selectedStartMonth) && d < moment(this.selectedEndMonth);
+      return isLater;
+    });
+    // const filteredList_checkedItems = datasetClone
+    //   .filter(x => !_.includes(this.uncheckedEvents, x.clinicalevent));
+    // console.log(filteredList_checkedItems);
+    // const filteredList_checkItems_dateRange = filteredList_checkedItems.filter(x => !_.includes(this.eventsNotInTimeFrame, x.clinicalevent));
+    // console.log(filteredList_checkItems_dateRange);
 
-    const filteredList_checkedItems = datasetClone
-      .filter(x => !_.includes(this.uncheckedEvents, x.clinicalevent));
-    console.log(filteredList_checkedItems);
-    const filteredList_checkItems_dateRange = filteredList_checkedItems.filter(x => !_.includes(this.eventsNotInTimeFrame, x.clinicalevent));
-    console.log(filteredList_checkItems_dateRange);
-
-    const newSet = this.prepareData(filteredList_checkItems_dateRange);
-    this.subject.next(filteredList_checkItems_dateRange);
+    const newSet = this.prepareData(filteredList);//_checkItems_dateRange);
+    this.subject.next(filteredList);//filteredList_checkItems_dateRange);
     this.wrappedSubject.next(newSet);
   }
 
@@ -477,7 +499,7 @@ export class TimelineService {
   }
 
   // key Bar helper functions
-  getMonthRange(minDate:string, maxDate:string): Array<MonthViewmodel> {
+  getMonthRange(minDate: string, maxDate: string): Array<MonthViewmodel> {
     let min = moment(minDate).month();
     let max = moment(maxDate).month();
     let year = moment(minDate).year();
