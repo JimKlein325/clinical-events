@@ -7,6 +7,7 @@ import { ClinicalEventItem } from "./clinicalevent-chart/models/clinical-event-i
 import { ClinicalEventReport } from "./clinicalevent-chart/models/clinical-event-report";
 import { ClinicalEventItemWrapper } from "./clinicalevent-chart/models/clinical-event-item-wrapper";
 import { EventItemViewmodel } from "./model/event-item-viewmodel";
+import { EventItemViewGroup } from "./model/event-item-view-group";
 import { MonthViewmodel } from "./model/month-viewmodel";
 import { TestData } from "./model/test-data";
 import { KeyBarViewmodel } from "./model/key-bar-viewmodel";
@@ -20,6 +21,7 @@ export class TimelineService {
   private dataset = TestData.dataset;
 
   private subject = new BehaviorSubject<ClinicalEventItem[]>(this.initializeService(this.dataset));
+  clinicalEventItems$: Observable<ClinicalEventItem[]> = this.subject.asObservable();
 
   private wrappedSubject = new BehaviorSubject<ClinicalEventItemWrapper[]>(this.prepareData(this.dataset));
 
@@ -39,7 +41,6 @@ export class TimelineService {
 
   testtest = moment("2010-05-05").format('YYYY-MM-DD');
 
-  clinicalEventItems$: Observable<ClinicalEventItem[]> = this.subject.asObservable();
 
   testStuff(): Array<ClinicalEventItem> {
     this.clinicalEventItems$
@@ -96,13 +97,25 @@ export class TimelineService {
       );
     });
   initializeService(clinicalEvents: Array<ClinicalEventItem>): Array<ClinicalEventItem> {
-          // initialize Key-Bar state items
-      this.datasetMinMaxDates = this.getMinMaxDates(clinicalEvents);
-      this.datasetMonthValues = this.getMonthRange(this.datasetMinMaxDates.minDate, this.datasetMinMaxDates.maxDate);
-      this.selectedStartMonth =this.datasetMinMaxDates.minDate;
-      this.selectedEndMonth =  this.datasetMinMaxDates.maxDate;
+    // initialize Key-Bar state items
+    this.datasetMinMaxDates = this.getMinMaxDates(clinicalEvents);
+    this.datasetMonthValues = this.getMonthRange(this.datasetMinMaxDates.minDate, this.datasetMinMaxDates.maxDate);
+    this.selectedStartMonth = this.datasetMinMaxDates.minDate;
+    this.selectedEndMonth = this.datasetMinMaxDates.maxDate;
 
-      //initialize event-list state items
+    //initialize event-list state items
+    const viewItems = clinicalEvents.map(item => {
+      const event: EventItemViewmodel =
+        {
+          text: item.clinicalevent,
+          isActive: true,
+          eventType: item.eventtype
+        };
+      return event;
+    });
+    const noDupes = _.uniqBy(viewItems, 'text');
+    this.eventCheckboxViewItems = noDupes;
+
 
     return clinicalEvents;
   }
@@ -113,9 +126,8 @@ export class TimelineService {
     selectedStartMonth: string,
     selectedEndMonth: string
   ): KeyBarViewmodel {
-    let minMaxMonths = this.getMinMaxDates(items);// = this.initializeMonthViewModel(items);
+    let minMaxMonths = this.getMinMaxDates(items);;
 
-   
     const viewModelClone_Start = this.datasetMonthValues.map(item => Object.assign({}, item));
     const viewModelClone = this.datasetMonthValues.map(item => Object.assign({}, item));
 
@@ -125,18 +137,10 @@ export class TimelineService {
 
     const startOptions = _.takeWhile(viewModelClone_Start, (element) => (element.id <= endIndex));
     const endOptions = _.slice(viewModelClone, startIndex, viewModelClone.length);
-    
-    console.log(viewModelClone_Start);
-    console.log(endOptions);
 
     const selectedStartMonthIndex = _.findIndex(startOptions, item => item.id === viewModelClone_Start[startIndex].id);
     const selectedEndMonthIndex = _.findIndex(endOptions, item => item.id === viewModelClone[endIndex].id);
 
-
-    //let current = moment(item.value);
-    // adding one month to the selected end month, then using < comparison will capture any month before the selected month
-    let endSelection = moment(this.datasetEndMonth);
-    let subsequentMonth = endSelection.add(1, 'M');
     const viewModel: KeyBarViewmodel = {
       selectedStartMonth: startOptions[selectedStartMonthIndex],
       startMonthOptions: startOptions,//startOptions,
@@ -320,6 +324,51 @@ export class TimelineService {
 
       });
   }
+  eventList$: Observable<Array<EventItemViewGroup>> = this.clinicalEventItems$
+    .map(items => {
+      let eventsNotInCurrentView = this.getEventsNotInView(items);
+
+      const eventSections: Array<EventItemViewGroup> = [
+        { title: "Diagnosis", events: new Array<EventItemViewmodel>() },
+        { title: "Treatment", events: new Array<EventItemViewmodel>() },
+        { title: "Quality of Life", events: new Array<EventItemViewmodel>() }
+      ]
+      const viewItemsClone = this.eventCheckboxViewItems
+        .map(a => Object.assign({}, a))
+        .map(item => {
+          let checkboxState = !_.includes(this.uncheckedEvents, item.text) && !_.includes(eventsNotInCurrentView, item.text);
+          const event: EventItemViewmodel =
+            {
+              text: item.text,
+              isActive: checkboxState,
+              eventType: item.eventType
+            };
+          return event;
+        })
+        //use reduce here to sort items into section array
+        .reduce(function (acc, item )  {
+          switch (item.eventType) {
+            case 2: {
+              // Diagnosis section
+              acc[0].events.push(item);
+              break;
+            }
+            case 0: {
+              acc[2].events.push(item);
+              break;
+            }
+            case 1: {
+              acc[1].events.push(item);
+              break;
+            }
+            default: { break; }
+          }
+          return acc;
+        }, eventSections)
+        ;
+      return eventSections;
+    }
+    )
 
   getEventsNotInView(events: ClinicalEventItem[]): Array<string> {
     //map ce's to viewItems
@@ -473,19 +522,26 @@ export class TimelineService {
 
   emitNewClinicalEventsSet() {
     const datasetClone = this.dataset.map(a => Object.assign({}, a));
+
     const filteredList = datasetClone.filter(x => {
       let d = moment(x.eventtime);
       let isLater = d > moment(this.selectedStartMonth) && d < moment(this.selectedEndMonth);
       return isLater;
     });
-    // const filteredList_checkedItems = datasetClone
-    //   .filter(x => !_.includes(this.uncheckedEvents, x.clinicalevent));
-    // console.log(filteredList_checkedItems);
+
+    const filteredList_checkedItems = filteredList
+      .filter(x => !_.includes(this.uncheckedEvents, x.clinicalevent));
+    console.log(filteredList_checkedItems);
+    //filter by user-checked items
     // const filteredList_checkItems_dateRange = filteredList_checkedItems.filter(x => !_.includes(this.eventsNotInTimeFrame, x.clinicalevent));
     // console.log(filteredList_checkItems_dateRange);
 
-    const newSet = this.prepareData(filteredList);//_checkItems_dateRange);
-    this.subject.next(filteredList);//filteredList_checkItems_dateRange);
+    const newSet = this.prepareData(filteredList_checkedItems);//_checkItems_dateRange);
+
+    //update state
+    //this.addEventsNotInTimeframeToList(filteredList_checkedItems);
+
+    this.subject.next(filteredList_checkedItems);//filteredList_checkItems_dateRange);
     this.wrappedSubject.next(newSet);
   }
 

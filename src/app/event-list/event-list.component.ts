@@ -4,6 +4,7 @@ import { MdList, MdCheckbox } from '@angular/material';
 import { TimelineService } from "../timeline.service";
 import { Observable } from "rxjs/Observable";
 import { EventItemViewmodel } from "../model/event-item-viewmodel";
+import { EventItemViewGroup } from "../model/event-item-view-group";
 
 @Component({
   selector: 'event-list',
@@ -11,11 +12,11 @@ import { EventItemViewmodel } from "../model/event-item-viewmodel";
   styleUrls: ['./event-list.component.css']
 })
 export class EventListComponent implements OnInit {
-  public events$: Observable<EventItemViewmodel[]>;
+  public events$: Observable<Array<EventItemViewGroup>>
   constructor(private timelineService: TimelineService) { }
 
   ngOnInit() {
-    this.events$ = this.timelineService.getEventList();
+    this.events$ = this.timelineService.eventList$;//.getEventList();
   }
   
   onCheckChange(event) {

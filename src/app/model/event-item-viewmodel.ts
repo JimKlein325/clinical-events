@@ -4,3 +4,6 @@ export class EventItemViewmodel {
         public isActive: boolean,
         public eventType: number) { }
 }
+
+
+
