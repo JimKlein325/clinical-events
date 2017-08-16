@@ -38,24 +38,14 @@ export class TimelineService {
   private endSelectValues: Array<Date>;
   test: Array<ClinicalEventItem>;
   private datasetMinMaxDates: MinmaxDates;
-
-  testtest = moment("2010-05-05").format('YYYY-MM-DD');
-
-
-  testStuff(): Array<ClinicalEventItem> {
-    this.clinicalEventItems$
-      .take(1)
-      .subscribe(value => this.test);
-    return this.test;
-  }
-  private testDerivedSubject$ = new BehaviorSubject<ClinicalEventItem[]>(
-    this.testStuff()
-  );
+  private eventCheckboxViewItems: Array<EventItemViewmodel>;
 
   wrappedEvents$: Observable<ClinicalEventItemWrapper[]> = this.clinicalEventItems$
+
     .switchMap(events => {
       return Observable.of(this.prepareData(events));
     });
+
 
   maxMinDates$ = this.clinicalEventItems$
     .map(event => event.map(item => new Date(item.eventtime)))
@@ -73,24 +63,13 @@ export class TimelineService {
       }];
     });
 
-  // clinicalEvents_Initialized$ = this.clinicalEventItems$
-  //   .do(items => {
-  //     // initialize Key-Bar state items
-  //     this.datasetMinMaxDates = this.getMinMaxDates(items);
-  //     this.datasetMonthValues = this.getMonthRange(this.datasetMinMaxDates.minDate, this.datasetMinMaxDates.maxDate);
-  //     this.selectedStartMonth =this.datasetMinMaxDates.minDate;
-  //     this.selectedEndMonth =  this.datasetMinMaxDates.maxDate;
 
-  //     //initialize event-list state items
 
-  //   });
   keyBarModel$: Observable<KeyBarViewmodel> = this.clinicalEventItems$
     .switchMap(events => {
       return Observable.of(
         this.getKeyBarModel(
           events,
-          // this.datasetMinMaxDates,//no this value needs to b e computed from currrent events
-          // this.datasetMonthValues,//
           this.selectedStartMonth,
           this.selectedEndMonth
         )
@@ -151,58 +130,7 @@ export class TimelineService {
 
   }
 
-  monthViewItems$: Observable<Array<MonthViewmodel>> = this.wrappedEvents$
-    .map(event => event.map(wrapper => new Date(wrapper.item.eventtime)))
-    .switchMap(dates => {
 
-      let minD = _.min(dates.map(date => date.getTime()));
-      let maxD = _.max(dates.map(date => date.getTime()));
-      let min = moment(minD).format('YYYY-MM-DD');
-      let max = moment(maxD).format('YYYY-MM-DD');
-
-
-
-      // if (!this.datasetStartMonth) {
-      //   // values set to dataset min and max dates
-      //   this.datasetStartMonth = this.testtest;//min;
-      //   this.datasetEndMonth = max;
-      // }
-
-      //emit min and max dates for current data set 
-      return [{
-        minDate: this.testtest,//min,
-        maxDate: max
-      }];
-    })
-    // build array of MonthViewmodel items
-    .map(minMaxDates => {
-      return this.getMonthRange(minMaxDates.minDate, minMaxDates.maxDate)
-    })
-
-  ;
-  getMinMaxClinicalEvents(clinicalEventItems: Array<ClinicalEventItem>) {
-    const dates = clinicalEventItems
-      .map(item => new Date(item.eventtime));
-    // .switchMap(dates => {
-
-    let minD = _.min(dates.map(date => date.getTime()));
-    let maxD = _.max(dates.map(date => date.getTime()));
-    let min = moment(minD).format('YYYY-MM-DD');
-    let max = moment(maxD).format('YYYY-MM-DD');
-
-    // if (!this.datasetStartMonth) {
-    //   // values set to dataset min and max dates
-    //   this.datasetStartMonth = min;
-    //   this.datasetEndMonth = max;
-    // }
-    const minMaxDates =
-      //emit min and max dates for current data set 
-      {
-        minDate: min,
-        maxDate: max
-      };
-    return minMaxDates;
-  }
 
   initializeMonthViewModel(clinicalEventItems: Array<ClinicalEventItem>): Array<MonthViewmodel> {
 
@@ -227,7 +155,7 @@ export class TimelineService {
 
     return this.clinicalEventItems$
       .switchMap((items) => {
-        let minMaxMonths = this.getMinMaxDates(items);// = this.initializeMonthViewModel(items);
+        let minMaxMonths = this.getMinMaxDates(items);
 
         const startIndex = _.findIndex(initialSetofMonths, (item) => moment(minMaxMonths.minDate).month() === moment(item.value).month());
         const endIndex = _.findIndex(initialSetofMonths, (item) => moment(minMaxMonths.maxDate).month() === moment(item.value).month());
@@ -245,7 +173,7 @@ export class TimelineService {
         let subsequentMonth = endSelection.add(1, 'M');
         const viewModel: KeyBarViewmodel = {
           selectedStartMonth: startOptions[selectedStartMonthIndex],
-          startMonthOptions: startOptions,//startOptions,
+          startMonthOptions: startOptions,
           selectedEndMonth: endOptions[selectedEndMonthIndex],
           endMonthOptions: endOptions
         }
@@ -253,26 +181,6 @@ export class TimelineService {
 
       });
   }
-
-
-  intermediateStep$: Observable<ClinicalEventItem[]> = this.clinicalEventItems$
-    .do(items => {
-      if (this.datasetMonthValues === undefined) {
-        this.datasetMonthValues = this.initializeMonthViewModel(items);
-      }
-    })
-
-
-  endDateSelect$: Observable<Array<MonthViewmodel>> = this.monthViewItems$
-    // filter if the user has selected a different end date
-    .map(items => items.filter(item => {
-      let current = moment(item.value);
-      let minDate = this.getMinMaxDates(this.dataset);
-      let startSelection = moment(minDate.minDate);
-      let keepItem = current > startSelection;
-      return keepItem;
-    }))
-  ;
 
   constructor() { }
   inDateRange(dateString: string): boolean {
@@ -285,48 +193,10 @@ export class TimelineService {
     return inRange
       ;
   }
-  private eventCheckboxViewItems: Array<EventItemViewmodel>;
 
-  getEventList(): Observable<EventItemViewmodel[]> {
-
-    return this.clinicalEventItems$
-      .switchMap(items => {
-        //first access initialize eventCheckboxViewItems
-        if (this.eventCheckboxViewItems === undefined) {
-          const viewItems = this.dataset.map(item => {
-            const event: EventItemViewmodel =
-              {
-                text: item.clinicalevent,
-                isActive: true,
-                eventType: item.eventtype
-              };
-            return event;
-          });
-          const noDupes = _.uniqBy(viewItems, 'text');
-          this.eventCheckboxViewItems = noDupes;
-          return Observable.of(noDupes.map(a => Object.assign({}, a)));//this.clinicalEvents.map(a => Object.assign({}, a)));
-        }
-        //subsequent filtering of dataset in view:  update state of eventCheckboxViewItems list
-        let eventsNotInCurrentView = this.getEventsNotInView(items);
-        const viewItemsClone = this.eventCheckboxViewItems
-          .map(a => Object.assign({}, a))
-          .map(item => {
-            let checkboxState = !_.includes(this.uncheckedEvents, item.text) && !_.includes(eventsNotInCurrentView, item.text);
-            const event: EventItemViewmodel =
-              {
-                text: item.text,
-                isActive: checkboxState,
-                eventType: item.eventType
-              };
-            return event;
-          });
-        return Observable.of(viewItemsClone);
-
-      });
-  }
   eventList$: Observable<Array<EventItemViewGroup>> = this.clinicalEventItems$
     .map(items => {
-      let eventsNotInCurrentView = this.getEventsNotInView(items);
+      this.eventsNotInTimeFrame = this.getEventsNotInView(items);
 
       const eventSections: Array<EventItemViewGroup> = [
         { title: "Diagnosis", events: new Array<EventItemViewmodel>() },
@@ -336,7 +206,7 @@ export class TimelineService {
       const viewItemsClone = this.eventCheckboxViewItems
         .map(a => Object.assign({}, a))
         .map(item => {
-          let checkboxState = !_.includes(this.uncheckedEvents, item.text) && !_.includes(eventsNotInCurrentView, item.text);
+          let checkboxState = !_.includes(this.uncheckedEvents, item.text) && !_.includes(this.eventsNotInTimeFrame, item.text);
           const event: EventItemViewmodel =
             {
               text: item.text,
@@ -346,7 +216,7 @@ export class TimelineService {
           return event;
         })
         //use reduce here to sort items into section array
-        .reduce(function (acc, item )  {
+        .reduce(function (acc, item) {
           switch (item.eventType) {
             case 2: {
               // Diagnosis section
@@ -430,7 +300,6 @@ export class TimelineService {
       .reduce((acc, item, index) => {
         let yVal = this.genYValue(item.eventtype, slots, offset, index);
         let ce = [new ClinicalEventItemWrapper(item, yVal, this.getDate(item.eventtime))];
-        // array.push returns a number, so use concat here
         return acc.concat(ce);
       },
       new Array<ClinicalEventItemWrapper>()
@@ -470,6 +339,10 @@ export class TimelineService {
   filterEvents(item: string, checked: boolean) {
     if (checked) {
       this.uncheckedEvents = this.uncheckedEvents.filter(element => element !== item);
+      if (_.includes(this.eventsNotInTimeFrame, item)) {
+        this.selectedStartMonth = this.datasetMinMaxDates.minDate;
+        this.selectedEndMonth = this.datasetMinMaxDates.maxDate;
+      }
     }
     else {
       this.uncheckedEvents.push(item);
@@ -478,45 +351,13 @@ export class TimelineService {
     this.emitNewClinicalEventsSet();
   }
 
-  // always filter and emit clone of dataset
-  // filter operation performed on raw event items
-  // prepareData then builds d3 chart out the list with the correct offset.
-  filterBySelectedItems() {
-    const datasetClone = this.dataset.map(a => Object.assign({}, a));
-
-    const filteredList = datasetClone.filter(x => !_.includes(this.uncheckedEvents, x.clinicalevent));
-
-    //const newClinicalEventList = this.prepareData(filteredList);
-
-    this.subject.next(filteredList);
-  }
-
   updateDate_Start(startDate: string) {
     this.selectedStartMonth = startDate;
     this.emitNewClinicalEventsSet();
-    // this.updateDateRange(startDate, this.datasetMonthValues[this.datasetMonthValues.length - 1].value);
   }
 
   updateDate_End(endDate: string) {
     this.selectedEndMonth = endDate;
-    this.emitNewClinicalEventsSet();
-    // this.updateDateRange(this.datasetMonthValues[0].value, endDate);
-  }
-
-  // 
-  updateDateRange(startDate: string, endDate: string) {
-    // clone dataset and filter
-    const newArray = this.dataset.map(a => Object.assign({}, a));
-    const filteredList = newArray.filter(x => {
-      let d = moment(x.eventtime);
-      let isLater = d > moment(startDate) && d < moment(endDate);
-      return isLater;
-    });
-
-    // update the filter list before emitting new value
-    this.addEventsNotInTimeframeToList(newArray);
-
-    // emit new list of clinical events
     this.emitNewClinicalEventsSet();
   }
 
@@ -532,26 +373,11 @@ export class TimelineService {
     const filteredList_checkedItems = filteredList
       .filter(x => !_.includes(this.uncheckedEvents, x.clinicalevent));
     console.log(filteredList_checkedItems);
-    //filter by user-checked items
-    // const filteredList_checkItems_dateRange = filteredList_checkedItems.filter(x => !_.includes(this.eventsNotInTimeFrame, x.clinicalevent));
-    // console.log(filteredList_checkItems_dateRange);
 
-    const newSet = this.prepareData(filteredList_checkedItems);//_checkItems_dateRange);
+    const newSet = this.prepareData(filteredList_checkedItems);
 
-    //update state
-    //this.addEventsNotInTimeframeToList(filteredList_checkedItems);
-
-    this.subject.next(filteredList_checkedItems);//filteredList_checkItems_dateRange);
+    this.subject.next(filteredList_checkedItems);
     this.wrappedSubject.next(newSet);
-  }
-
-  addEventsNotInTimeframeToList(items: ClinicalEventItem[]) {
-    const fullListOfEvents = _.uniqBy(this.dataset, 'clinicalevent')
-      .map(ce => ce.clinicalevent);
-    const noDupes = _.uniqBy(items, 'clinicalevent');
-    let filterResult = noDupes.map(ce => ce.clinicalevent);
-    // the new values are the difference between existing filterEvents and current event items
-    this.eventsNotInTimeFrame = _.difference(fullListOfEvents, filterResult);
   }
 
   // key Bar helper functions

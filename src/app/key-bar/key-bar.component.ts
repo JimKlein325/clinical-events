@@ -29,7 +29,6 @@ export class KeyBarComponent implements OnInit {
 
   ngOnInit() {
     this.model = this.service.keyBarModel$;
-    this.monthViewItems = this.service.monthViewItems$;
   }
 
   onSelectChange_start(event) {
@@ -37,7 +36,6 @@ export class KeyBarComponent implements OnInit {
   }
 
   onSelectChange_end(event) {
-    //let startDate = this.selectedStartDate;
     this.service.updateDate_End( event.value);
   }
 }

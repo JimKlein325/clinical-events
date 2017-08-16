@@ -16,12 +16,10 @@ export class EventListComponent implements OnInit {
   constructor(private timelineService: TimelineService) { }
 
   ngOnInit() {
-    this.events$ = this.timelineService.eventList$;//.getEventList();
+    this.events$ = this.timelineService.eventList$;
   }
   
   onCheckChange(event) {
-    /* Checked.  Pass the label value stored in the 
-    id property to the service filter method.*/
     let idString = event.source.value;
     this.timelineService.filterEvents(idString, event.checked);
   }
