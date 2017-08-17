@@ -12,6 +12,7 @@ import { MonthViewmodel } from "./model/month-viewmodel";
 import { TestData } from "./model/test-data";
 import { KeyBarViewmodel } from "./model/key-bar-viewmodel";
 import { MinmaxDates } from "./model/minmax-dates";
+import { ClinicaleventChartViewmodel } from "./model/clinicalevent-chart-viewmodel";
 
 @Injectable()
 export class TimelineService {
@@ -46,7 +47,25 @@ export class TimelineService {
       return Observable.of(this.prepareData(events));
     });
 
+  chartView$: Observable<ClinicaleventChartViewmodel> =
+  this.clinicalEventItems$
+    .switchMap(events => {
 
+      let minMaxMonths = this.getMinMaxDates(events);
+      let monthRangeLength = this.getMonthRange(
+        minMaxMonths.minDate,
+        minMaxMonths.maxDate
+      ).length;
+
+      const viewModel: ClinicaleventChartViewmodel = {
+        eventItems: this.prepareData(events),
+        report: this.clinicalEventReport,
+        monthsInCurrentTimeframe: monthRangeLength,
+        minDate: new Date(minMaxMonths.minDate),
+        maxDate: new Date(minMaxMonths.maxDate)
+      }
+      return Observable.of(viewModel);
+    });
   maxMinDates$ = this.clinicalEventItems$
     .map(event => event.map(item => new Date(item.eventtime)))
     .switchMap(dates => {
@@ -100,8 +119,6 @@ export class TimelineService {
   }
   getKeyBarModel(
     items: Array<ClinicalEventItem>,
-    // datasetMaxMinDates: MinmaxDates,
-    // datasetViewModelArray: Array<MonthViewmodel>,
     selectedStartMonth: string,
     selectedEndMonth: string
   ): KeyBarViewmodel {
@@ -128,6 +145,26 @@ export class TimelineService {
     }
     return viewModel;
 
+  }
+  getChartViewModel(
+    items: Array<ClinicalEventItem>,
+    selectedStartMonth: string,
+    selectedEndMonth: string
+  ): ClinicaleventChartViewmodel {
+    let minMaxMonths = this.getMinMaxDates(items);
+    let monthRangeLength = this.getMonthRange(
+      minMaxMonths.minDate,
+      minMaxMonths.maxDate
+    ).length;
+
+    const viewModel: ClinicaleventChartViewmodel = {
+      eventItems: this.prepareData(items),
+      report: this.clinicalEventReport,
+      monthsInCurrentTimeframe: monthRangeLength,
+      minDate: new Date(minMaxMonths.minDate),
+      maxDate: new Date(minMaxMonths.maxDate)
+    }
+    return viewModel;
   }
 
 

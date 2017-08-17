@@ -18,6 +18,7 @@ import { ClinicalEventReport } from './models/clinical-event-report'
 import { ClinicalEventItem } from './models/clinical-event-item'
 import { ClinicalEventDataService } from './models/clinical-event-data-service'
 import { ClinicalEventItemWrapper } from './models/clinical-event-item-wrapper'
+import { ClinicaleventChartViewmodel } from "../model/clinicalevent-chart-viewmodel";
 import { TimelineService } from "../timeline.service";
 
 
@@ -63,25 +64,25 @@ export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
   constructor(private tlService: TimelineService, public dataService: ClinicalEventDataService) { }
 
   ngAfterViewInit(): void {
-    this.tlService.maxMinDates$
+    this.tlService.chartView$
       .takeUntil(this.ngUnsubscribe)
-      .map(val => {
-        this.minDate = val.minDate;
-        this.maxDate = val.maxDate;
-      })
-      .subscribe();
+      .do(vm => {
+        this.wrappedItems = vm.eventItems;
+        this.clinicalEventReport = vm.report;
+        this.dateTicks = vm.monthsInCurrentTimeframe;
+        this.minDate = vm.minDate;
+        this.maxDate = vm.maxDate;
 
-    this.tlService.wrappedEvents$
-      .takeUntil(this.ngUnsubscribe)
-      .do(val => {
-        this.wrappedItems = val;
-        this.clinicalEventReport = this.tlService.clinicalEventReport;
         if (!this.chart) {
           this.createChart();
         }
         this.updateChart();
+
       })
       .subscribe();
+
+
+
   }
 
   createChart() {
@@ -187,7 +188,7 @@ export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
       .transition()
       .duration(750)
       .attr("x", (d, i) => this.xScale(d.itemDate))
-      .attr("y", (d, i) => d.item.eventtype == 1  || d.item.eventtype == 2 ? this.height - this.yScale((d.yValue)) : this.yScale(0))
+      .attr("y", (d, i) => d.item.eventtype == 1 || d.item.eventtype == 2 ? this.height - this.yScale((d.yValue)) : this.yScale(0))
       .attr("height", (d, i) => Math.abs(this.yScale(d.yValue) - this.yScale(0)));
 
     // ENTER existing items, applying a transition
@@ -195,7 +196,7 @@ export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
       .enter()
       .append("rect")
       .attr("x", (d, i) => this.xScale(d.itemDate))
-      .attr("y", (d, i) => d.item.eventtype == 1  || d.item.eventtype == 2 ? this.height - this.yScale((d.yValue)) : this.yScale(0))
+      .attr("y", (d, i) => d.item.eventtype == 1 || d.item.eventtype == 2 ? this.height - this.yScale((d.yValue)) : this.yScale(0))
       .attr("width", 2)
       .attr("height", (d, i) => Math.abs(this.yScale(d.yValue) - this.yScale(0)))
       .attr("fill", this.barColor)
