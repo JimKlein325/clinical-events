@@ -33,7 +33,7 @@ describe('ItemSelectComponent', () => {
   it('should load event items from server', () => {
     let items = ["5", "2", "3"];
     let service = TestBed.get(TimelineService);
-    spyOn(service, 'getEventList').and.returnValue(Observable.of(items));
+    // spyOn(service, 'getEventList').and.returnValue(Observable.of(items));
 
     // spec generation places this code in the beforeEach() block
     // need to move it down here so that ngOnInt is called after we set up the test

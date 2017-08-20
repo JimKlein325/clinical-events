@@ -66,23 +66,6 @@ export class TimelineService {
       }
       return Observable.of(viewModel);
     });
-  maxMinDates$ = this.clinicalEventItems$
-    .map(event => event.map(item => new Date(item.eventtime)))
-    .switchMap(dates => {
-      let minD = _.min(dates.map(date => date.getTime()));
-      let maxD = _.max(dates.map(date => date.getTime()));
-      let min = moment(minD).format('YYYY-MM-DD');
-      let max = moment(maxD).format('YYYY-MM-DD');
-
-      return [{
-        minDate: minD,
-        maxDate: maxD,
-        minDateString: min,
-        maxDateString: max
-      }];
-    });
-
-
 
   keyBarModel$: Observable<KeyBarViewmodel> = this.clinicalEventItems$
     .switchMap(events => {
@@ -121,7 +104,7 @@ export class TimelineService {
     items: Array<ClinicalEventItem>,
     selectedStartMonth: string,
     selectedEndMonth: string
-  ): KeyBarViewmodel {
+    ): KeyBarViewmodel {
     let minMaxMonths = this.getMinMaxDates(items);;
 
     const viewModelClone_Start = this.datasetMonthValues.map(item => Object.assign({}, item));
@@ -167,15 +150,11 @@ export class TimelineService {
     return viewModel;
   }
 
-
-
   initializeMonthViewModel(clinicalEventItems: Array<ClinicalEventItem>): Array<MonthViewmodel> {
 
     const minMaxDates = this.getMinMaxDates(clinicalEventItems);
 
-    // this.datasetMonthValues = this.getMonthRange(minMaxDates);
     return this.getMonthRange(minMaxDates.minDate, minMaxDates.maxDate);
-    // console.log(this.datasetMonthValues);
   }
 
   getStartDateOptions(): Observable<KeyBarViewmodel> {
@@ -241,7 +220,7 @@ export class TimelineService {
         { title: "Quality of Life", events: new Array<EventItemViewmodel>() }
       ]
       const viewItemsClone = this.eventCheckboxViewItems
-        .map(a => Object.assign({}, a))
+        .map(eventItem => Object.assign({}, eventItem))
         .map(item => {
           let checkboxState = !_.includes(this.uncheckedEvents, item.text) && !_.includes(this.eventsNotInTimeFrame, item.text);
           const event: EventItemViewmodel =
@@ -261,10 +240,12 @@ export class TimelineService {
               break;
             }
             case 0: {
+              //Treatments
               acc[2].events.push(item);
               break;
             }
             case 1: {
+              //Quality of Life
               acc[1].events.push(item);
               break;
             }

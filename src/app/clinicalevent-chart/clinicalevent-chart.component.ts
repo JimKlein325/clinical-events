@@ -73,16 +73,12 @@ export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
         this.minDate = vm.minDate;
         this.maxDate = vm.maxDate;
 
-        if (!this.chart) {
-          this.createChart();
-        }
-        this.updateChart();
+        (!this.chart) ? 
+          this.createChart() :
+          this.updateChart();
 
       })
       .subscribe();
-
-
-
   }
 
   createChart() {

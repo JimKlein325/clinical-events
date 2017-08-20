@@ -25,7 +25,7 @@ export class KeyBarComponent implements OnInit {
 
   monthViewItems: Observable<Array<MonthViewmodel>>;
 
-  constructor(private service: TimelineService) { }
+  constructor(public service: TimelineService) { }
 
   ngOnInit() {
     this.model = this.service.keyBarModel$;
