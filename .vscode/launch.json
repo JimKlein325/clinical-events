@@ -1,31 +1,57 @@
 {
-    "version": "0.2.0",
+	"version": "0.2.0",
 	"configurations": [
-		{
-			"name": "Launch localhost with sourcemaps",
-			"type": "chrome",
-			"request": "launch",
-			"url": "http://localhost:4200",
-			"sourceMaps": true,
-			"webRoot": "${workspaceRoot}",
-			// Uncomment this to run easily alongside another running instance of Chrome
-			"userDataDir": "${workspaceRoot}/.vscode/chrome",
-			// from https://github.com/Microsoft/vscode-chrome-debug/issues/163
-			"runtimeArgs": ["--disable-infobars --disable-session-crashed-bubble"]
+    {
+      "name": "Launch Chrome with ng serve",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4200/#",
+      "webRoot": "${workspaceRoot}"
+    },
+    {
+      "name": "Launch Chrome with ng test",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:9876/debug.html",
+      "webRoot": "${workspaceRoot}"
+    },
+    {
+      "name": "Launch ng e2e",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceRoot}/node_modules/protractor/bin/protractor",
+      "protocol": "inspector",
+      "args": ["${workspaceRoot}/protractor.conf.js"]
+    }      
+  ]
+	//replacing configurations with updated version to support debugging unit tests from:
+	https://github.com/weinand/vscode-recipes/tree/master/Angular-CLI
+	// "configurations": [
+	// 	{
+	// 		"name": "Launch localhost with sourcemaps",
+	// 		"type": "chrome",
+	// 		"request": "launch",
+	// 		"url": "http://localhost:4200",
+	// 		"sourceMaps": true,
+	// 		"webRoot": "${workspaceRoot}",
+	// 		// Uncomment this to run easily alongside another running instance of Chrome
+	// 		"userDataDir": "${workspaceRoot}/.vscode/chrome",
+	// 		// from https://github.com/Microsoft/vscode-chrome-debug/issues/163
+	// 		"runtimeArgs": ["--disable-infobars --disable-session-crashed-bubble"]
 
 
-			// Uncomment this to get diagnostic logs in the console
-			// "diagnosticLogging": true
-		},
-		{
-			"name": "Attach with sourcemaps",
-			"type": "chrome",
-			"request": "attach",
-			"port": 9222,
-			"sourceMaps": true,
-			"webRoot": "${workspaceRoot}"
-		}
-	]
+	// 		// Uncomment this to get diagnostic logs in the console
+	// 		// "diagnosticLogging": true
+	// 	},
+	// 	{
+	// 		"name": "Attach with sourcemaps",
+	// 		"type": "chrome",
+	// 		"request": "attach",
+	// 		"port": 9222,
+	// 		"sourceMaps": true,
+	// 		"webRoot": "${workspaceRoot}"
+	// 	}
+	// ]
     // "version": "0.2.0",
     // "configurations": [
     //     {
