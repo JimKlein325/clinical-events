@@ -7,8 +7,14 @@ import { EventItemViewmodel } from "../app/model/event-item-viewmodel";
 @Injectable()
 export class TimelineServiceStub {
     eventSections: Array<EventItemViewGroup> = [
-        { title: "Diagnosis", events: new Array<EventItemViewmodel>() },
-        { title: "Treatment", events: new Array<EventItemViewmodel>() },
+        { title: "Diagnosis", events: new Array<EventItemViewmodel>(
+                new EventItemViewmodel("test", true, 0),
+                new EventItemViewmodel("test1", true, 0),
+        ) },
+        { title: "Treatment", events: new Array<EventItemViewmodel>(
+                new EventItemViewmodel("test2", true, 0),
+                new EventItemViewmodel("test3", true, 0),
+        ) },
         { title: "Quality of Life", events: new Array<EventItemViewmodel>() }
     ];
 
