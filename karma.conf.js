@@ -15,6 +15,11 @@ module.exports = function (config) {
     client: {
       clearContext: false // leave Jasmine Spec Runner output visible in browser
     },
+    files: [
+     
+            // Include a Material theme in the test suite.
+      {pattern: './node_modules/@angular/material/prebuilt-themes/purple-green.css', included: true, watched: true},
+    ],
     coverageIstanbulReporter: {
       reports: ['html', 'lcovonly'],
       fixWebpackSourcePaths: true
