@@ -13,11 +13,12 @@ import { TextTestComponent } from './text-test/text-test.component';
 import { ClinicaleventChartComponent } from './clinicalevent-chart/clinicalevent-chart.component';
 import {TimelineService  } from "./timeline.service";
 import { MaterialModule } from "./material/material.module";
-import { FlexLayoutModule } from '@angular/flex-layout';
+// import { FlexLayoutModule } from '@angular/flex-layout';
 import { EventsInputComponent } from './events-input/events-input.component';
 import { ItemSelectComponent } from './item-select/item-select.component';
 import { EventListComponent } from './event-list/event-list.component';
 import { KeyBarComponent } from './key-bar/key-bar.component';
+import { FlexLayoutModule } from '@angular/flex-layout';
 
 @NgModule({
   declarations: [

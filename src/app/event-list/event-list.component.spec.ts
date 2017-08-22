@@ -7,19 +7,19 @@ import { TimelineServiceStub } from "../../testing/timeline-service-stub";
 import { By } from "@angular/platform-browser";
 
 ////// Testing Vars //////
-
-
-////// Tests  ////////////
-
-describe('EventListComponent', () => {
   let component: EventListComponent;
   let fixture: ComponentFixture<EventListComponent>;
   let de: DebugElement;
   let el: HTMLElement;
 
+
+////// Tests  ////////////
+
+describe('EventListComponent', () => {
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      schemas: [NO_ERRORS_SCHEMA],
+      // schemas: [NO_ERRORS_SCHEMA],
       declarations: [EventListComponent],
       imports: [MaterialModule],
       providers: [{ provide: TimelineService, useClass: TimelineServiceStub }]
@@ -41,19 +41,19 @@ describe('EventListComponent', () => {
   });
   it('should display Diagnosis header', () => {
     const subHeads = fixture.debugElement.queryAll(By.css('strong'));
-    console.log(subHeads);
+    // console.log(subHeads);
     let firstHeader = subHeads[0];
-    console.log(firstHeader.nativeElement);
+    // console.log(firstHeader.nativeElement);
     let el = firstHeader.nativeElement;
     expect(el.textContent).toContain('Diagnosis');
   });
   it('should display checkbox', () => {
     const cBoxes = fixture.debugElement.queryAll(By.css('md-checkbox'));
-    console.log(cBoxes);
+    // console.log(cBoxes);
     let firstHeader = cBoxes[0];
-    console.log(firstHeader.nativeElement);
+    // console.log(firstHeader.nativeElement);
     let el: HTMLElement = firstHeader.nativeElement;
-    console.log(el.outerHTML);
+    // console.log(el.outerHTML);
     expect(el.textContent).toContain('test');
   });
 });
