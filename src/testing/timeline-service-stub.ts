@@ -2,6 +2,8 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Injectable } from "@angular/core";
 import { EventItemViewGroup } from "../app/model/event-item-view-group";
 import { EventItemViewmodel } from "../app/model/event-item-viewmodel";
+import { MonthViewmodel } from "../app/model/month-viewmodel";
+import { KeyBarViewmodel } from "../app/model/key-bar-viewmodel";
 
 
 @Injectable()
@@ -29,4 +31,39 @@ export class TimelineServiceStub {
     //     this._testParamMap = convertToParamMap(params);
     //     this.subject.next(this._testParamMap);
     //   }
+
+    /////KEY BAR COMPONENT 
+    data_start: Array<MonthViewmodel> = [
+        { viewValue: "Jan, 2010", value: "2010-01-01", id: 0 },
+        { viewValue: "Feb, 2010", value: "2010-02-01", id: 1 },
+        { viewValue: "Mar, 2010", value: "2010-03-01", id: 2 },
+        { viewValue: "Apr, 2010", value: "2010-04-01", id: 3 },
+        { viewValue: "May, 2010", value: "2010-05-01", id: 4 },
+        { viewValue: "Jun, 2010", value: "2010-06-01", id: 5 },
+        { viewValue: "Jul, 2010", value: "2010-07-01", id: 6 },
+        { viewValue: "Aug, 2010", value: "2010-08-01", id: 7 }
+      ];
+      selected_start: MonthViewmodel;// = null;//this.data_start[0];
+      data_end: Array<MonthViewmodel> = [
+        { viewValue: "Jan, 2010", value: "2010-01-01", id: 0 },
+        { viewValue: "Feb, 2010", value: "2010-02-01", id: 1 },
+        { viewValue: "Mar, 2010", value: "2010-03-01", id: 2 },
+        { viewValue: "Apr, 2010", value: "2010-04-01", id: 3 },
+        { viewValue: "May, 2010", value: "2010-05-01", id: 4 },
+        { viewValue: "Jun, 2010", value: "2010-06-01", id: 5 },
+        { viewValue: "Jul, 2010", value: "2010-07-01", id: 6 },
+        { viewValue: "Aug, 2010", value: "2010-08-01", id: 7 }
+      ];
+      selected_end: MonthViewmodel;
+  
+      viewModel: KeyBarViewmodel = {
+        selectedStartMonth: this.data_start[0],
+        startMonthOptions: this.data_start,
+        selectedEndMonth: this.data_end[1],
+        endMonthOptions: this.data_end
+      };
+      subjectKeyBar = new BehaviorSubject<KeyBarViewmodel>(this.viewModel);
+      keyBarModel$ = this.subjectKeyBar.asObservable(); //Observable.of(subject);
+  
+
 }
