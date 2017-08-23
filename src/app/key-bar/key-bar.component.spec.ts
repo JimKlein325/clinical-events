@@ -13,6 +13,7 @@ import { By } from "@angular/platform-browser";
 
 import { MdSelectModule } from "@angular/material";
 import { MaterialModule } from "@angular/material";
+import { FormsModule } from "@angular/forms";
 
 describe('KeyBarComponent', () => {
   let component: KeyBarComponent;
@@ -29,7 +30,7 @@ describe('KeyBarComponent', () => {
     TestBed.configureTestingModule({
       // schemas: [NO_ERRORS_SCHEMA],
       declarations: [KeyBarComponent],
-      imports: [ BrowserAnimationsModule, MaterialModule, MdSelectModule ],
+      imports: [ BrowserAnimationsModule, MaterialModule, MdSelectModule, FormsModule ],
       providers: [{ provide: TimelineService, useClass: TimelineServiceStub }]
     })
       .compileComponents();
@@ -47,13 +48,12 @@ describe('KeyBarComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  // it('should display Diagnosis header', () => {
-  //   const options = fixture.debugElement.queryAll(By.css('input'));
-  //   console.log((fixture.debugElement).nativeElement);
-  //   let firstHeader = options[0];
-  //   console.log(firstHeader.nativeElement);
-  //   let el = firstHeader.nativeElement;
-
-  //   expect(el.textContent).toContain('Jan');
-  // });
+  it('should display Date Select', () => {
+    const options = fixture.debugElement.queryAll(By.css('md-select'));
+    // console.log((fixture.debugElement).nativeElement);
+    let firstHeader = options[0];
+    // console.log(firstHeader.nativeElement);
+    let el = firstHeader.nativeElement;
+     expect(el).toBeDefined();//('Jan', 'text content');
+  });
 });

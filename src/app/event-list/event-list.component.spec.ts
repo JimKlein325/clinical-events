@@ -51,9 +51,9 @@ describe('EventListComponent', () => {
     const cBoxes = fixture.debugElement.queryAll(By.css('md-checkbox'));
     // console.log(cBoxes);
     let firstHeader = cBoxes[0];
-    // console.log(firstHeader.nativeElement);
+    console.log(firstHeader.nativeElement);
     let el: HTMLElement = firstHeader.nativeElement;
-    // console.log(el.outerHTML);
+    console.log(el.outerHTML);
     expect(el.textContent).toContain('test');
   });
 });
