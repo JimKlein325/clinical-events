@@ -1,5 +1,4 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { MdList, MdCheckbox } from '@angular/material';
 import { FormGroup, FormControl } from "@angular/forms";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import * as _ from "lodash";
@@ -8,6 +7,7 @@ import { Observable, Subject, BehaviorSubject } from "rxjs/Rx";
 import { MonthViewmodel } from "../model/month-viewmodel";
 import { TimelineService } from "../timeline.service";
 import { KeyBarViewmodel } from "../model/key-bar-viewmodel";
+import { MaterialModule, MdSelectModule } from "@angular/material";
 @Component({
   selector: 'app-key-bar',
   templateUrl: './key-bar.component.html',

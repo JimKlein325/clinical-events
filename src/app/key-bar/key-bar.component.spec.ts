@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { Observable, Subject, BehaviorSubject } from "rxjs/Rx";
 
 import { KeyBarComponent } from './key-bar.component';
@@ -8,10 +9,10 @@ import { MonthViewmodel } from "../model/month-viewmodel";
 import { KeyBarViewmodel } from "../model/key-bar-viewmodel";
 import { of } from "rxjs/observable/of";
 import { TimelineServiceStub } from "../../testing/timeline-service-stub";
-import { MaterialModule } from "@angular/material";
 import { By } from "@angular/platform-browser";
 
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { MdSelectModule } from "@angular/material";
+import { MaterialModule } from "@angular/material";
 
 describe('KeyBarComponent', () => {
   let component: KeyBarComponent;
@@ -26,9 +27,9 @@ describe('KeyBarComponent', () => {
    
 
     TestBed.configureTestingModule({
-      schemas: [NO_ERRORS_SCHEMA],
+      // schemas: [NO_ERRORS_SCHEMA],
       declarations: [KeyBarComponent],
-      imports: [MaterialModule, BrowserAnimationsModule],
+      imports: [ BrowserAnimationsModule, MaterialModule, MdSelectModule ],
       providers: [{ provide: TimelineService, useClass: TimelineServiceStub }]
     })
       .compileComponents();
@@ -45,4 +46,14 @@ describe('KeyBarComponent', () => {
     fixture.detectChanges();
     expect(component).toBeTruthy();
   });
+
+  // it('should display Diagnosis header', () => {
+  //   const options = fixture.debugElement.queryAll(By.css('input'));
+  //   console.log((fixture.debugElement).nativeElement);
+  //   let firstHeader = options[0];
+  //   console.log(firstHeader.nativeElement);
+  //   let el = firstHeader.nativeElement;
+
+  //   expect(el.textContent).toContain('Jan');
+  // });
 });

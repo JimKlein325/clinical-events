@@ -1,22 +1,22 @@
 <div class="container" fxLayout="row" fxFlex>
+  <md-select name="monthSelect_start" [ngModel]="(model | async).selectedEndMonth.value"  (change)="onSelectChange_start($event)">
+    <md-option *ngFor="let month of (model | async).startMonthOptions" [value]="month.value">
+      {{month.viewValue}}
+    </md-option>
+  </md-select>
 
   <form>
     <div class="container" fxLayout="row" fxFlex>
       <div fxFlexOffset="20">
-        <md-select name="monthSelect_start" [ngModel]="(model | async).selectedStartMonth.value" (change)="onSelectChange_start($event)">
-          <md-option *ngFor="let month of (model | async).startMonthOptions" [value]="month.value">
-            {{month.viewValue}}
-          </md-option>
-        </md-select>
       </div>
       <div fxFlex></div>
-      <div fxflex fxFlexOffset="295">
+      <!-- <div fxflex fxFlexOffset="295">
         <md-select name="monthSelect_end" [ngModel]="(model | async).selectedEndMonth.value" (change)="onSelectChange_end($event)">
           <md-option *ngFor="let month of (model | async).endMonthOptions" [value]="month.value">
             {{month.viewValue}}
           </md-option>
         </md-select>
-      </div>
+      </div> -->
     </div>
   </form>
 </div>

@@ -62,7 +62,11 @@ export class TimelineServiceStub {
         selectedEndMonth: this.data_end[1],
         endMonthOptions: this.data_end
       };
-      subjectKeyBar = new BehaviorSubject<KeyBarViewmodel>(this.viewModel);
+      getModel(): KeyBarViewmodel {
+        //   console.log(this.viewModel);
+          return this.viewModel;
+      }
+      subjectKeyBar = new BehaviorSubject<KeyBarViewmodel>(this.getModel());
       keyBarModel$ = this.subjectKeyBar.asObservable(); //Observable.of(subject);
   
 
