@@ -48,12 +48,15 @@ describe('KeyBarComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should display Date Select', () => {
-    const options = fixture.debugElement.queryAll(By.css('md-select'));
+  it('should display Date Select drop down lists', () => {
+    const dateSelect = fixture.debugElement.queryAll(By.css('md-select'));
     // console.log((fixture.debugElement).nativeElement);
-    let firstHeader = options[0];
+    let firstDropDownList = dateSelect[0];
+    let secondDropDownList = dateSelect[1];
     // console.log(firstHeader.nativeElement);
-    let el = firstHeader.nativeElement;
-     expect(el).toBeDefined();//('Jan', 'text content');
+    let el = firstDropDownList.nativeElement;
+    let el_secondDDL = secondDropDownList.nativeElement;
+    expect(el).toBeDefined();
+    expect(el_secondDDL).toBeDefined();
   });
 });

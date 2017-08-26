@@ -1,14 +1,28 @@
 <div class="container " fxFlex>
-<form [formGroup]="eventForm">
+  <form [formGroup]="eventForm">
+    <md-list dense>
+      <!-- <h3 md-subheader style="color: black"><strong>Treatment</strong></h3> -->
+      <div *ngFor="let section of eventItemGroups">
+          <h3 md-subheader class="subheader" style="color: black"><strong>{{section.title}}</strong></h3>
+  
+      <div formArrayName="events">
+        <md-list-item *ngFor="let event of events.controls; index as idx">
+          <md-checkbox [formControlName]="idx" (change)="onCheckChange($event)" id="{{idx}}" value="{{labels[idx]}}" align="start">
+          {{labels[idx]}}</md-checkbox>
+        </md-list-item>
+      </div>
+      </div>>
+    </md-list>
+  </form>
+  <!-- <form [formGroup]="eventForm">
   <md-list dense>
     <h3 md-subheader style="color: black"><strong>Treatment</strong></h3>
 
     <div formArrayName="events">
       <md-list-item *ngFor="let event of events.controls; index as idx">
-        <!--<h3 md-line> </h3>-->
         <md-checkbox [formControlName]="idx" (change)="onCheckChange($event)" id="{{idx}}" value="{{labels[idx]}}" align="start"> {{labels[idx]}}</md-checkbox>
       </md-list-item>
     </div>
   </md-list>
-</form>
+</form> -->
 </div>

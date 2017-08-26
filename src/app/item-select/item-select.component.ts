@@ -3,9 +3,11 @@ import { FormBuilder, FormGroup, FormControl, FormArray } from "@angular/forms";
 import { MdList, MdCheckbox } from '@angular/material';
 import { TimelineService } from "../timeline.service";
 import * as _ from "lodash";
+import { Observable } from "rxjs/Observable";
 import 'rxjs/add/operator/takeUntil';
 import { Subject } from 'rxjs/Subject';
-
+import { EventItemViewmodel } from "../model/event-item-viewmodel";
+import { EventItemViewGroup } from "../model/event-item-view-group";
 
 @Component({
   selector: 'item-select',
@@ -13,21 +15,24 @@ import { Subject } from 'rxjs/Subject';
   styleUrls: ['./item-select.component.css']
 })
 export class ItemSelectComponent implements OnInit, OnDestroy {
+  public eventsItemGroup$: Observable<Array<EventItemViewGroup>>
+  
   public labels: string[];
   private form: FormGroup;
   private fArray: FormArray = new FormArray([]);
   private singleUseFlag = false;
   private eventsList: any;
   private ngUnsubscribe: Subject<void> = new Subject<void>();
-
+  public eventItemGroups: Array<EventItemViewGroup>;
   events: FormArray = new FormArray([
   ]);
 
   eventForm = new FormGroup({
     events: this.events
   });
-
-  datesForm: FormGroup;
+  eventSelectForm: FormGroup= new FormGroup({
+    events: this.events
+  });
 
   constructor(private fb: FormBuilder,
     private service: TimelineService) { }
@@ -39,9 +44,27 @@ export class ItemSelectComponent implements OnInit, OnDestroy {
       this.events.push(new FormControl(true));
     });
   }
+  buildEventGroup(events: Array<EventItemViewmodel>){
 
+  }
   ngOnInit() {
-    //refactored timeline.service and this no longer compiles.
+    this.service.eventList$
+      .takeUntil(this.ngUnsubscribe)
+      .subscribe( val => {
+        this.eventItemGroups = val;
+        let formGroup: FormGroup;
+        this.eventItemGroups.forEach((item, index) => {
+          //Add Form Array
+          let i = index.toString();
+          item.events.forEach( (event, index) => {
+            let j = index.toString();
+            let name = i + "_" +j;
+            this.events.push(new FormControl(event.text));
+          });
+
+        });
+
+      });
     // this.eventsList = this.service.getEventList()
     //   .takeUntil(this.ngUnsubscribe)
     //   .subscribe(val => {

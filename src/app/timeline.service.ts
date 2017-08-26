@@ -83,17 +83,19 @@ export class TimelineService {
     this.datasetMonthValues = this.getMonthRange(this.datasetMinMaxDates.minDate, this.datasetMinMaxDates.maxDate);
     this.selectedStartMonth = this.datasetMinMaxDates.minDate;
     this.selectedEndMonth = this.datasetMinMaxDates.maxDate;
-
+    const v = this.getEventListViewModelItems
     //initialize event-list state items
-    const viewItems = clinicalEvents.map(item => {
-      const event: EventItemViewmodel =
-        {
-          text: item.clinicalevent,
-          isActive: true,
-          eventType: item.eventtype
-        };
-      return event;
-    });
+    const viewItems =  this.getEventListViewModelItems(clinicalEvents);
+    // clinicalEvents.map(item => {
+    //   const event: EventItemViewmodel =
+    //     {
+    //       text: item.clinicalevent,
+    //       isActive: true,
+    //       eventType: item.eventtype,
+    //       controlIndex: item.con
+    //     };
+    //   return event;
+    // });
     const noDupes = _.uniqBy(viewItems, 'text');
     this.eventCheckboxViewItems = noDupes;
 
@@ -227,12 +229,14 @@ export class TimelineService {
             {
               text: item.text,
               isActive: checkboxState,
-              eventType: item.eventType
+              eventType: item.eventType,
+              controlIndex: item.controlIndex
             };
           return event;
         })
-        //use reduce here to sort items into section array
-        .reduce(function (acc, item) {
+        //use reduce here to sort items into section array, additionally, set control index value
+        .reduce(function (acc, item, index) {
+          item.controlIndex = index;
           switch (item.eventType) {
             case 2: {
               // Diagnosis section
@@ -256,17 +260,46 @@ export class TimelineService {
         ;
       return eventSections;
     }
-    )
+    );
 
-  getEventsNotInView(events: ClinicalEventItem[]): Array<string> {
-    //map ce's to viewItems
-    const eventsInView = events.map(item => {
-      const event: EventItemViewmodel =
+  getEventListViewModelItems(events: Array<ClinicalEventItem>):Array<EventItemViewmodel> {
+    const eventSections: Array<EventItemViewGroup> = [
+      { title: "Diagnosis", events: new Array<EventItemViewmodel>() },
+      { title: "Treatment", events: new Array<EventItemViewmodel>() },
+      { title: "Quality of Life", events: new Array<EventItemViewmodel>() }
+    ];
+
+    // const viewItemsClone = this.eventCheckboxViewItems
+      //use reduce (fold) here to sort items into section array, additionally, set control index value  
+      const eventViewModels = events
+      .reduce(function (acc, item, index) {
+        // let checkboxState = !_.includes(this.uncheckedEvents, item.clinicalevent) && !_.includes(this.eventsNotInTimeFrame, item.clinicalevent);
+        let eventViewItem: EventItemViewmodel =
         {
           text: item.clinicalevent,
           isActive: true,
-          eventType: item.eventtype
+          eventType: item.eventtype,
+          controlIndex: index
         };
+        acc.push(eventViewItem);
+        return acc;
+      }, [])
+      ;
+    return eventViewModels;
+  }
+  getEventsNotInView(events: ClinicalEventItem[]): Array<string> {
+    //map ce's to viewItems
+    let items = this.eventCheckboxViewItems;
+    const eventsInView = events.map(item => {
+      let event: EventItemViewmodel = 
+         _.find(items, ['text', item.clinicalevent ]);
+      
+        // {
+        //   text: item.clinicalevent,
+        //   isActive: true,
+        //   eventType: item.eventtype,
+        //   controlIndex: item
+        // };
       return event;
     });
 
