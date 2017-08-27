@@ -50,35 +50,27 @@ export class ItemSelectComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.service.eventList$
       .takeUntil(this.ngUnsubscribe)
-      .do(val => this.eventItemGroups = val)
+      .do(val => {
+      })
       .subscribe( val => {
         this.eventItemGroups = val;
-        let formGroup: FormGroup;
-        this.eventItemGroups.forEach((item, index) => {
-          item.events.forEach( (event, index) => {
-            // set initial value to clinicalevent name stored in text property
-            this.events.push(new FormControl(event.text));
-          });
-
-        });
-
+        if (this.events.length<1)
+          {
+            this.eventItemGroups.forEach((item, index) => {
+              item.events.forEach( (event, index) => {
+                // set initial value to clinicalevent name stored in text property
+                this.events.push(new FormControl(event.text));
+              });
+            });
+          }
+        console.log(this.events);
       });
-    // this.eventsList = this.service.getEventList()
-    //   .takeUntil(this.ngUnsubscribe)
-    //   .subscribe(val => {
-    //     // console.log(val);
-    //     if (!this.singleUseFlag) {
-    //       this.singleUseFlag = true;
-    //       this.buildControls(val);
-    //     }
-    //   })
-    //   ;
   }
   
   onCheckChange(event) {
     /* Checked.  Pass the label value stored in the 
     id property to the service filter method.*/
-    let idString = event.source.value;
+    let idString = event.source.id;
     this.service.filterEvents(idString, event.checked);
   }
   // use of ngUnsubscribe ensures clean up of observable subscription
