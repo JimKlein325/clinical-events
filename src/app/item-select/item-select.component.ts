@@ -50,15 +50,13 @@ export class ItemSelectComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.service.eventList$
       .takeUntil(this.ngUnsubscribe)
+      .do(val => this.eventItemGroups = val)
       .subscribe( val => {
         this.eventItemGroups = val;
         let formGroup: FormGroup;
         this.eventItemGroups.forEach((item, index) => {
-          //Add Form Array
-          let i = index.toString();
           item.events.forEach( (event, index) => {
-            let j = index.toString();
-            let name = i + "_" +j;
+            // set initial value to clinicalevent name stored in text property
             this.events.push(new FormControl(event.text));
           });
 
