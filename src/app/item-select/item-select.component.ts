@@ -16,7 +16,7 @@ import { EventItemViewGroup } from "../model/event-item-view-group";
 })
 export class ItemSelectComponent implements OnInit, OnDestroy {
   public eventsItemGroup$: Observable<Array<EventItemViewGroup>>
-  
+
   public labels: string[];
   private form: FormGroup;
   private fArray: FormArray = new FormArray([]);
@@ -30,7 +30,7 @@ export class ItemSelectComponent implements OnInit, OnDestroy {
   eventForm = new FormGroup({
     events: this.events
   });
-  eventSelectForm: FormGroup= new FormGroup({
+  eventSelectForm: FormGroup = new FormGroup({
     events: this.events
   });
 
@@ -44,7 +44,7 @@ export class ItemSelectComponent implements OnInit, OnDestroy {
       this.events.push(new FormControl(true));
     });
   }
-  buildEventGroup(events: Array<EventItemViewmodel>){
+  buildEventGroup(events: Array<EventItemViewmodel>) {
 
   }
   ngOnInit() {
@@ -52,21 +52,30 @@ export class ItemSelectComponent implements OnInit, OnDestroy {
       .takeUntil(this.ngUnsubscribe)
       .do(val => {
       })
-      .subscribe( val => {
+      .subscribe(val => {
         this.eventItemGroups = val;
-        if (this.events.length<1)
-          {
-            this.eventItemGroups.forEach((item, index) => {
-              item.events.forEach( (event, index) => {
-                // set initial value to clinicalevent name stored in text property
-                this.events.push(new FormControl(event.text));
-              });
+        if (this.events.length < 1) {
+          this.eventItemGroups.forEach((item, index) => {
+            item.events.forEach((event, index) => {
+              // set initial value to clinicalevent name stored in text property
+              this.events.push(new FormControl(event.text));
             });
-          }
+          });
+        }
+        else {
+          //loop over this.eventItemGroups and set value
+          this.eventItemGroups.forEach((item, index) => {
+            item.events.forEach((event, index) => {
+              // set initial value to clinicalevent name stored in text property
+              let checkBox = this.eventForm.get(['events', event.controlIndex]);
+              checkBox.setValue(event.isActive);
+            });
+          });
+        }
         console.log(this.events);
       });
   }
-  
+
   onCheckChange(event) {
     /* Checked.  Pass the label value stored in the 
     id property to the service filter method.*/

@@ -20,7 +20,13 @@ body {
 
 }
 .key-bar {
+        background:#0F0456;
+        /* max-height: calc(100vh - 100px); */
+
+}
+.item-select {
         background:purple;
+        max-height: 100px;
 
 }
 .parent {
