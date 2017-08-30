@@ -17,11 +17,8 @@ import { EventItemViewGroup } from "../model/event-item-view-group";
 export class ItemSelectComponent implements OnInit, OnDestroy {
   public eventsItemGroup$: Observable<Array<EventItemViewGroup>>
 
-  public labels: string[];
   private form: FormGroup;
   private fArray: FormArray = new FormArray([]);
-  private singleUseFlag = false;
-  private eventsList: any;
   private ngUnsubscribe: Subject<void> = new Subject<void>();
   public eventItemGroups: Array<EventItemViewGroup>;
   events: FormArray = new FormArray([
@@ -34,19 +31,8 @@ export class ItemSelectComponent implements OnInit, OnDestroy {
     events: this.events
   });
 
-  constructor(private fb: FormBuilder,
-    private service: TimelineService) { }
+  constructor(private fb: FormBuilder, private service: TimelineService) { }
 
-  buildControls(eventLabels: string[]) {
-    this.labels = eventLabels;
-
-    this.labels.forEach(element => {
-      this.events.push(new FormControl(true));
-    });
-  }
-  buildEventGroup(events: Array<EventItemViewmodel>) {
-
-  }
   ngOnInit() {
     this.service.eventList$
       .takeUntil(this.ngUnsubscribe)
@@ -83,7 +69,7 @@ export class ItemSelectComponent implements OnInit, OnDestroy {
     this.service.filterEvents(idString, event.checked);
   }
   // use of ngUnsubscribe ensures clean up of observable subscription
-  //  Observables that complete() are automatically cleanup by ng:  http, router
+  //  Observables that complete() are automatically cleanup by ng: for example, http, router
   ngOnDestroy() {
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();

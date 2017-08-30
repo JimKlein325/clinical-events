@@ -47,7 +47,7 @@ describe('EventListComponent', () => {
     let el = firstHeader.nativeElement;
     expect(el.textContent).toContain('Diagnosis');
   });
-  it('should display checkbox', () => {
+  it('should display checkbox for each view item', () => {
     const cBoxes = fixture.debugElement.queryAll(By.css('md-checkbox'));
     // console.log(cBoxes);
     let firstHeader = cBoxes[0];
@@ -55,6 +55,7 @@ describe('EventListComponent', () => {
     let el: HTMLElement = firstHeader.nativeElement;
     console.log(el.outerHTML);
     expect(el.textContent).toContain('test');
+    expect(cBoxes.length).toBe(6);
   });
 });
 /////////// Helpers /////
