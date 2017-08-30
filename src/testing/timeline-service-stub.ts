@@ -8,7 +8,8 @@ import { KeyBarViewmodel } from "../app/model/key-bar-viewmodel";
 
 @Injectable()
 export class TimelineServiceStub {
-  eventSections: Array<EventItemViewGroup> = [
+
+  public eventSections: Array<EventItemViewGroup> = [
     {
       title: "Diagnosis", events: new Array<EventItemViewmodel>(
         new EventItemViewmodel("test", true, 2, 0),
@@ -28,10 +29,38 @@ export class TimelineServiceStub {
       )
     }
   ];
-
+  
+  public checkChangedStateEventSections: Array<EventItemViewGroup> = [
+    {
+      title: "Diagnosis", events: new Array<EventItemViewmodel>(
+        //change isActive value to false for test
+        new EventItemViewmodel("test", false, 2, 0),
+        new EventItemViewmodel("test1", true, 2, 1)
+      )
+    },
+    {
+      title: "Treatment", events: new Array<EventItemViewmodel>(
+        new EventItemViewmodel("test2", true, 0, 2),
+        new EventItemViewmodel("test3", true, 0, 3)
+      )
+    },
+    {
+      title: "Quality of Life", events: new Array<EventItemViewmodel>(
+        new EventItemViewmodel("test4", true, 1, 4),
+        new EventItemViewmodel("test5", true, 1, 5)
+      )
+    }
+  ];
+  
   // ActivatedRoute.paramMap is Observable
+  private _eventList$: Array<EventItemViewGroup>;
+  //set subject initial value
   private subject = new BehaviorSubject(this.eventSections);
-  eventList$ = this.subject.asObservable();
+  public get eventList$() {return this.subject.asObservable();} 
+  public set eventList$ (list:{}) {
+    this._eventList$ = list as Array<EventItemViewGroup>;
+    this.subject.next(this._eventList$);
+  }
 
   // Test parameters
   //   private _testParamMap: ParamMap;
