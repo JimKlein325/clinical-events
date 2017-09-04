@@ -22,13 +22,10 @@ let timelineServiceStub = new TimelineServiceStub();
 ////// Tests  ////////////
 
 describe('ItemSelectComponent', () => {
-  let component: ItemSelectComponent;
-  let fixture: ComponentFixture<ItemSelectComponent>;
-
   beforeEach(() => timelineServiceStub = new TimelineServiceStub() );
 
   beforeEach(async(() => {
-    component = new ItemSelectComponent(new FormBuilder(), new TimelineService());
+    // component = new ItemSelectComponent(new FormBuilder(), new TimelineService());
     TestBed.configureTestingModule({
       imports: [ReactiveFormsModule, MaterialModule],
       declarations: [ItemSelectComponent],

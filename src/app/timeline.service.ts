@@ -85,7 +85,7 @@ export class TimelineService {
     this.selectedEndMonth = this.datasetMinMaxDates.maxDate;
     const v = this.getEventListViewModelItems
     //initialize event-list state items
-    const viewItems =  this.getEventListViewModelItems(clinicalEvents);
+    const viewItems = this.getEventListViewModelItems(clinicalEvents);
     // clinicalEvents.map(item => {
     //   const event: EventItemViewmodel =
     //     {
@@ -106,7 +106,7 @@ export class TimelineService {
     items: Array<ClinicalEventItem>,
     selectedStartMonth: string,
     selectedEndMonth: string
-    ): KeyBarViewmodel {
+  ): KeyBarViewmodel {
     let minMaxMonths = this.getMinMaxDates(items);;
 
     const viewModelClone_Start = this.datasetMonthValues.map(item => Object.assign({}, item));
@@ -262,7 +262,7 @@ export class TimelineService {
     }
     );
 
-  getEventListViewModelItems(events: Array<ClinicalEventItem>):Array<EventItemViewmodel> {
+  getEventListViewModelItems(events: Array<ClinicalEventItem>): Array<EventItemViewmodel> {
     const eventSections: Array<EventItemViewGroup> = [
       { title: "Diagnosis", events: new Array<EventItemViewmodel>() },
       { title: "Treatment", events: new Array<EventItemViewmodel>() },
@@ -270,17 +270,17 @@ export class TimelineService {
     ];
 
     // const viewItemsClone = this.eventCheckboxViewItems
-      //use reduce (fold) here to sort items into section array, additionally, set control index value  
-      const eventViewModels = events
+    //use reduce (fold) here to sort items into section array, additionally, set control index value  
+    const eventViewModels = events
       .reduce(function (acc, item, index) {
         // let checkboxState = !_.includes(this.uncheckedEvents, item.clinicalevent) && !_.includes(this.eventsNotInTimeFrame, item.clinicalevent);
         let eventViewItem: EventItemViewmodel =
-        {
-          text: item.clinicalevent,
-          isActive: true,
-          eventType: item.eventtype,
-          controlIndex: index
-        };
+          {
+            text: item.clinicalevent,
+            isActive: true,
+            eventType: item.eventtype,
+            controlIndex: index
+          };
         acc.push(eventViewItem);
         return acc;
       }, [])
@@ -291,15 +291,15 @@ export class TimelineService {
     //map ce's to viewItems
     let items = this.eventCheckboxViewItems;
     const eventsInView = events.map(item => {
-      let event: EventItemViewmodel = 
-         _.find(items, ['text', item.clinicalevent ]);
-      
-        // {
-        //   text: item.clinicalevent,
-        //   isActive: true,
-        //   eventType: item.eventtype,
-        //   controlIndex: item
-        // };
+      let event: EventItemViewmodel =
+        _.find(items, ['text', item.clinicalevent]);
+
+      // {
+      //   text: item.clinicalevent,
+      //   isActive: true,
+      //   eventType: item.eventtype,
+      //   controlIndex: item
+      // };
       return event;
     });
 
@@ -386,19 +386,31 @@ export class TimelineService {
     return fullList;
   }
 
+  // Filter occurrences of checked item
+  // Get min and max dates
+  // set min and max dates if outside current set
+  // emit view model
   // Filter events using array of unchecked events stored in this.uncheckedEvents.  This method manages the list when items are manually selected.
   filterEvents(item: string, checked: boolean) {
     if (checked) {
       this.uncheckedEvents = this.uncheckedEvents.filter(element => element !== item);
       if (_.includes(this.eventsNotInTimeFrame, item)) {
-        this.selectedStartMonth = this.datasetMinMaxDates.minDate;
-        this.selectedEndMonth = this.datasetMinMaxDates.maxDate;
+        const datasetClone = this.dataset.map(a => Object.assign({}, a));
+        const filteredList = datasetClone.filter(x => x.clinicalevent === item);
+
+        let localMinMaxDate = this.getMinMaxDates(filteredList);
+
+        if(localMinMaxDate.minDate < this.selectedStartMonth){
+          this.selectedStartMonth = localMinMaxDate.minDate;
+        }
+        if ( localMinMaxDate.maxDate > this.selectedEndMonth) {
+          this.selectedEndMonth = localMinMaxDate.maxDate;
+        }
       }
     }
     else {
       this.uncheckedEvents.push(item);
     }
-    // this.filterBySelectedItems();
     this.emitNewClinicalEventsSet();
   }
 
