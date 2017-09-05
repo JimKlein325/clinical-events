@@ -36,8 +36,6 @@ export class ItemSelectComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.service.eventList$
       .takeUntil(this.ngUnsubscribe)
-      .do(val => {
-      })
       .subscribe(val => {
         this.eventItemGroups = val;
         if (this.events.length < 1) {

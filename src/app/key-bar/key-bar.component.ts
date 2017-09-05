@@ -1,29 +1,18 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { FormGroup, FormControl } from "@angular/forms";
+import { Component, OnInit } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import * as _ from "lodash";
 import { Observable, Subject, BehaviorSubject } from "rxjs/Rx";
 
-import { MonthViewmodel } from "../model/month-viewmodel";
 import { TimelineService } from "../timeline.service";
 import { KeyBarViewmodel } from "../model/key-bar-viewmodel";
 import { MaterialModule, MdSelectModule } from "@angular/material";
+
 @Component({
   selector: 'app-key-bar',
   templateUrl: './key-bar.component.html',
   styleUrls: ['./key-bar.component.css']
 })
 export class KeyBarComponent implements OnInit {
-  public selectedStartDate;
-  public selectedEndDate;
-  public startSelectValues: Array<MonthViewmodel>;
-  public endSelectValues: Array<MonthViewmodel>;
-  public model: Observable<KeyBarViewmodel>;
-  datesForm: FormGroup;
-  private viewModel: KeyBarViewmodel;
-  private selectedStartIndex: number;
-
-  monthViewItems: Observable<Array<MonthViewmodel>>;
+  model: Observable<KeyBarViewmodel>;
 
   constructor(public service: TimelineService) { }
 
