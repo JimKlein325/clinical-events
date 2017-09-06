@@ -16,7 +16,6 @@ import { Subject } from 'rxjs/Subject';
 
 import { ClinicalEventReport } from './models/clinical-event-report'
 import { ClinicalEventItem } from './models/clinical-event-item'
-import { ClinicalEventDataService } from './models/clinical-event-data-service'
 import { ClinicalEventItemWrapper } from './models/clinical-event-item-wrapper'
 import { ClinicaleventChartViewmodel } from "../model/clinicalevent-chart-viewmodel";
 import { TimelineService } from "../timeline.service";
@@ -25,8 +24,7 @@ import { TimelineService } from "../timeline.service";
 @Component({
   selector: 'clinicalevent-chart',
   templateUrl: './clinicalevent-chart.component.html',
-  styleUrls: ['./clinicalevent-chart.component.css'],
-  providers: [ClinicalEventDataService]
+  styleUrls: ['./clinicalevent-chart.component.css']
 
 })
 @Injectable()
@@ -43,7 +41,7 @@ export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
   private wrappedItems: ClinicalEventItemWrapper[];
 
   private margin: any = { top: 20, bottom: 20, left: 20, right: 80 };
-  private chart: any;
+  chart: any;
   maxDate: Date;
   minDate: Date;
   private width: number;
@@ -61,7 +59,7 @@ export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
   public problemName: string;
 
 
-  constructor(private tlService: TimelineService, public dataService: ClinicalEventDataService) { }
+  constructor(private tlService: TimelineService) { }
 
   ngAfterViewInit(): void {
     this.tlService.chartView$

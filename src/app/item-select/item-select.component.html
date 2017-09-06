@@ -2,41 +2,15 @@
   <form [formGroup]="eventForm">
     <md-list dense>
       <div formArrayName="events">
-      <div *ngFor="let section of eventItemGroups; let i=index">
+        <div *ngFor="let section of eventItemGroups; let i=index">
           <h3 md-subheader class="subheader" style="color: black"><strong>{{section.title}}</strong></h3>
-  
-        <!-- <md-list-item *ngFor="let event of events.controls; index as idx"> -->
-        <md-list-item *ngFor="let event of section.events as EventItemViewmodel; index as idx">
-          <md-checkbox [formControlName]="event.controlIndex" id="{{event.text}}"
-          (change)="onCheckChange($event)" [checked]="event.isActive"
-          align="start">
-          <span>{{event.text}}</span></md-checkbox>
-        </md-list-item>
-      </div>
-      </div>>
-    </md-list>
-  </form>
-      <!-- <md-list dense>
-        <!-- <div *ngFor="let section of eventItemGroups; let i=index">
-            <h3 md-subheader class="subheader" style="color: black"><strong>{{section.title}}</strong></h3> 
-    
-        <div formArrayName="events">
-          <md-list-item *ngFor="let event of events.controls; index as idx">
-            <md-checkbox [formControlName]="idx" name="{{idx}}" align="start">
-            {{event.value}}</md-checkbox>
+          <md-list-item *ngFor="let event of section.events as EventItemViewmodel; index as idx">
+            <md-checkbox [formControlName]="event.controlIndex" id="{{event.text}}" (change)="onCheckChange($event)" [checked]="event.isActive"
+              align="start">
+              <span style="color: black">{{event.text}}</span></md-checkbox>
           </md-list-item>
         </div>
-        <!-- </div>> 
-      </md-list> -->
-  <!-- <form [formGroup]="eventForm">
-  <md-list dense>
-    <h3 md-subheader style="color: black"><strong>Treatment</strong></h3>
-
-    <div formArrayName="events">
-      <md-list-item *ngFor="let event of events.controls; index as idx">
-        <md-checkbox [formControlName]="idx" (change)="onCheckChange($event)" id="{{idx}}" value="{{labels[idx]}}" align="start"> {{labels[idx]}}</md-checkbox>
-      </md-list-item>
-    </div>
-  </md-list>
-</form> -->
+      </div>
+    </md-list>
+  </form>
 </div>

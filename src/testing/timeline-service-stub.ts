@@ -4,6 +4,11 @@ import { EventItemViewGroup } from "../app/model/event-item-view-group";
 import { EventItemViewmodel } from "../app/model/event-item-viewmodel";
 import { MonthViewmodel } from "../app/model/month-viewmodel";
 import { KeyBarViewmodel } from "../app/model/key-bar-viewmodel";
+import { ClinicalEventItem } from "../app/clinicalevent-chart/models/clinical-event-item";
+import { ClinicalEventReport } from "../app/clinicalevent-chart/models/clinical-event-report";
+import { ClinicalEventItemWrapper } from "../app/clinicalevent-chart/models/clinical-event-item-wrapper";
+import { ClinicaleventChartViewmodel } from "../app/model/clinicalevent-chart-viewmodel";
+
 
 
 @Injectable()
@@ -29,7 +34,7 @@ export class TimelineServiceStub {
       )
     }
   ];
-  
+
   public checkChangedStateEventSections: Array<EventItemViewGroup> = [
     {
       title: "Diagnosis", events: new Array<EventItemViewmodel>(
@@ -51,13 +56,52 @@ export class TimelineServiceStub {
       )
     }
   ];
+  eventItemWrappers: Array<ClinicalEventItemWrapper> = [
+      {
+        item: {
+          patientid: 1, sourceid: 1000000000, semantictype: "DiagnosticProcedure",
+          clinicalevent: "Diagnosis", eventtime: "2010-02-01",
+          problem: "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb", eventtype: 2
+        },
+        yValue: 21,
+        itemDate: new Date("Thu Feb 1 2010 00:00:00 GMT-0700 (Pacific Daylight Time)")
+      },
+      {
+        item: {
+          patientid: 1, sourceid: 1000000000, semantictype: "DiagnosticProcedure",
+          clinicalevent: "Staging", eventtime: "2010-02-01",
+          problem: "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb", eventtype: 2
+        },
+        yValue: 31,
+        itemDate: new Date("Thu Feb 1 2010 00:00:00 GMT-0700 (Pacific Daylight Time)")
+      },
+  ];
+  clinicalEventVM = new ClinicaleventChartViewmodel(this.eventItemWrappers, 
+    new ClinicalEventReport(5, 5, 
+      [{
+        patientid: 1, sourceid: 1000000000, semantictype: "DiagnosticProcedure",
+        clinicalevent: "Diagnosis", eventtime: "2010-02-01",
+        problem: "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb", eventtype: 2
+      },
+      {
+        patientid: 1, sourceid: 1000000000, semantictype: "DiagnosticProcedure",
+        clinicalevent: "Diagnosis", eventtime: "2010-02-01",
+        problem: "Non-Small-Cell Lung Cancer, EGFR Mutation Positive, Stage IIIb", eventtype: 2
+      }]),
+    5, 
+    new Date("2010-02-01"), 
+    new Date("2010-02-01"));
+  subjectChartView = new BehaviorSubject<ClinicaleventChartViewmodel>(this.clinicalEventVM);
+  chartView$ = this.subjectChartView.asObservable(); 
+
   
+
   // ActivatedRoute.paramMap is Observable
   private _eventList$: Array<EventItemViewGroup>;
   //set subject initial value
   private subject = new BehaviorSubject(this.eventSections);
-  public get eventList$() {return this.subject.asObservable();} 
-  public set eventList$ (list:{}) {
+  public get eventList$() { return this.subject.asObservable(); }
+  public set eventList$(list: {}) {
     this._eventList$ = list as Array<EventItemViewGroup>;
     this.subject.next(this._eventList$);
   }
@@ -107,6 +151,6 @@ export class TimelineServiceStub {
   subjectKeyBar = new BehaviorSubject<KeyBarViewmodel>(this.getModel());
   keyBarModel$ = this.subjectKeyBar.asObservable(); //Observable.of(subject);
 
-  filterEvents(item: string, checked: boolean) {}
-    
+  filterEvents(item: string, checked: boolean) { }
+
 }

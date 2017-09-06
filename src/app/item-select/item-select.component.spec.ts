@@ -98,11 +98,11 @@ describe('ItemSelectComponent', () => {
     
     fixture.detectChanges();
     
-    let checkbox2 = fixture.debugElement.query(By.css('md-checkbox'));
-    let checkbox3 = checkbox2.nativeElement;
+    let cb_afterObservableEmit = fixture.debugElement.query(By.css('md-checkbox'));
+    let checkbox3 = cb_afterObservableEmit.nativeElement;
     
-    console.log(checkbox3);
-    expect(checkbox3.outerHTML).toContain('ng-reflect-checked="false"', 'INITIAL checked value to be set to true');
+    //console.log(checkbox3);
+    expect(checkbox3.outerHTML).toContain('ng-reflect-checked="false"', 'UPDATED checked value to be set to false after click event');
 
    });
 });

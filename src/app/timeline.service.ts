@@ -36,7 +36,7 @@ export class TimelineService {
 
   private subject = new BehaviorSubject<ClinicalEventItem[]>(this.initializeService(this.dataset));
 
-  constructor() { }  
+  constructor() { }
 
   clinicalEventItems$: Observable<ClinicalEventItem[]> = this.subject.asObservable();
 
@@ -63,6 +63,7 @@ export class TimelineService {
         minDate: new Date(minMaxMonths.minDate),
         maxDate: new Date(minMaxMonths.maxDate)
       }
+      console.log(viewModel);      
       return Observable.of(viewModel);
     });
 
@@ -90,7 +91,7 @@ export class TimelineService {
     const noDupes = _.uniqBy(viewItems, 'text');
     this.eventCheckboxViewItems = noDupes;
     return clinicalEvents;
-  } 
+  }
   getKeyBarModel(
     items: Array<ClinicalEventItem>,
     selectedStartMonth: string,
@@ -241,6 +242,7 @@ export class TimelineService {
           return acc;
         }, eventSections)
         ;
+        console.log(eventSections);
       return eventSections;
     }
     );
@@ -276,13 +278,6 @@ export class TimelineService {
     const eventsInView = events.map(item => {
       let event: EventItemViewmodel =
         _.find(items, ['text', item.clinicalevent]);
-
-      // {
-      //   text: item.clinicalevent,
-      //   isActive: true,
-      //   eventType: item.eventtype,
-      //   controlIndex: item
-      // };
       return event;
     });
 
@@ -306,7 +301,7 @@ export class TimelineService {
   ): number {
     let slotsAboveOrBelowAxis = slots / 2;
 
-    let multiplier = (eventType == 1 || eventType == 2) ? 1 : -1; // multiplier used to position item above or below axis
+    let multiplier = (eventType === 1 || eventType == 2) ? 1 : -1; // multiplier used to position item above or below axis
 
     return multiplier * (slotsAboveOrBelowAxis - (index % (slots / 2))) * offset
   };
@@ -334,6 +329,7 @@ export class TimelineService {
       .reduce((acc, item, index) => {
         let yVal = this.genYValue(item.eventtype, slots, offset, index);
         let ce = [new ClinicalEventItemWrapper(item, yVal, this.getDate(item.eventtime))];
+        console.log(ce);
         return [...acc, ...ce];
         // return acc.concat(ce);// refactor using spread operator ...
       },
@@ -381,11 +377,11 @@ export class TimelineService {
         const datasetClone = this.dataset.map(a => Object.assign({}, a));
         const filteredList = datasetClone.filter(x => x.clinicalevent === item);
         let localMinMaxDate = this.getMinMaxDates(filteredList);
-        
-        if(localMinMaxDate.minDate < this.selectedStartMonth){
+
+        if (localMinMaxDate.minDate < this.selectedStartMonth) {
           this.selectedStartMonth = localMinMaxDate.minDate;
         }
-        if ( localMinMaxDate.maxDate > this.selectedEndMonth) {
+        if (localMinMaxDate.maxDate > this.selectedEndMonth) {
           this.selectedEndMonth = localMinMaxDate.maxDate;
         }
       }
