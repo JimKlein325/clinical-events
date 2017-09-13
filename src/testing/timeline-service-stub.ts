@@ -152,5 +152,6 @@ export class TimelineServiceStub {
   keyBarModel$ = this.subjectKeyBar.asObservable(); //Observable.of(subject);
 
   filterEvents(item: string, checked: boolean) { }
+  updateDate_Start(startDate: string) {  }
 
 }

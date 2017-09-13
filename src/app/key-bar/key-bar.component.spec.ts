@@ -32,8 +32,9 @@ describe('KeyBarComponent', () => {
       declarations: [KeyBarComponent],
       imports: [ BrowserAnimationsModule, MaterialModule, MdSelectModule, FormsModule ],
       providers: [{ provide: TimelineService, useClass: TimelineServiceStub }]
-    })
-      .compileComponents();
+    });
+    //don't need to call compileComponents if you use WebPack
+      //.compileComponents();
   }));
 
   beforeEach(() => {
@@ -53,10 +54,25 @@ describe('KeyBarComponent', () => {
     // console.log((fixture.debugElement).nativeElement);
     let firstDropDownList = dateSelect[0];
     let secondDropDownList = dateSelect[1];
-    // console.log(firstHeader.nativeElement);
+    console.log(firstDropDownList.nativeElement);
     let el = firstDropDownList.nativeElement;
     let el_secondDDL = secondDropDownList.nativeElement;
     expect(el).toBeDefined();
     expect(el_secondDDL).toBeDefined();
+  });
+  it('should call service when new value is selected', () => {
+    // this tests integration of component and service
+    //get the stub service instance
+    let userService = fixture.debugElement.injector.get(TimelineService);
+    let spy = spyOn(userService, 'updateDate_Start').and.callFake(t => {
+      return Observable.empty();
+    });
+    let eventStub = { viewValue: "Feb, 2010", value: "2010-02-01", id: 1 };
+
+    let dropDown = fixture.debugElement.query(By.css('md-select'));
+    //trigger the call to the service by triggering event
+    dropDown.triggerEventHandler('change', eventStub);
+
+    expect(spy).toHaveBeenCalledWith("2010-02-01");
   });
 });

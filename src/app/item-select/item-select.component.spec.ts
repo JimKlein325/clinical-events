@@ -71,6 +71,7 @@ describe('ItemSelectComponent', () => {
   });
 
   it('should call service when checkbox is checked/unchecked', () => {
+    // this tests integration of component and service
     //get the stub service instance
     let userService = fixture.debugElement.injector.get(TimelineService);
     let spy = spyOn(userService, 'filterEvents').and.callFake(t => {
@@ -81,8 +82,8 @@ describe('ItemSelectComponent', () => {
     let checkbox = fixture.debugElement.query(By.css('md-checkbox'));
     //trigger the call to the service by triggering event
     checkbox.triggerEventHandler('change', eventStub);
-
-    expect(spy).toHaveBeenCalled();
+    // use actual values
+    expect(spy).toHaveBeenCalledWith("1", true);
   });
   it('should update checkbox.checked value when observable emits new value', () => {
     //get the stub service instance
@@ -99,10 +100,10 @@ describe('ItemSelectComponent', () => {
     fixture.detectChanges();
     
     let cb_afterObservableEmit = fixture.debugElement.query(By.css('md-checkbox'));
-    let checkbox3 = cb_afterObservableEmit.nativeElement;
+    let checkbox_afterEmit = cb_afterObservableEmit.nativeElement;
     
-    //console.log(checkbox3);
-    expect(checkbox3.outerHTML).toContain('ng-reflect-checked="false"', 'UPDATED checked value to be set to false after click event');
+    //console.log(checkbox_afterEmit);
+    expect(checkbox_afterEmit.outerHTML).toContain('ng-reflect-checked="false"', 'UPDATED checked value to be set to false after click event');
 
    });
 });
