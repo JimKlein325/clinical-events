@@ -14,19 +14,16 @@ describe('TimelineService', () => {
     expect(service).toBeTruthy();
   }));
   describe('prepareData()', () => {
-    it('should place Diagnosis information above axis', inject([TimelineService], (service: TimelineService) => {
-      const prepareData = service.prepareData(TestData.dataset);
-      // console.log(prepareData[0].yValue);
+    it('should place Diagnosis information ABOVE X axis', inject([TimelineService], (service: TimelineService) => {
+      let prepareData = service.prepareData(TestData.dataset);
       expect(prepareData[0].yValue).toBeGreaterThan(0);
     }));
-    it('should place Treatment information above axis', inject([TimelineService], (service: TimelineService) => {
-      const prepareData = service.prepareData(TestData.dataset);
-      // console.log(prepareData[2].yValue);
+    it('should place Treatment information ABOVE X axis', inject([TimelineService], (service: TimelineService) => {
+      let prepareData = service.prepareData(TestData.dataset);
       expect(prepareData[2].yValue).toBeGreaterThan(0);
     }));
-    it('should place Quality of Life information above axis', inject([TimelineService], (service: TimelineService) => {
-      const prepareData = service.prepareData(TestData.dataset);
-      // console.log(prepareData[prepareData.length -1].yValue);
+    it('should place Quality of Life information BELOW X axis', inject([TimelineService], (service: TimelineService) => {
+      let prepareData = service.prepareData(TestData.dataset);
       expect(prepareData[prepareData.length -1].yValue).toBeLessThan(0);
     }));
   })

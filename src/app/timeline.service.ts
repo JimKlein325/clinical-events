@@ -394,6 +394,9 @@ export class TimelineService {
 
   updateDate_Start(startDate: string) {
     this.selectedStartMonth = startDate;
+    // If changing the start date eliminates some items from the view entirely,
+    // update the list of eventsNotInTimeFrame
+    
     this.emitNewClinicalEventsSet();
   }
 
