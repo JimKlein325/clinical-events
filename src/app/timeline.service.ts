@@ -63,7 +63,7 @@ export class TimelineService {
         minDate: new Date(minMaxMonths.minDate),
         maxDate: new Date(minMaxMonths.maxDate)
       }
-      console.log(viewModel);      
+      //console.log(viewModel);      
       return Observable.of(viewModel);
     });
 
@@ -242,7 +242,7 @@ export class TimelineService {
           return acc;
         }, eventSections)
         ;
-        console.log(eventSections);
+        //console.log(eventSections);
       return eventSections;
     }
     );
@@ -329,7 +329,7 @@ export class TimelineService {
       .reduce((acc, item, index) => {
         let yVal = this.genYValue(item.eventtype, slots, offset, index);
         let ce = [new ClinicalEventItemWrapper(item, yVal, this.getDate(item.eventtime))];
-        console.log(ce);
+        //console.log(ce);
         return [...acc, ...ce];
         // return acc.concat(ce);// refactor using spread operator ...
       },
