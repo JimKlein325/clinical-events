@@ -9,10 +9,10 @@ import { Subject } from 'rxjs/Subject';
 import { EventItemViewmodel } from "../model/event-item-viewmodel";
 import { EventItemViewGroup } from "../model/event-item-view-group";
 
-  function eventCountGreaterThanZero ( formGroup: FormGroup): {[key: string]: boolean} | null {
-    //console.log(Object.keys((<FormGroup>formGroup.root).controls)) ;
-    return null;
-  }
+  // function eventCountGreaterThanZero ( formGroup: FormGroup): {[key: string]: boolean} | null {
+  //   //console.log(Object.keys((<FormGroup>formGroup.root).controls)) ;
+  //   return null;
+  // }
 
 @Component({
   selector: 'item-select',
@@ -30,7 +30,7 @@ export class ItemSelectComponent implements OnInit, OnDestroy {
   ]);
 
   eventForm = new FormGroup(
-    {events: this.events},  eventCountGreaterThanZero
+    {events: this.events}//,  eventCountGreaterThanZero
     // events: this.events, eventCountGreaterThanZero
   );
   // eventSelectForm: FormGroup = new FormGroup({
@@ -48,7 +48,7 @@ export class ItemSelectComponent implements OnInit, OnDestroy {
           this.eventItemGroups.forEach((item, index) => {
             item.events.forEach((event, index) => {
               // set initial value to clinicalevent name stored in text property
-              this.events.push(new FormControl(event.text, eventCountGreaterThanZero));
+              this.events.push(new FormControl(event.isActive));
             });
           });
         }
@@ -73,16 +73,8 @@ export class ItemSelectComponent implements OnInit, OnDestroy {
   onCheckChange(event) {
     /* Checked.  Pass the label value stored in the 
     id property to the service filter method.*/
-    let atLeastOneBoxChecked = false;
-    for (var index = 0; index < this.events.length; index++) {
-      var element = this.events[index];
-      let checkbox = this.eventForm.get(['events', index]);
-      if (checkbox.value != false)
-        {
-          atLeastOneBoxChecked = true;
-        }
+    const atLeastOneBoxChecked = this.events.controls.reduce(function(acc, item, index){ return  event.value? true:  acc}, false);
 
-    }
     if (atLeastOneBoxChecked){
     let idString = event.source.id;
     this.service.filterEvents(idString, event.checked);

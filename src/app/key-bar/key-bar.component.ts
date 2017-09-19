@@ -17,7 +17,7 @@ export class KeyBarComponent implements OnInit {
   constructor(public service: TimelineService) { }
 
   ngOnInit() {
-    this.model = this.service.keyBarModel$;
+    this.model = this.service.keyBarModel_Reactive$;
   }
 
   onSelectChange_start(event) {

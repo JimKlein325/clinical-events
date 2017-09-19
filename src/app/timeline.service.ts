@@ -34,11 +34,19 @@ export class TimelineService {
   private datasetMinMaxDates: MinmaxDates;
   private eventCheckboxViewItems: Array<EventItemViewmodel>;
 
-  private subject = new BehaviorSubject<ClinicalEventItem[]>(this.initializeService(this.dataset));
+  private subject = new BehaviorSubject<ClinicalEventItem[]>(this.initializeService_Reactive(this.dataset));
+  clinicalEventItems$: Observable<ClinicalEventItem[]> = this.subject.asObservable();
+  
+  private subjectMonthRange: BehaviorSubject<MonthViewmodel[]>;
+  private subjectStartMonth: BehaviorSubject<string>;
+  startMonth$: Observable<string>;
+  private subjectEndMonth: BehaviorSubject<string>;
+  endMonth$: Observable<string>;
+  private subjectUncheckedEvents = new BehaviorSubject<string[]>(new Array<string>());
+  uncheckedEvents$ = this.subjectUncheckedEvents.asObservable();
 
   constructor() { }
 
-  clinicalEventItems$: Observable<ClinicalEventItem[]> = this.subject.asObservable();
 
   wrappedEvents$: Observable<ClinicalEventItemWrapper[]> = this.clinicalEventItems$
 
@@ -73,7 +81,8 @@ export class TimelineService {
         this.getKeyBarModel(
           events,
           this.selectedStartMonth,
-          this.selectedEndMonth
+          this.selectedEndMonth,
+          null
         )
       );
     });
@@ -92,15 +101,48 @@ export class TimelineService {
     this.eventCheckboxViewItems = noDupes;
     return clinicalEvents;
   }
+  monthRange$: Observable<MonthViewmodel[]> = this.clinicalEventItems$
+    .switchMap(events => {
+      let datasetMinMaxDates = this.getMinMaxDates(events);
+      return Observable.of(this.getMonthRange(datasetMinMaxDates.minDate, datasetMinMaxDates.maxDate));
+    });
+
+  keyBarModel_Reactive$: Observable<KeyBarViewmodel> = this.clinicalEventItems$
+    .withLatestFrom(this.monthRange$,
+                    this.startMonth$,
+                    this.endMonth$,
+                    (events, months, start, end) => {
+      return this.getKeyBarModel(
+        events,
+        start,
+        end,
+        months
+      );
+    });
+
+  initializeService_Reactive(clinicalEvents: Array<ClinicalEventItem>): Array<ClinicalEventItem> {
+    this.subjectStartMonth = new BehaviorSubject<string>(clinicalEvents[0].eventtime);
+    this.startMonth$ = this.subjectStartMonth.asObservable()
+    
+    this.subjectEndMonth = new BehaviorSubject<string>(clinicalEvents[clinicalEvents.length - 1].eventtime);
+    this.endMonth$ = this.subjectEndMonth.asObservable()
+    //initialize event-list state items
+    const viewItems = this.getEventListViewModelItems(clinicalEvents);
+
+    const noDupes = _.uniqBy(viewItems, 'text');
+    this.eventCheckboxViewItems = noDupes;
+    return clinicalEvents;
+  }
   getKeyBarModel(
     items: Array<ClinicalEventItem>,
     selectedStartMonth: string,
-    selectedEndMonth: string
+    selectedEndMonth: string,
+    months: MonthViewmodel[]
   ): KeyBarViewmodel {
     let minMaxMonths = this.getMinMaxDates(items);;
 
-    const viewModelClone_Start = this.datasetMonthValues.map(item => Object.assign({}, item));
-    const viewModelClone = this.datasetMonthValues.map(item => Object.assign({}, item));
+    const viewModelClone_Start = months.map(item => Object.assign({}, item));
+    const viewModelClone = months.map(item => Object.assign({}, item));
 
     const startIndex = _.findIndex(viewModelClone_Start, (item) => moment(minMaxMonths.minDate).month() === moment(item.value).month());
     const endIndex = _.findIndex(viewModelClone, (item) => moment(minMaxMonths.maxDate).month() === moment(item.value).month());
@@ -242,7 +284,7 @@ export class TimelineService {
           return acc;
         }, eventSections)
         ;
-        //console.log(eventSections);
+      //console.log(eventSections);
       return eventSections;
     }
     );
@@ -393,11 +435,11 @@ export class TimelineService {
   }
 
   updateDate_Start(startDate: string) {
-    this.selectedStartMonth = startDate;
+    this.subjectStartMonth.next(startDate);
     // If changing the start date eliminates some items from the view entirely,
     // update the list of eventsNotInTimeFrame
-    
-    this.emitNewClinicalEventsSet();
+
+    //this.emitNewClinicalEventsSet();
   }
 
   updateDate_End(endDate: string) {
