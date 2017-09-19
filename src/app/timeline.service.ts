@@ -14,6 +14,11 @@ import { KeyBarViewmodel } from "./model/key-bar-viewmodel";
 import { MinmaxDates } from "./model/minmax-dates";
 import { ClinicaleventChartViewmodel } from "./model/clinicalevent-chart-viewmodel";
 
+export interface UserCheckEvent {
+  event: string;
+  isChecked: boolean;
+}
+
 @Injectable()
 export class TimelineService {
 
@@ -36,14 +41,20 @@ export class TimelineService {
 
   private subject = new BehaviorSubject<ClinicalEventItem[]>(this.initializeService_Reactive(this.dataset));
   clinicalEventItems$: Observable<ClinicalEventItem[]> = this.subject.asObservable();
-  
+
   private subjectMonthRange: BehaviorSubject<MonthViewmodel[]>;
   private subjectStartMonth: BehaviorSubject<string>;
   startMonth$: Observable<string>;
   private subjectEndMonth: BehaviorSubject<string>;
   endMonth$: Observable<string>;
-  private subjectUncheckedEvents = new BehaviorSubject<string[]>(new Array<string>());
-  uncheckedEvents$ = this.subjectUncheckedEvents.asObservable();
+  private subjectUncheckedEvent: BehaviorSubject<UserCheckEvent> = new BehaviorSubject<UserCheckEvent>({ event: "", isChecked: true });
+  uncheckedEvent$ = this.subjectUncheckedEvent.asObservable();
+
+  uncheckedEventsList$ = this.uncheckedEvent$
+    .scan((acc, value, index) => {
+      return value.isChecked ? acc.filter((s) => s != value.event) : [...acc, value.event]
+    }
+    , new Array<string>());
 
   constructor() { }
 
@@ -104,14 +115,27 @@ export class TimelineService {
   monthRange$: Observable<MonthViewmodel[]> = this.clinicalEventItems$
     .switchMap(events => {
       let datasetMinMaxDates = this.getMinMaxDates(events);
-      return Observable.of(this.getMonthRange(datasetMinMaxDates.minDate, datasetMinMaxDates.maxDate));
-    });
+      return Observable.of(this.getMonthRange(datasetMinMaxDates.minDate, datasetMinMaxDates.maxDate))
+        ;
+    })
+    .distinctUntilChanged();
 
+  viewEvents$ = this.clinicalEventItems$
+    .combineLatest(this.uncheckedEvent$, (events, value) => { return events.filter((event) => event.clinicalevent === value.event) })
+    .combineLatest(this.uncheckedEvent$, (events, value) => { return events.filter((event) => event.clinicalevent === value.event) })
+    .withLatestFrom(
+    this.uncheckedEventsList$,
+    this.startMonth$,
+    this.endMonth$,
+    (events, uncheckedEvents, start, end) => {
+      const containsEvent = events.reduce
+    }
+    );
   keyBarModel_Reactive$: Observable<KeyBarViewmodel> = this.clinicalEventItems$
     .withLatestFrom(this.monthRange$,
-                    this.startMonth$,
-                    this.endMonth$,
-                    (events, months, start, end) => {
+    this.startMonth$,
+    this.endMonth$,
+    (events, months, start, end) => {
       return this.getKeyBarModel(
         events,
         start,
@@ -123,7 +147,7 @@ export class TimelineService {
   initializeService_Reactive(clinicalEvents: Array<ClinicalEventItem>): Array<ClinicalEventItem> {
     this.subjectStartMonth = new BehaviorSubject<string>(clinicalEvents[0].eventtime);
     this.startMonth$ = this.subjectStartMonth.asObservable()
-    
+
     this.subjectEndMonth = new BehaviorSubject<string>(clinicalEvents[clinicalEvents.length - 1].eventtime);
     this.endMonth$ = this.subjectEndMonth.asObservable()
     //initialize event-list state items
