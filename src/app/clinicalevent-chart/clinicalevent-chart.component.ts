@@ -75,7 +75,6 @@ export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
           this.createChart();
         }
         this.updateChart();
-
       })
       .subscribe();
   }

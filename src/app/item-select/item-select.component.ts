@@ -40,7 +40,7 @@ export class ItemSelectComponent implements OnInit, OnDestroy {
   constructor(private fb: FormBuilder, private service: TimelineService) { }
 
   ngOnInit() {
-    this.service.eventList$
+    this.service.eventList_Reactive$
       .takeUntil(this.ngUnsubscribe)
       .subscribe(val => {
         this.eventItemGroups = val;
@@ -63,22 +63,24 @@ export class ItemSelectComponent implements OnInit, OnDestroy {
           });
         }
         let t = Object.keys((<FormGroup>this.eventForm.root).controls);
-        console.log((<FormGroup>this.eventForm.root).controls);
-        console.log( Object.keys((<FormGroup>this.eventForm.root).controls));
-        console.log(t[0]);
-        console.log(this.eventForm.get([t[0], 0]));
+        // console.log((<FormGroup>this.eventForm.root).controls);
+        // console.log( Object.keys((<FormGroup>this.eventForm.root).controls));
+        // console.log(t[0]);
+        // console.log(this.eventForm.get([t[0], 0]));
       });
   }
 
   onCheckChange(event) {
     /* Checked.  Pass the label value stored in the 
     id property to the service filter method.*/
-    const atLeastOneBoxChecked = this.events.controls.reduce(function(acc, item, index){ return  event.value? true:  acc}, false);
 
-    if (atLeastOneBoxChecked){
-    let idString = event.source.id;
-    this.service.filterEvents(idString, event.checked);
-    }
+    this.service.filterEvents(event.source.id, event.checked);
+    // const atLeastOneBoxChecked = this.events.controls.reduce(function(acc, item, index){ return  event.value? true:  acc}, false);
+
+    // if (atLeastOneBoxChecked){
+    // let idString = event.source.id;
+    // this.service.filterEvents(idString, event.checked);
+    // }
   }
   // use of ngUnsubscribe ensures clean up of observable subscription
   //  Observables that complete() are automatically cleanup by ng: for example, http, router
