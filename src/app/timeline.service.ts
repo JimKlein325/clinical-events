@@ -128,10 +128,7 @@ export class TimelineService {
   keyBarModel$: Observable<KeyBarViewmodel> = this.viewEvents$
     .switchMap(events => {
       return Observable.of(
-        this.getKeyBarModel(
-          events,
-          null
-        )
+        this.getKeyBarModel(events, null)
       );
     });
 
@@ -183,6 +180,8 @@ export class TimelineService {
     items: Array<ClinicalEventItem>,
     months: MonthViewmodel[]
   ): KeyBarViewmodel {
+    // start month range:  first month in dataset overall timeframe to selected end month
+    // end month range: selected start month to end month in dataset overall timeframe
     let minMaxMonths = this.getMinMaxDates(items);;
 
     const viewModelClone_Start = months.map(item => Object.assign({}, item));
@@ -190,7 +189,6 @@ export class TimelineService {
 
     const startIndex = _.findIndex(viewModelClone_Start, (item) => moment(minMaxMonths.minDate).month() === moment(item.value).month());
     const endIndex = _.findIndex(viewModelClone, (item) => moment(minMaxMonths.maxDate).month() === moment(item.value).month());
-
 
     const startOptions = _.takeWhile(viewModelClone_Start, (element) => (element.id <= endIndex));
     const endOptions = _.slice(viewModelClone, startIndex, viewModelClone.length);
@@ -298,52 +296,52 @@ export class TimelineService {
     }, false);
   }
   eventList_Reactive$: Observable<Array<EventItemViewGroup>> = this.viewEvents$ // this.clinicalEventItems$
-  .withLatestFrom( this.clinicalEventItems$, this.uncheckedEventsList$, (list, allEvents, uncheckedEvents) => {
-    const eventsOutsideTimeframe = this.getEventsNotInView_Reactive(list, allEvents);
-    const eventSections: Array<EventItemViewGroup> = [
-      { title: "Diagnosis", events: new Array<EventItemViewmodel>() },
-      { title: "Treatment", events: new Array<EventItemViewmodel>() },
-      { title: "Quality of Life", events: new Array<EventItemViewmodel>() }
-    ];
-    const eventList:ClinicalEventItem[] = _.uniqBy(allEvents, 'clinicalevent' );
-    
-    eventList.map(item => {
+    .withLatestFrom(this.clinicalEventItems$, this.uncheckedEventsList$, (list, allEvents, uncheckedEvents) => {
+      const eventsOutsideTimeframe = this.getEventsNotInView_Reactive(list, allEvents);
+      const eventList: ClinicalEventItem[] = _.uniqBy(allEvents, 'clinicalevent');
 
+      eventList.map(item => {
+
+      });
+      const eventSections: Array<EventItemViewGroup> = [
+        { title: "Diagnosis", events: new Array<EventItemViewmodel>() },
+        { title: "Treatment", events: new Array<EventItemViewmodel>() },
+        { title: "Quality of Life", events: new Array<EventItemViewmodel>() }
+      ];
+      const eventViewModels = eventList
+        .reduce(function (acc, item, index) {
+          let checkboxState = !_.includes(uncheckedEvents, item.clinicalevent) && !_.includes(eventsOutsideTimeframe, item.clinicalevent);
+          let eventViewItem: EventItemViewmodel =
+            {
+              text: item.clinicalevent,
+              isActive: checkboxState,
+              eventType: item.eventtype,
+              controlIndex: index
+            };
+
+          switch (item.eventtype) {
+            case 0: {
+              //Treatments
+              acc[2].events.push(eventViewItem);
+              break;
+            }
+            case 1: {
+              //Quality of Life
+              acc[1].events.push(eventViewItem);
+              break;
+            }
+            case 2: {
+              // Diagnosis section
+              acc[0].events.push(eventViewItem);
+              break;
+            }
+            default: { break; }
+          }
+          return acc;
+        }, eventSections);
+
+      return eventSections;
     });
-    const eventViewModels = eventList
-    .reduce(function (acc, item, index) {
-      let checkboxState = !_.includes(uncheckedEvents, item.clinicalevent) && !_.includes(eventsOutsideTimeframe, item.clinicalevent);
-      let eventViewItem: EventItemViewmodel =
-        {
-          text: item.clinicalevent,
-          isActive: checkboxState,
-          eventType: item.eventtype,
-          controlIndex: index
-        };
-
-        switch (item.eventtype) {
-          case 0: {
-            //Treatments
-            acc[2].events.push(eventViewItem);
-            break;
-          }
-          case 1: {
-            //Quality of Life
-            acc[1].events.push(eventViewItem);
-            break;
-          }
-          case 2: {
-            // Diagnosis section
-            acc[0].events.push(eventViewItem);
-            break;
-          }
-          default: { break; }
-        }
-        return acc;
-    }, eventSections);
-
-    return eventSections;
-  });
 
   eventList$: Observable<Array<EventItemViewGroup>> = this.clinicalEventItems$
     .map(items => {
@@ -440,13 +438,13 @@ export class TimelineService {
     //return a difference between full list and current view
     return eventsNotInCurrentView;
   }
-  getEventsNotInView_Reactive(events: Array<ClinicalEventItem>, allEvents: Array<ClinicalEventItem>): Array<string>{
+  getEventsNotInView_Reactive(events: Array<ClinicalEventItem>, allEvents: Array<ClinicalEventItem>): Array<string> {
     const eventStringList = events.map((event) => event.clinicalevent);
     const eventStringList_NoDupes = _.uniq(eventStringList);
 
     const allEventsStringList = allEvents.map((event) => event.clinicalevent);
     const allEventsStringList_NoDupes = _.uniq(allEventsStringList);
-    let x =  _.difference( allEventsStringList_NoDupes, eventStringList_NoDupes)
+    let x = _.difference(allEventsStringList_NoDupes, eventStringList_NoDupes)
     return x;
   }
 

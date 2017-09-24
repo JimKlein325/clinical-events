@@ -9,11 +9,6 @@ import { Subject } from 'rxjs/Subject';
 import { EventItemViewmodel } from "../model/event-item-viewmodel";
 import { EventItemViewGroup } from "../model/event-item-view-group";
 
-  // function eventCountGreaterThanZero ( formGroup: FormGroup): {[key: string]: boolean} | null {
-  //   //console.log(Object.keys((<FormGroup>formGroup.root).controls)) ;
-  //   return null;
-  // }
-
 @Component({
   selector: 'item-select',
   templateUrl: './item-select.component.html',
@@ -22,20 +17,14 @@ import { EventItemViewGroup } from "../model/event-item-view-group";
 export class ItemSelectComponent implements OnInit, OnDestroy {
   public eventsItemGroup$: Observable<Array<EventItemViewGroup>>
 
-  // private form: FormGroup;
-  private fArray: FormArray = new FormArray([]);
   private ngUnsubscribe: Subject<void> = new Subject<void>();
   public eventItemGroups: Array<EventItemViewGroup>;
   events: FormArray = new FormArray([
   ]);
 
   eventForm = new FormGroup(
-    {events: this.events}//,  eventCountGreaterThanZero
-    // events: this.events, eventCountGreaterThanZero
+    {events: this.events}
   );
-  // eventSelectForm: FormGroup = new FormGroup({
-  //   events: this.events
-  // });
 
   constructor(private fb: FormBuilder, private service: TimelineService) { }
 
@@ -62,25 +51,13 @@ export class ItemSelectComponent implements OnInit, OnDestroy {
             });
           });
         }
-        let t = Object.keys((<FormGroup>this.eventForm.root).controls);
-        // console.log((<FormGroup>this.eventForm.root).controls);
-        // console.log( Object.keys((<FormGroup>this.eventForm.root).controls));
-        // console.log(t[0]);
-        // console.log(this.eventForm.get([t[0], 0]));
       });
   }
 
   onCheckChange(event) {
     /* Checked.  Pass the label value stored in the 
     id property to the service filter method.*/
-
     this.service.filterEvents(event.source.id, event.checked);
-    // const atLeastOneBoxChecked = this.events.controls.reduce(function(acc, item, index){ return  event.value? true:  acc}, false);
-
-    // if (atLeastOneBoxChecked){
-    // let idString = event.source.id;
-    // this.service.filterEvents(idString, event.checked);
-    // }
   }
   // use of ngUnsubscribe ensures clean up of observable subscription
   //  Observables that complete() are automatically cleanup by ng: for example, http, router

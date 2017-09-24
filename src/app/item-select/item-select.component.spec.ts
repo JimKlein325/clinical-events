@@ -42,7 +42,7 @@ describe('ItemSelectComponent', () => {
   });
 
   it('should be created', () => {
-    // fixture.detectChanges();
+    fixture.detectChanges();
     expect(component).toBeTruthy();
   });
   it('should display Diagnosis header', () => {
@@ -59,10 +59,6 @@ describe('ItemSelectComponent', () => {
     let firstHeader = cBoxes[0];
     el = firstHeader.nativeElement;
     expect(el.textContent).toContain('test');
-    // expect(el.textContent).toContain('test1');
-    // expect(el.textContent).toContain('test2');
-    // expect(el.textContent).toContain('test3');
-    // expect(el.textContent).toContain('test4');
     let lastHeader = cBoxes[5];
     let lastEl: HTMLElement = lastHeader.nativeElement;
     expect(lastEl.textContent).toContain('test5');
