@@ -52,7 +52,8 @@ export class TimelineService {
 
   uncheckedEventsList$ = this.uncheckedEvent$
     .scan((acc, value, index) => {
-      return value.isChecked ? acc.filter((s) => s != value.event) : [...acc, value.event]
+      const list = value.isChecked ? acc.filter((s) => s != value.event) : [...acc, value.event];
+      return list;
     }
     , new Array<string>());
 
@@ -66,19 +67,20 @@ export class TimelineService {
     });
 
   viewEvents$ = this.clinicalEventItems$
-    .combineLatest(
+    .withLatestFrom(
     this.uncheckedEvent$,
     this.startMonth$,
     this.endMonth$,
     (events, uncheckedEvent, start, end) => {
       let timeframeStart;
       let timeframeEnd;
-      if (uncheckedEvent.isChecked && this.eventInTimeFrame(uncheckedEvent.event, start, end, events)) {
+      if (uncheckedEvent.isChecked && !this.eventInTimeFrame(uncheckedEvent.event, start, end, events)) {
         // set start end dates to min max dates of event occurence
         const occurences = events.filter((event) => event.clinicalevent === uncheckedEvent.event);
         const minMaxDates = this.getMinMaxDates(occurences);
-        timeframeStart = minMaxDates.minDate;
-        timeframeEnd = minMaxDates.maxDate;
+        timeframeStart = start < minMaxDates.minDate? start : minMaxDates.minDate;
+        timeframeEnd = end > minMaxDates.maxDate? end: minMaxDates.maxDate;
+        //this.uncheckedEventsList$
       }
       else {
         //then dates stay the same
@@ -95,11 +97,11 @@ export class TimelineService {
       });
     })
     .withLatestFrom(this.uncheckedEventsList$, (events, list) => {
-      return events.filter((event) => !_.includes(list, event.clinicalevent))
+      const ve = events.filter((event) => !_.includes(list, event.clinicalevent));
+             return ve;
     })
+    // .share()
   ;
-
-
 
   chartView$: Observable<ClinicaleventChartViewmodel> =
   // this.clinicalEventItems$
@@ -122,7 +124,7 @@ export class TimelineService {
       //console.log(viewModel);      
       return Observable.of(viewModel);
     })
-    .distinctUntilChanged();
+    ;
 
   // keyBarModel$: Observable<KeyBarViewmodel> = this.clinicalEventItems$
   keyBarModel$: Observable<KeyBarViewmodel> = this.viewEvents$
@@ -155,6 +157,7 @@ export class TimelineService {
     .distinctUntilChanged();
 
   keyBarModel_Reactive$: Observable<KeyBarViewmodel> = this.viewEvents$
+  // .share()
     .withLatestFrom(this.monthRange$,
     (events, months) => {
       return this.getKeyBarModel(
@@ -525,33 +528,37 @@ export class TimelineService {
 
   // Filter events using array of unchecked events stored in this.uncheckedEvents.  This method manages the list when items are manually selected.
   filterEvents(item: string, checked: boolean) {
-    if (checked) {
-      this.subjectUncheckedEvent.next({ event: item, isChecked: checked });
-      this.uncheckedEvents = this.uncheckedEvents.filter(element => element !== item);
-      if (_.includes(this.eventsNotInTimeFrame, item)) {
-        // if the selected event occurs outside of the current date range, update
-        // start or end date so that range contains all occurrences of seleted event
-        const datasetClone = this.dataset.map(a => Object.assign({}, a));
-        const filteredList = datasetClone.filter(x => x.clinicalevent === item);
-        let localMinMaxDate = this.getMinMaxDates(filteredList);
+    this.subjectUncheckedEvent.next({ event: item, isChecked: checked });
+    this.subject.next(this.dataset);
+    // if (checked) {
+    //   this.subjectUncheckedEvent.next({ event: item, isChecked: checked });
+    //   this.uncheckedEvents = this.uncheckedEvents.filter(element => element !== item);
+    //   if (_.includes(this.eventsNotInTimeFrame, item)) {
+    //     // if the selected event occurs outside of the current date range, update
+    //     // start or end date so that range contains all occurrences of seleted event
+    //     const datasetClone = this.dataset.map(a => Object.assign({}, a));
+    //     const filteredList = datasetClone.filter(x => x.clinicalevent === item);
+    //     let localMinMaxDate = this.getMinMaxDates(filteredList);
 
-        if (localMinMaxDate.minDate < this.selectedStartMonth) {
-          this.selectedStartMonth = localMinMaxDate.minDate;
-        }
-        if (localMinMaxDate.maxDate > this.selectedEndMonth) {
-          this.selectedEndMonth = localMinMaxDate.maxDate;
-        }
-      }
-    }
-    else {
-      this.subjectUncheckedEvent.next({ event: item, isChecked: checked });
-      this.uncheckedEvents.push(item);
-    }
-    this.emitNewClinicalEventsSet();
+    //     if (localMinMaxDate.minDate < this.selectedStartMonth) {
+    //       this.selectedStartMonth = localMinMaxDate.minDate;
+    //     }
+    //     if (localMinMaxDate.maxDate > this.selectedEndMonth) {
+    //       this.selectedEndMonth = localMinMaxDate.maxDate;
+    //     }
+    //   }
+    // }
+    // else {
+    //   this.subjectUncheckedEvent.next({ event: item, isChecked: checked });
+    //   this.uncheckedEvents.push(item);
+    // }
+    // this.emitNewClinicalEventsSet();
   }
 
   updateDate_Start(startDate: string) {
     this.subjectStartMonth.next(startDate);
+    this.subject.next(this.dataset);
+    
     // If changing the start date eliminates some items from the view entirely,
     // update the list of eventsNotInTimeFrame
 
@@ -560,7 +567,7 @@ export class TimelineService {
 
   updateDate_End(endDate: string) {
     this.selectedEndMonth = endDate;
-    this.emitNewClinicalEventsSet();
+    // this.emitNewClinicalEventsSet();
   }
 
   emitNewClinicalEventsSet() {

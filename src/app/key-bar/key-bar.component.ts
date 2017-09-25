@@ -12,12 +12,12 @@ import { MaterialModule, MdSelectModule } from "@angular/material";
   styleUrls: ['./key-bar.component.css']
 })
 export class KeyBarComponent implements OnInit {
-  model: Observable<KeyBarViewmodel>;
+  model$: Observable<KeyBarViewmodel>;
 
   constructor(public service: TimelineService) { }
 
   ngOnInit() {
-    this.model = this.service.keyBarModel_Reactive$;
+    this.model$ = this.service.keyBarModel_Reactive$;
   }
 
   onSelectChange_start(event) {
