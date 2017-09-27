@@ -58,9 +58,9 @@ clinicalevent-chart {
         min-height: 100vh; 
         min-width: 100%;  
 }*/
-item-select {
+/* item-select {
         overflow: auto;
-}
+} */
 md-list > h3{
      color: black;   
 }

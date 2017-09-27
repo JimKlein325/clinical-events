@@ -7,7 +7,7 @@ import { KeyBarViewmodel } from "../model/key-bar-viewmodel";
 import { MaterialModule, MdSelectModule } from "@angular/material";
 
 @Component({
-  selector: 'app-key-bar',
+  selector: 'key-bar',
   templateUrl: './key-bar.component.html',
   styleUrls: ['./key-bar.component.css']
 })

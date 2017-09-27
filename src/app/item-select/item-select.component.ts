@@ -29,7 +29,7 @@ export class ItemSelectComponent implements OnInit, OnDestroy {
   constructor(private fb: FormBuilder, private service: TimelineService) { }
 
   ngOnInit() {
-    this.service.eventList_Reactive$
+    this.service.eventList$
       .takeUntil(this.ngUnsubscribe)
       .subscribe(val => {
         this.eventItemGroups = val;

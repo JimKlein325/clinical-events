@@ -1,5 +1,4 @@
 <div class="container" fxLayout="row" fxFlex>
-  
   <form>
     <div class="container" fxLayout="row" fxFlex  *ngIf="model$ | async; let model; else loading">
       <div fxFlexOffset="20">
@@ -10,7 +9,7 @@
         </md-select>
       </div>
       <div fxFlex></div>
-      <div fxflex fxFlexOffset="295">
+      <div fxflex fxFlexOffset="285">
         <md-select name="monthSelect_end" [ngModel]="model.selectedEndMonth.value" (change)="onSelectChange_end($event)">
           <md-option *ngFor="let month of model.endMonthOptions" [value]="month.value">
             {{month.viewValue}}
