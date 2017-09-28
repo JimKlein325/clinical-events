@@ -44,17 +44,13 @@ describe('KeyBarComponent', () => {
   });
 
   it('should be created', () => {
-    fixture = TestBed.createComponent(KeyBarComponent);
-    fixture.detectChanges();
     expect(component).toBeTruthy();
   });
-
+  
   it('should display Date Select drop down lists', () => {
     const dateSelect = fixture.debugElement.queryAll(By.css('md-select'));
-    // console.log((fixture.debugElement).nativeElement);
     let firstDropDownList = dateSelect[0];
     let secondDropDownList = dateSelect[1];
-    console.log(firstDropDownList.nativeElement);
     let el = firstDropDownList.nativeElement;
     let el_secondDDL = secondDropDownList.nativeElement;
     expect(el).toBeDefined();

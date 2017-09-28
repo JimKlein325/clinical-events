@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject, BehaviorSubject } from "rxjs/Rx";
 import * as _ from "lodash";
 import * as moment from 'moment';
-
 import { ClinicalEventItem } from "./clinicalevent-chart/models/clinical-event-item";
 import { ClinicalEventReport } from "./clinicalevent-chart/models/clinical-event-report";
 import { ClinicalEventItemWrapper } from "./clinicalevent-chart/models/clinical-event-item-wrapper";
@@ -18,6 +17,11 @@ export interface UserCheckEvent {
   event: string;
   isChecked: boolean;
 }
+const enum LatestEvent {
+  Initial,
+  Check,
+  DateSelect
+}
 
 @Injectable()
 export class TimelineService {
@@ -25,15 +29,11 @@ export class TimelineService {
   public clinicalEventReport: ClinicalEventReport;
 
   private dataset = TestData.dataset;
-  // private datasetMonthValues: Array<MonthViewmodel>;
-  // private startSelectValues: Array<Date>;
-  // private endSelectValues: Array<Date>;
-  // private datasetMinMaxDates: MinmaxDates;
-  // private eventCheckboxViewItems: Array<EventItemViewmodel>;
 
-  private subject = new BehaviorSubject<ClinicalEventItem[]>(this.initializeService_Reactive(this.dataset));
+  private subject = new BehaviorSubject<ClinicalEventItem[]>(this.initializeService(this.dataset));
   clinicalEventItems$: Observable<ClinicalEventItem[]> = this.subject.asObservable();
 
+  private lastEvent: LatestEvent = LatestEvent.Initial;
   private subjectMonthRange: BehaviorSubject<MonthViewmodel[]>;
   private subjectStartMonth: BehaviorSubject<string>;
   startMonth$: Observable<string>;
@@ -43,7 +43,7 @@ export class TimelineService {
   uncheckedEvent$ = this.subjectUncheckedEvent.asObservable();
 
   uncheckedEventsList$ = this.uncheckedEvent$
-    .scan((acc, value, index) => {
+    .scan((acc, value) => {
       const list = value.isChecked ? acc.filter((s) => s != value.event) : [...acc, value.event];
       return list;
     }
@@ -52,47 +52,43 @@ export class TimelineService {
   constructor() { }
 
   viewEvents$ = this.clinicalEventItems$
-    .withLatestFrom(
+    .combineLatest(
     this.uncheckedEvent$,
+    this.uncheckedEventsList$,
     this.startMonth$,
     this.endMonth$,
-    (events, uncheckedEvent, start, end) => {
+    (events, uncheckedEvent, list, start, end) => {
       let timeframeStart;
       let timeframeEnd;
-      let isInsideTimeFrame = this.eventInTimeFrame(uncheckedEvent.event, start, end, events);
-      if (uncheckedEvent.isChecked && !isInsideTimeFrame) {
-        // set start end dates to min max dates of event occurence
+      const isInsideTimeFrame = this.eventInTimeFrame(uncheckedEvent.event, start, end, events);
+      if (this.lastEvent == LatestEvent.Check && 
+        uncheckedEvent.isChecked && 
+        !isInsideTimeFrame) {
         const occurences = events.filter((event) => event.clinicalevent === uncheckedEvent.event);
         const minMaxDates = this.getMinMaxDates(occurences);
         timeframeStart = start < minMaxDates.minDate ? start : minMaxDates.minDate;
         timeframeEnd = end > minMaxDates.maxDate ? end : minMaxDates.maxDate;
       }
       else {
-        //then dates stay the same
         timeframeStart = start;
         timeframeEnd = end;
       }
-      // filter results
       let minDate = new Date(timeframeStart);
       let maxDate = new Date(timeframeEnd);
-
-      return events.filter((event) => {
+      let events_filteredByDate = events.filter((event) => {
         let date = new Date(event.eventtime);
         return (date >= minDate && date <= maxDate);
       });
+
+      let events_filteredByDateAndEventSelection = 
+        events_filteredByDate.filter((event) => !_.includes(list, event.clinicalevent));
+      return events_filteredByDateAndEventSelection;
     })
-    .withLatestFrom(this.uncheckedEventsList$, (events, list) => {
-      const ve = events.filter((event) => !_.includes(list, event.clinicalevent));
-      return ve;
-    })
-  // .share()
   ;
 
   chartView$: Observable<ClinicaleventChartViewmodel> =
-  // this.clinicalEventItems$
   this.viewEvents$
     .switchMap(events => {
-
       let minMaxMonths = this.getMinMaxDates(events);
       let monthRangeLength = this.getMonthRange(
         minMaxMonths.minDate,
@@ -106,18 +102,9 @@ export class TimelineService {
         minDate: new Date(minMaxMonths.minDate),
         maxDate: new Date(minMaxMonths.maxDate)
       }
-      //console.log(viewModel);      
       return Observable.of(viewModel);
     })
   ;
-
-  // keyBarModel$: Observable<KeyBarViewmodel> = this.clinicalEventItems$
-  keyBarModel$: Observable<KeyBarViewmodel> = this.viewEvents$
-    .switchMap(events => {
-      return Observable.of(
-        this.getKeyBarModel(events, null)
-      );
-    });
 
   monthRange$: Observable<MonthViewmodel[]> = this.clinicalEventItems$
     .switchMap(events => {
@@ -127,7 +114,7 @@ export class TimelineService {
     })
     .distinctUntilChanged();
 
-  keyBarModel_Reactive$: Observable<KeyBarViewmodel> = this.viewEvents$
+  keyBarViewModel$: Observable<KeyBarViewmodel> = this.viewEvents$
     .withLatestFrom(this.monthRange$,
     (events, months) => {
       return this.getKeyBarModel(
@@ -136,7 +123,7 @@ export class TimelineService {
       );
     });
 
-  initializeService_Reactive(clinicalEvents: Array<ClinicalEventItem>): Array<ClinicalEventItem> {
+  initializeService(clinicalEvents: Array<ClinicalEventItem>): Array<ClinicalEventItem> {
     this.subjectStartMonth = new BehaviorSubject<string>(clinicalEvents[0].eventtime);
     this.startMonth$ = this.subjectStartMonth.asObservable();
     this.subjectEndMonth = new BehaviorSubject<string>(clinicalEvents[clinicalEvents.length - 1].eventtime);
@@ -173,29 +160,9 @@ export class TimelineService {
 
     const viewModel: KeyBarViewmodel = {
       selectedStartMonth: startOptions[selectedStartMonthIndex],
-      startMonthOptions: startOptions,//startOptions,
+      startMonthOptions: startOptions,
       selectedEndMonth: endOptions[selectedEndMonthIndex],
       endMonthOptions: endOptions
-    }
-    return viewModel;
-  }
-  getChartViewModel(
-    items: Array<ClinicalEventItem>,
-    selectedStartMonth: string,
-    selectedEndMonth: string
-  ): ClinicaleventChartViewmodel {
-    let minMaxMonths = this.getMinMaxDates(items);
-    let monthRangeLength = this.getMonthRange(
-      minMaxMonths.minDate,
-      minMaxMonths.maxDate
-    ).length;
-
-    const viewModel: ClinicaleventChartViewmodel = {
-      eventItems: this.prepareData(items),
-      report: this.clinicalEventReport,
-      monthsInCurrentTimeframe: monthRangeLength,
-      minDate: new Date(minMaxMonths.minDate),
-      maxDate: new Date(minMaxMonths.maxDate)
     }
     return viewModel;
   }
@@ -221,7 +188,7 @@ export class TimelineService {
       return acc;
     }, false);
   }
-  eventList$: Observable<Array<EventItemViewGroup>> = this.viewEvents$ // this.clinicalEventItems$
+  eventList$: Observable<Array<EventItemViewGroup>> = this.viewEvents$ 
     .withLatestFrom(this.clinicalEventItems$, this.uncheckedEventsList$, (list, allEvents, uncheckedEvents) => {
       const eventsOutsideTimeframe = this.getEventsNotInView(list, allEvents);
       const eventList: ClinicalEventItem[] = _.uniqBy(allEvents, 'clinicalevent');
@@ -304,6 +271,7 @@ export class TimelineService {
     let x = _.difference(allEventsStringList_NoDupes, eventStringList_NoDupes)
     return x;
   }
+
   // clinicalevent-chart helper fns
   // generate the height above or below the unmarked axis based on item's index position
   genYValue(
@@ -376,22 +344,6 @@ export class TimelineService {
     return fullList;
   }
 
-  // Filter events using array of unchecked events stored in this.uncheckedEvents.  This method manages the list when items are manually selected.
-  filterEvents(item: string, checked: boolean) {
-    this.subjectUncheckedEvent.next({ event: item, isChecked: checked });
-    this.subject.next(this.dataset);
-  }
-
-  updateDate_Start(startDate: string) {
-    this.subjectStartMonth.next(startDate);
-    this.subject.next(this.dataset);
-  }
-
-  updateDate_End(endDate: string) {
-    this.subjectEndMonth.next(endDate);
-    this.subject.next(this.dataset);
-  }
-
   // key Bar helper functions
   getMonthRange(minDate: string, maxDate: string): Array<MonthViewmodel> {
     let min = moment(minDate).month();
@@ -428,5 +380,23 @@ export class TimelineService {
       max
     );
   }
+
+  // Event Handlers
+  // This method manages the list when items are manually selected.
+  filterEvents(item: string, checked: boolean) {
+    this.lastEvent = LatestEvent.Check;
+    this.subjectUncheckedEvent.next({ event: item, isChecked: checked });
+  }
+
+  updateDate_Start(startDate: string) {
+    this.lastEvent = LatestEvent.DateSelect;
+    this.subjectStartMonth.next(startDate);
+  }
+
+  updateDate_End(endDate: string) {
+    this.lastEvent = LatestEvent.DateSelect;
+    this.subjectEndMonth.next(endDate);
+  }
+
 }
 

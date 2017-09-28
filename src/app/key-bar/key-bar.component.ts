@@ -17,7 +17,7 @@ export class KeyBarComponent implements OnInit {
   constructor(public service: TimelineService) { }
 
   ngOnInit() {
-    this.model$ = this.service.keyBarModel_Reactive$;
+    this.model$ = this.service.keyBarViewModel$;
   }
 
   onSelectChange_start(event) {
@@ -25,6 +25,6 @@ export class KeyBarComponent implements OnInit {
   }
 
   onSelectChange_end(event) {
-    this.service.updateDate_End( event.value);
+    this.service.updateDate_End(event.value);
   }
 }

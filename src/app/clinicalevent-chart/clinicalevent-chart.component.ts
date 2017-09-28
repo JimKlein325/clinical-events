@@ -79,11 +79,8 @@ export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
   }
 
   createChart() {
-    // this.chart = true;
     let element = this.chartContainer.nativeElement;
     this.width = element.offsetWidth - this.margin.left - this.margin.right;
-    console.log("width: " + this.width);
-    console.log("height: " + element.offsetHeight);
 
     this.height = element.offsetHeight - this.margin.top - this.margin.bottom;
     this.problemName = this.clinicalEventReport.problemName;
@@ -119,9 +116,10 @@ export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
     let xAxisGen = d3.axisBottom(this.xScale).tickFormat((d) => "").tickSize(0);
 
     // x & y axis
+    let fudgeLeft = this.margin.left + 6;
     this.xAxis = svg.append('g')
       .attr('class', 'axis axis-yZero')
-      .attr('transform', `translate(${this.margin.left}, ${this.yScale(0)})`)//place an axis at y=0
+      .attr('transform', `translate(${fudgeLeft}, ${this.yScale(0)})`)//place an axis at y=0
       .call(xAxisGen)//style the axis
       ;
     this.xBottomAxis = svg.append('g')
