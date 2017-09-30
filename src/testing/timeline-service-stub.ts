@@ -149,7 +149,7 @@ export class TimelineServiceStub {
     return this.viewModel;
   }
   subjectKeyBar = new BehaviorSubject<KeyBarViewmodel>(this.getModel());
-  keyBarModel$ = this.subjectKeyBar.asObservable(); //Observable.of(subject);
+  keyBarViewModel$ = this.subjectKeyBar.asObservable(); //Observable.of(subject);
 
   filterEvents(item: string, checked: boolean) { }
   updateDate_Start(startDate: string) {  }

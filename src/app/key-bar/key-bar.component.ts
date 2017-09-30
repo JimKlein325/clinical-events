@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Observable, Subject, BehaviorSubject } from "rxjs/Rx";
-
 import { TimelineService } from "../timeline.service";
 import { KeyBarViewmodel } from "../model/key-bar-viewmodel";
 import { MaterialModule, MdSelectModule } from "@angular/material";
