@@ -81,6 +81,33 @@ export class TimelineService {
         this.action$.next(action);
       }
     });
+  newStart$ = this.subjectStartMonth
+    .withLatestFrom(
+      this.testSubject,
+      this.uncheckedEventsList$,
+      this.endMonth$,
+      (start, events, list, end) => {
+        return { type: 'SELECT_START', payload: { start: start, events: events, list: list, end: end } };
+      })
+    .subscribe(action => {
+      if (action.payload.start != "") {
+        this.action$.next(action);
+      }
+    });
+
+  newEnd$ = this.subjectEndMonth
+    .withLatestFrom(
+      this.testSubject,
+      this.uncheckedEventsList$,
+      this.startMonth$,
+      (end, events, list, start) => {
+        return { type: 'SELECT_END', payload: { start: start, events: events, list: list, end: end } };
+      })
+    .subscribe(action => {
+      if (action.payload.end != "") {
+        this.action$.next(action);
+      }
+    });
 
   state$ = this.action$.scan((state, action) => {
     switch (action.type) {
@@ -91,20 +118,18 @@ export class TimelineService {
         return ({ data: this.dataset });
       case 'CHECK_EVENT': {
         const payload = action.payload;
-        const viewData = this.buildViewEvents(
-          payload.event,
-          payload.events,
-          payload.list,
-          payload.start,
-          payload.end);
+        const viewData = this.buildViewEvents(payload.event, payload.events, payload.list, payload.start, payload.end);
         return ({ data: viewData });
-
-        //  return ({data: this.dataset, viewData: this.dataset});
       }
-      // case 'SELECT_START':
-      //   return state;;
-      // case 'SELECT_END':
-      //   return state;;
+      case 'SELECT_START': {
+        const payload = action.payload;
+        const newView = this.filterViewItems(payload.events, payload.start, payload.end, payload.list);
+        return { data: newView };
+      }
+      case 'SELECT_END':
+        const {events, start, end, list} = action.payload;
+        const newView = this.filterViewItems(events, start, end, list);
+        return { data: newView };
       default:
         return state;
     }
@@ -128,9 +153,9 @@ export class TimelineService {
       timeframeStart = start;
       timeframeEnd = end;
     }
-    let minDate = new Date(timeframeStart);
-    let maxDate = new Date(timeframeEnd);
-    return this.filterViewItems(events, minDate, maxDate, list);
+    // let minDate = new Date(timeframeStart);
+    // let maxDate = new Date(timeframeEnd);
+    return this.filterViewItems(events, timeframeStart, timeframeEnd, list);
     // const events_filteredByDate = events.filter((event) => {
     //   let date = new Date(event.eventtime);
     //   return (date >= minDate && date <= maxDate);
@@ -141,7 +166,10 @@ export class TimelineService {
 
     // return events_filteredByDateAndEventSelection;
   }
-  filterViewItems(events, minDate, maxDate, list): Array<ClinicalEventItem> {
+  filterViewItems(events, timeframeStart, timeframeEnd, list): Array<ClinicalEventItem> {
+    let minDate = new Date(timeframeStart);
+    let maxDate = new Date(timeframeEnd);
+
     const events_filteredByDate = events.filter((event) => {
       let date = new Date(event.eventtime);
       return (date >= minDate && date <= maxDate);
