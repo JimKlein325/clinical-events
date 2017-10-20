@@ -26,5 +26,11 @@ describe('TimelineService', () => {
       let prepareData = service.prepareData(TestData.dataset);
       expect(prepareData[prepareData.length -1].yValue).toBeLessThan(0);
     }));
+    it('***Isolated Test**** should place Quality of Life information BELOW X axis',  () => {
+      //example of isolated test style for testing pure methods
+      const service = new TimelineService();
+      let prepareData = service.prepareData(TestData.dataset);
+      expect(prepareData[prepareData.length -1].yValue).toBeLessThan(0);
+    });
   })
 });

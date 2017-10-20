@@ -28,7 +28,7 @@ describe('ClinicaleventChartComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create component', () => {
     expect(component).toBeTruthy();
   });
   it('should create chart', () => {

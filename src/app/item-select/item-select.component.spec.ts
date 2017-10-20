@@ -36,7 +36,7 @@ describe('ItemSelectComponent', () => {
 
   beforeEach(() => {
     
-    fixture = TestBed.createComponent(ItemSelectComponent);
+    fixture = TestBed.createComponent(ItemSelectComponent);  4//
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

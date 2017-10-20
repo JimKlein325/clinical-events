@@ -21,12 +21,8 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 @NgModule({
   declarations: [
     AppComponent,
-    // ClinicalEventsComponent,
-    // SimpleBarchartComponent,
     ClinicaleventChartComponent,
-    // EventsInputComponent,
     ItemSelectComponent,
-    // EventListComponent,
     KeyBarComponent
   ],
   imports: [
