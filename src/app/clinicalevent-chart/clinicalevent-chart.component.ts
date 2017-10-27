@@ -65,15 +65,16 @@ export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
     this.tlService.chartView$
       .takeUntil(this.ngUnsubscribe)
       .do(vm => {
+        if(vm.eventItems.length > 0){
         this.wrappedItems = vm.eventItems;
         this.clinicalEventReport = vm.report;
         this.dateTicks = vm.monthsInCurrentTimeframe;
         this.minDate = vm.minDate;
         this.maxDate = vm.maxDate;
-
         if(!this.chart) this.createChart();
         
         this.updateChart();
+      }
       })
       .subscribe();
   }
@@ -83,7 +84,7 @@ export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
     this.width = element.offsetWidth - this.margin.left - this.margin.right;
 
     this.height = element.offsetHeight - this.margin.top - this.margin.bottom;
-    this.problemName = this.clinicalEventReport.problemName;
+    this.problemName = this.clinicalEventReport ? this.clinicalEventReport.problemName : "";
 
     let svg = d3.select(element).append("svg")
       .attr('width', this.width)
@@ -165,14 +166,14 @@ export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
     updateText
       .transition()
       .duration(750)
-      .attr("x", (d, i) => this.xScale(d.itemDate) + 4)
+      .attr("x", (d, i) => this.xScale(d.itemDate) + 8)
       .attr("y", (d, i) => this.height + 4 - this.yScale(d.yValue))
       ;
 
     updateCircles
       .transition()
       .duration(750)
-      .attr("cx", (d, i) => this.xScale(d.itemDate))
+      .attr("cx", (d, i) => this.xScale(d.itemDate) +1 )
       .attr("cy", (d, i) => this.height - this.yScale(d.yValue))
 
     updateRect
@@ -222,7 +223,7 @@ export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
     let enterCircles = updateCircles
       .enter()
       .append("circle")
-      .attr("cx", (d, i) => this.xScale(d.itemDate))
+      .attr("cx", (d, i) => this.xScale(d.itemDate) + 1)
       .attr("cy", (d, i) => this.height - this.yScale(d.yValue))
       .attr("r", 3)
       .attr("fill", this.dotColor);

@@ -28,7 +28,7 @@ describe('TimelineService', () => {
     }));
     it('***Isolated Test**** should place Quality of Life information BELOW X axis',  () => {
       //example of isolated test style for testing pure methods
-      const service = new TimelineService();
+      const service = new TimelineService(null);
       let prepareData = service.prepareData(TestData.dataset);
       expect(prepareData[prepareData.length -1].yValue).toBeLessThan(0);
     });
