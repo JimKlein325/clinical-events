@@ -1,6 +1,6 @@
 export class MinmaxDates {
     constructor(
-    public minDate: string,
-    public maxDate: string
+    public minDate: Date,
+    public maxDate: Date
     ){}
 }

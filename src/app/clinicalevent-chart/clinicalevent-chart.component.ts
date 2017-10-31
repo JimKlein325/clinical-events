@@ -14,19 +14,18 @@ import 'rxjs/add/operator/scan';
 import 'rxjs/add/operator/takeUntil';
 import { Subject } from 'rxjs/Subject';
 
-import { ClinicalEventReport } from './models/clinical-event-report'
-import { ClinicalEventItem } from './models/clinical-event-item'
-import { ClinicalEventItemWrapper } from './models/clinical-event-item-wrapper'
+import { ClinicalEventItem } from './models/clinical-event-item';
+import { ClinicalEventItemWrapper } from './models/clinical-event-item-wrapper';
 import { ClinicaleventChartViewmodel } from "../model/clinicalevent-chart-viewmodel";
+import { ClinicalEventReport } from './models/clinical-event-report';
 import { TimelineService } from "../timeline.service";
-
 
 @Component({
   selector: 'clinicalevent-chart',
   templateUrl: './clinicalevent-chart.component.html',
   styleUrls: ['./clinicalevent-chart.component.css']
-
 })
+
 @Injectable()
 export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
 
@@ -65,7 +64,7 @@ export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
     this.tlService.chartView$
       .takeUntil(this.ngUnsubscribe)
       .do(vm => {
-        if(vm.eventItems.length > 0){
+        if(vm){
         this.wrappedItems = vm.eventItems;
         this.clinicalEventReport = vm.report;
         this.dateTicks = vm.monthsInCurrentTimeframe;
