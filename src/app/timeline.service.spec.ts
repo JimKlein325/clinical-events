@@ -39,51 +39,78 @@ describe('TimelineService', () => {
     }));
     it('should place Quality of Life information BELOW X axis', inject([TimelineService], (service: TimelineService) => {
       let prepareData = service.prepareData(TestData.dataset);
-      expect(prepareData[prepareData.length -1].yValue).toBeLessThan(0);
+      expect(prepareData[prepareData.length - 1].yValue).toBeLessThan(0);
     }));
-    it('***Isolated Test**** should place Quality of Life information BELOW X axis',  () => {
+    it('***Isolated Test**** should place Quality of Life information BELOW X axis', () => {
       //example of isolated test style for testing pure methods
       const service = new TimelineService(null);
       let prepareData = service.prepareData(TestData.dataset);
-      expect(prepareData[prepareData.length -1].yValue).toBeLessThan(0);
+      expect(prepareData[prepareData.length - 1].yValue).toBeLessThan(0);
     });
   })
 
   /*
   Test loading of events by testing state after calling loadEvents().
   */
-//   describe('loadEvents()', () => {
+  //   describe('loadEvents()', () => {
 
-//     it('should load events and store them in state object',
-//     fakeAsync(() => {
-//       backend.connections.subscribe((connection) => { connection.mockRespond( new Response( new ResponseOptions({ body:  JSON.stringify(TestData.dataset)
-//       })));
-//     }); 
-//     service.loadEvents();
-//     tick();
+  //     it('should load events and store them in state object',
+  //     fakeAsync(() => {
+  //       backend.connections.subscribe((connection) => { connection.mockRespond( new Response( new ResponseOptions({ body:  JSON.stringify(TestData.dataset)
+  //       })));
+  //     }); 
+  //     service.loadEvents();
+  //     tick();
 
-//     service.state$.subscribe((result)=> {
-//       console.log('result: ', result);
-//       debugger;
-//       expect(result.data.length).toBe(35);
-//       });
+  //     service.state$.subscribe((result)=> {
+  //       console.log('result: ', result);
+  //       debugger;
+  //       expect(result.data.length).toBe(35);
+  //       });
 
-//   }));
-// });
-    describe('loadEvents()', () => {
-      it('should load events and store them in state object',
+  //   }));
+  // });
+  describe('loadEvents()', () => {
+    it('should load events and store them in state object',
       inject([TimelineService, XHRBackend], (service, mockBackend) => {
-        mockBackend.connections.subscribe((connection) => { connection.mockRespond( new Response( new ResponseOptions({ body:  JSON.stringify(TestData.dataset)
-        })));
-      }); 
-      service.loadEvents();
-  
-      service.state$.subscribe((result)=> {
-        console.log('result: ', result);
-        debugger;
-        expect(result.data.length).toBe(35);
+
+        mockBackend.connections.subscribe((connection) => {
+          connection.mockRespond(new Response(new ResponseOptions({
+            body: JSON.stringify(TestData.dataset)
+          })));
         });
-  
-    }));
+        
+        service.loadEvents();
+        // check property on ChartView subject
+        service.chartView$.subscribe((result) => {
+          expect(result.eventItems.length).toBe(35);
+        });
+        
+        // service.state$.subscribe((result) => {
+        //   expect(result.data.length).toBe(35);
+        // });
+      }));
+  //   it('should filter events when user selects new start date',
+  //     inject([TimelineService, XHRBackend], (service, mockBackend) => {
+
+  //       mockBackend.connections.subscribe((connection) => {
+  //         connection.mockRespond(new Response(new ResponseOptions({
+  //           body: JSON.stringify(TestData.dataset)
+  //         })));
+  //       });
+        
+  //       service.loadEvents();
+
+  //       // service.state$.subscribe((result) => {
+  //       //   // console.log('result: ', result);
+  //       //   debugger;
+  //       //   expect(result.data.length).toBe(33);
+  //       // });
+  //       // service.updateDate_Start("2010-03-01");
+
+  //       service.state$.subscribe((result) => {
+  //         expect(result.data.length).toBe(35);
+  //       });
+  //     }));
   });
 });
