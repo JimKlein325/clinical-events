@@ -4,6 +4,8 @@ import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 import { BehaviorSubject } from "rxjs/BehaviorSubject";
 import "rxjs/add/operator/map";
+import "rxjs/add/operator/withLatestFrom";
+import "rxjs/add/operator/shareReplay";
 import "rxjs/add/operator/catch";
 import "rxjs/add/observable/throw";
 import * as _ from "lodash";
@@ -66,7 +68,6 @@ export class TimelineService {
   ;
 
   newCheck$ = this.uncheckedEventsList$
-    // .do(() => (console.log('event check')))
     .withLatestFrom(
       this.subjectUncheckedEvent,
     ( list, uncheckedEvent) => {
@@ -109,7 +110,7 @@ export class TimelineService {
 
   ///////////////
   // State
-  state$ = this.action$.scan((state, action, ) => {
+  state$ = this.action$.scan((state, action ) => {
     const events = this.testSubject.value;
     // const events = Object.assign({},  this.testSubject.value);
 
@@ -120,7 +121,7 @@ export class TimelineService {
       case 'LOAD_DATA': {
         const initialDates = this.getMinMaxDates(action.payload);
         this.testSubject.next(action.payload);
-        return ({ data: action.payload, start: initialDates.minDate, end: initialDates.maxDate });
+        // return ({ data: action.payload, start: initialDates.minDate, end: initialDates.maxDate });
       }
       case 'CHECK_EVENT': {
         const viewData = this.buildViewEvents(action.payload.event, events, action.payload.list, state.start, state.end);
@@ -140,6 +141,7 @@ export class TimelineService {
         return state;
     }
   }, {data: new Array<ClinicalEventItem>(), start: this.subjectStartMonth.value, end: this.subjectEndMonth.value })
+  .shareReplay()
   ;
 
   /////////////

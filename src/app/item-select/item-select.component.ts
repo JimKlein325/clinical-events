@@ -36,7 +36,7 @@ export class ItemSelectComponent implements OnInit, OnDestroy {
       this.eventItemGroups = val;
       if (this.events.length < 1) {
         this.eventItemGroups.forEach((item, index) => {
-          item.events .forEach((event, index) => {
+          item.events.forEach((event, index) => {
             // set initial value to clinicalevent name stored in text property
             this.events.push(new FormControl(event.isActive));
           });

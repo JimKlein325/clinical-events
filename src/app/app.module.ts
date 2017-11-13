@@ -6,8 +6,8 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { Observable } from 'rxjs/Observable';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
+import { AppComponent } from "./app.component";
 
-import { AppComponent } from './app.component';
 import { ClinicaleventChartComponent } from './clinicalevent-chart/clinicalevent-chart.component';
 import { ItemSelectComponent } from './item-select/item-select.component';
 import { KeyBarComponent } from './key-bar/key-bar.component';

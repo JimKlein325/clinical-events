@@ -70,6 +70,7 @@ export class ClinicaleventChartComponent implements AfterViewInit, OnDestroy {
         this.dateTicks = vm.monthsInCurrentTimeframe;
         this.minDate = vm.minDate;
         this.maxDate = vm.maxDate;
+        
         if(!this.chart) this.createChart();
         
         this.updateChart();
