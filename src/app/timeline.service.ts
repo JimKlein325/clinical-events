@@ -224,8 +224,6 @@ export class TimelineService {
     .withLatestFrom(this.testSubject,
     this.uncheckedEventsList$,
     (state, allEvents, uncheckedEvents) => {
-      // console.log('eventList: first event: ', state.data.length);
-      //console.log('eventList: uncheckedEvents: ' , [...uncheckedEvents]);
 
       const eventsOutsideTimeframe = this.getEventsNotInView(state.data, allEvents);
       const eventList: ClinicalEventItem[] = _.uniqBy(allEvents, 'clinicalevent');
@@ -313,9 +311,6 @@ export class TimelineService {
     return viewModel;
   }
   eventInTimeFrame(event: string, start: Date, end: Date, events: ClinicalEventItem[]): boolean {
-    // const dates = this.getMinMaxDates
-    // const startDate = new Date(start);
-    // const endDate = new Date(end);
 
     return events.reduce((acc, item, index) => {
       const itemDate = new Date(item.eventtime);
@@ -473,23 +468,6 @@ export class TimelineService {
       minDate,
       maxDate
     );
-    // let minD: Date = _.min(dates.map(date => date.getTime()));
-    //   let event_minDate = clinicalEvents
-    //     .map(event => ({originalEvent: event, date: new Date(event.eventtime)}))
-    //     .reduce((acc, e) => {
-    //       return e.date < acc.date ? e : acc;
-    //     });
-    //   let event_maxDate = clinicalEvents
-    //     .map(event => ({originalEvent: event, date: new Date(event.eventtime)}))
-    //     .reduce((acc, e) => {
-    //       return e.date >= acc.date ? e : acc;
-    //     });
-    //     //let testDate = new Date(test.originalDate);
-    // // let maxD = _.max(dates.map(date => date.getTime()));
-    // let min = event_minDate.originalEvent.eventtime;
-    // let max = event_maxDate.originalEvent.eventtime;
-
-    //emit min and max dates for current data set 
   }
 
   ///////////////
@@ -543,11 +521,4 @@ export class TimelineService {
     }
     return Observable.throw(errorMessage);
   }
-  // private extractData (response: Response) {
-  //   let body = response.json();
-  //   return body.data || {};
-  // }
-  // private handleError (response: Response): Observable<any> {}
-
-
 }
