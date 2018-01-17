@@ -10,7 +10,7 @@ export class AppComponent implements OnInit {
   constructor(private service: TimelineService){}
 
   ngOnInit(): void {
-    this.service.loadEvents();
+    //this.service.loadEvents();
   }
   title = 'Clinical Events';
 

@@ -26,7 +26,7 @@
     }      
   ]
 	//replacing configurations with updated version to support debugging unit tests from:
-	https://github.com/weinand/vscode-recipes/tree/master/Angular-CLI
+	//https://github.com/weinand/vscode-recipes/tree/master/Angular-CLI
 	// "configurations": [
 	// 	{
 	// 		"name": "Launch localhost with sourcemaps",

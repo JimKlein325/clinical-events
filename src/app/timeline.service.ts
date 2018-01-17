@@ -48,20 +48,32 @@ export class TimelineService {
   private subjectUncheckedEvent: BehaviorSubject<UserCheckEvent> = new BehaviorSubject<UserCheckEvent>({ event: "", isChecked: false });
 
   // User Data Stream
-  private testSubject = new BehaviorSubject(new Array<ClinicalEventItem>());
+  private eventDataStream = new BehaviorSubject(new Array<ClinicalEventItem>());
 
   ////////////////
   // User Action combining inputs and data
   action$ = new BehaviorSubject({ type: 'INITIAL_STATE', payload: null });
 
-
   //////////////////
   // User Input Streams
+  eventData$ = this.http.get('/assets/data.js')
+  .map(response => {
+    return response.json();
+  })
+  .map(data => {
+    return ({ type: 'LOAD_DATA', payload: data })
+  })
+  .catch(this.handleError)
+  .subscribe(action => {
+    if (action.payload) {
+      this.action$.next(action);
+    }
+  })
+  ;
+
   uncheckedEventsList$ = this.subjectUncheckedEvent
-    //.do(() => (console.log('event uncheckedList', list)))
     .scan((acc, value) => {
       const list = value.isChecked ? acc.filter(s => s != value.event) : [...acc, value.event];
-      // console.log('event uncheckedList', list);
       return list;
     }
     , new Array<string>())
@@ -81,7 +93,6 @@ export class TimelineService {
   ;
 
   newStart$ = this.subjectStartMonth
-    // .do(() => (console.log('event start')))
     .withLatestFrom(
     this.uncheckedEventsList$,
     (start, list) => {
@@ -111,8 +122,7 @@ export class TimelineService {
   ///////////////
   // State
   state$ = this.action$.scan((state, action ) => {
-    const events = this.testSubject.value;
-    // const events = Object.assign({},  this.testSubject.value);
+    const events = this.eventDataStream.value;
 
     switch (action.type) {
       // case 'INITIAL_STATE': {
@@ -120,8 +130,8 @@ export class TimelineService {
       // }
       case 'LOAD_DATA': {
         const initialDates = this.getMinMaxDates(action.payload);
-        this.testSubject.next(action.payload);
-        // return ({ data: action.payload, start: initialDates.minDate, end: initialDates.maxDate });
+        this.eventDataStream.next(action.payload);
+        return ({ data: action.payload, start: initialDates.minDate, end: initialDates.maxDate });
       }
       case 'CHECK_EVENT': {
         const viewData = this.buildViewEvents(action.payload.event, events, action.payload.list, state.start, state.end);
@@ -179,15 +189,13 @@ export class TimelineService {
   ///////////////////
   // Selectors:  computed properties on eventsSubject
 
-  initialMonths$ = this.testSubject
-    // .do(() => console.log('initial Months'))
+  initialMonths$ = this.eventDataStream
     .map(events => {
       const dates = this.getMinMaxDates(events);
       return ({ minDate: dates.minDate, maxDate: dates.maxDate })
     });
 
-  monthRange$: Observable<MonthViewmodel[]> = this.testSubject
-    // .do(() => console.log('initial Months'))
+  monthRange$: Observable<MonthViewmodel[]> = this.eventDataStream
     .switchMap(events => {
       let datasetMinMaxDates = this.getMinMaxDates(events);
       return Observable.of(this.getMonthRange(datasetMinMaxDates.minDate, datasetMinMaxDates.maxDate))
@@ -221,7 +229,7 @@ export class TimelineService {
   ;
 
   eventList$: Observable<Array<EventItemViewGroup>> = this.state$
-    .withLatestFrom(this.testSubject,
+    .withLatestFrom(this.eventDataStream,
     this.uncheckedEventsList$,
     (state, allEvents, uncheckedEvents) => {
 
